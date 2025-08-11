@@ -1,0 +1,672 @@
+export class CronParser {
+  constructor() {
+    this.container = null;
+    this.cronInput = null;
+    this.errorDisplay = null;
+  }
+  
+  init(containerId) {
+    this.container = document.getElementById(containerId);
+    if (!this.container) return;
+    
+    this.render();
+    this.attachEventListeners();
+    this.loadExample();
+  }
+  
+  render() {
+    this.container.innerHTML = `
+      <div class="tool-container">
+        <div class="tool-header">
+          <h1>Cron Parser</h1>
+          <p class="tool-description">Parse and understand cron expressions with human-readable explanations</p>
+        </div>
+        
+        <div class="cron-input-section">
+          <label for="cron-expression">Cron Expression</label>
+          <div class="cron-input-wrapper">
+            <input 
+              type="text" 
+              id="cron-expression" 
+              class="cron-expression-input"
+              placeholder="0 0 * * MON-FRI"
+              value="0 0 * * MON-FRI"
+              spellcheck="false"
+            />
+            <button class="btn btn-primary" data-action="parse">Parse</button>
+          </div>
+          
+          <div class="cron-format-hint">
+            Format: <code>minute hour day month weekday</code> or <code>@yearly</code>
+          </div>
+        </div>
+        
+        <div class="error-display" data-error hidden></div>
+        
+        <div class="cron-breakdown" id="cron-breakdown">
+          <h3>Expression Breakdown</h3>
+          <div class="field-grid">
+            <div class="field-item">
+              <span class="field-label">Minute</span>
+              <span class="field-value" id="field-minute">-</span>
+              <span class="field-range">(0-59)</span>
+            </div>
+            <div class="field-item">
+              <span class="field-label">Hour</span>
+              <span class="field-value" id="field-hour">-</span>
+              <span class="field-range">(0-23)</span>
+            </div>
+            <div class="field-item">
+              <span class="field-label">Day of Month</span>
+              <span class="field-value" id="field-day">-</span>
+              <span class="field-range">(1-31)</span>
+            </div>
+            <div class="field-item">
+              <span class="field-label">Month</span>
+              <span class="field-value" id="field-month">-</span>
+              <span class="field-range">(1-12 or JAN-DEC)</span>
+            </div>
+            <div class="field-item">
+              <span class="field-label">Day of Week</span>
+              <span class="field-value" id="field-weekday">-</span>
+              <span class="field-range">(0-7 or SUN-SAT)</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="cron-description">
+          <h3>Human-Readable Description</h3>
+          <div class="description-text" id="description-text">
+            Enter a cron expression to see its description
+          </div>
+        </div>
+        
+        <div class="next-runs">
+          <h3>Next Execution Times</h3>
+          <div class="next-runs-list" id="next-runs-list">
+            <div class="no-runs">Parse a cron expression to see upcoming execution times</div>
+          </div>
+        </div>
+        
+        <div class="common-expressions">
+          <h3>Common Expressions</h3>
+          <div class="expressions-grid">
+            <button class="expression-card" data-cron="* * * * *">
+              <span class="expression-value">* * * * *</span>
+              <span class="expression-desc">Every minute</span>
+            </button>
+            <button class="expression-card" data-cron="0 * * * *">
+              <span class="expression-value">0 * * * *</span>
+              <span class="expression-desc">Every hour</span>
+            </button>
+            <button class="expression-card" data-cron="0 0 * * *">
+              <span class="expression-value">0 0 * * *</span>
+              <span class="expression-desc">Daily at midnight</span>
+            </button>
+            <button class="expression-card" data-cron="0 9 * * MON-FRI">
+              <span class="expression-value">0 9 * * MON-FRI</span>
+              <span class="expression-desc">Weekdays at 9 AM</span>
+            </button>
+            <button class="expression-card" data-cron="0 0 1 * *">
+              <span class="expression-value">0 0 1 * *</span>
+              <span class="expression-desc">Monthly on the 1st</span>
+            </button>
+            <button class="expression-card" data-cron="0 0 1 1 *">
+              <span class="expression-value">0 0 1 1 *</span>
+              <span class="expression-desc">Yearly on Jan 1st</span>
+            </button>
+            <button class="expression-card" data-cron="*/5 * * * *">
+              <span class="expression-value">*/5 * * * *</span>
+              <span class="expression-desc">Every 5 minutes</span>
+            </button>
+            <button class="expression-card" data-cron="0 */2 * * *">
+              <span class="expression-value">0 */2 * * *</span>
+              <span class="expression-desc">Every 2 hours</span>
+            </button>
+            <button class="expression-card" data-cron="0 0 * * SUN">
+              <span class="expression-value">0 0 * * SUN</span>
+              <span class="expression-desc">Every Sunday</span>
+            </button>
+            <button class="expression-card" data-cron="30 3 15 * *">
+              <span class="expression-value">30 3 15 * *</span>
+              <span class="expression-desc">15th at 3:30 AM</span>
+            </button>
+            <button class="expression-card" data-cron="@hourly">
+              <span class="expression-value">@hourly</span>
+              <span class="expression-desc">Start of every hour</span>
+            </button>
+            <button class="expression-card" data-cron="@daily">
+              <span class="expression-value">@daily</span>
+              <span class="expression-desc">Start of every day</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="cron-reference">
+          <h3>Quick Reference</h3>
+          <div class="reference-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Character</th>
+                  <th>Description</th>
+                  <th>Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>*</code></td>
+                  <td>Any value</td>
+                  <td>* in hour field = every hour</td>
+                </tr>
+                <tr>
+                  <td><code>,</code></td>
+                  <td>Value list separator</td>
+                  <td>1,3,5 = at 1, 3, and 5</td>
+                </tr>
+                <tr>
+                  <td><code>-</code></td>
+                  <td>Range of values</td>
+                  <td>1-5 = 1 through 5</td>
+                </tr>
+                <tr>
+                  <td><code>/</code></td>
+                  <td>Step values</td>
+                  <td>*/15 = every 15 units</td>
+                </tr>
+                <tr>
+                  <td><code>@yearly</code></td>
+                  <td>Annually</td>
+                  <td>0 0 1 1 *</td>
+                </tr>
+                <tr>
+                  <td><code>@monthly</code></td>
+                  <td>Monthly</td>
+                  <td>0 0 1 * *</td>
+                </tr>
+                <tr>
+                  <td><code>@weekly</code></td>
+                  <td>Weekly</td>
+                  <td>0 0 * * 0</td>
+                </tr>
+                <tr>
+                  <td><code>@daily</code></td>
+                  <td>Daily</td>
+                  <td>0 0 * * *</td>
+                </tr>
+                <tr>
+                  <td><code>@hourly</code></td>
+                  <td>Hourly</td>
+                  <td>0 * * * *</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    this.cronInput = this.container.querySelector('#cron-expression');
+    this.errorDisplay = this.container.querySelector('[data-error]');
+  }
+  
+  attachEventListeners() {
+    // Auto-parse on input with debounce
+    let parseTimeout;
+    this.cronInput.addEventListener('input', () => {
+      clearTimeout(parseTimeout);
+      parseTimeout = setTimeout(() => {
+        this.parse();
+      }, 300); // 300ms debounce
+    });
+    
+    // Parse button (kept for explicit parsing)
+    this.container.querySelector('[data-action="parse"]').addEventListener('click', () => this.parse());
+    
+    // Common expressions
+    this.container.querySelectorAll('[data-cron]').forEach(card => {
+      card.addEventListener('click', () => {
+        this.cronInput.value = card.dataset.cron;
+        this.parse();
+      });
+    });
+  }
+  
+  loadExample() {
+    this.parse();
+  }
+  
+  parse() {
+    const expression = this.cronInput.value.trim();
+    if (!expression) {
+      this.clearResults();
+      return;
+    }
+    
+    try {
+      // Handle special expressions
+      const specialExpressions = {
+        '@yearly': '0 0 1 1 *',
+        '@annually': '0 0 1 1 *',
+        '@monthly': '0 0 1 * *',
+        '@weekly': '0 0 * * 0',
+        '@daily': '0 0 * * *',
+        '@midnight': '0 0 * * *',
+        '@hourly': '0 * * * *'
+      };
+      
+      const normalizedExpression = specialExpressions[expression.toLowerCase()] || expression;
+      const parts = normalizedExpression.split(/\s+/);
+      
+      if (parts.length !== 5) {
+        throw new Error('Cron expression must have exactly 5 fields');
+      }
+      
+      const [minute, hour, day, month, weekday] = parts;
+      
+      // Validate and display fields
+      this.validateField(minute, 0, 59, 'minute');
+      this.validateField(hour, 0, 23, 'hour');
+      this.validateField(day, 1, 31, 'day');
+      this.validateField(month, 1, 12, 'month');
+      this.validateField(weekday, 0, 7, 'weekday');
+      
+      // Update field display
+      this.container.querySelector('#field-minute').textContent = minute;
+      this.container.querySelector('#field-hour').textContent = hour;
+      this.container.querySelector('#field-day').textContent = day;
+      this.container.querySelector('#field-month').textContent = this.expandMonth(month);
+      this.container.querySelector('#field-weekday').textContent = this.expandWeekday(weekday);
+      
+      // Generate description
+      const description = this.generateDescription(minute, hour, day, month, weekday);
+      this.container.querySelector('#description-text').textContent = description;
+      
+      // Calculate next runs
+      const nextRuns = this.calculateNextRuns(minute, hour, day, month, weekday);
+      this.displayNextRuns(nextRuns);
+      
+      this.clearError();
+    } catch (error) {
+      this.showError(error.message);
+      this.clearResults();
+    }
+  }
+  
+  validateField(field, min, max, name) {
+    // Allow wildcards
+    if (field === '*') return true;
+    
+    // Handle lists
+    if (field.includes(',')) {
+      const values = field.split(',');
+      for (const value of values) {
+        this.validateField(value.trim(), min, max, name);
+      }
+      return true;
+    }
+    
+    // Handle ranges
+    if (field.includes('-')) {
+      const [start, end] = field.split('-');
+      this.validateSingleValue(start, min, max, name);
+      this.validateSingleValue(end, min, max, name);
+      return true;
+    }
+    
+    // Handle steps
+    if (field.includes('/')) {
+      const [range, step] = field.split('/');
+      if (range !== '*') {
+        this.validateField(range, min, max, name);
+      }
+      const stepNum = parseInt(step);
+      if (isNaN(stepNum) || stepNum < 1) {
+        throw new Error(`Invalid step value in ${name} field`);
+      }
+      return true;
+    }
+    
+    // Validate single value
+    this.validateSingleValue(field, min, max, name);
+    return true;
+  }
+  
+  validateSingleValue(value, min, max, name) {
+    // Handle month names
+    if (name === 'month') {
+      const monthMap = {
+        'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6,
+        'JUL': 7, 'AUG': 8, 'SEP': 9, 'OCT': 10, 'NOV': 11, 'DEC': 12
+      };
+      if (monthMap[value.toUpperCase()]) return true;
+    }
+    
+    // Handle weekday names
+    if (name === 'weekday') {
+      const weekdayMap = {
+        'SUN': 0, 'MON': 1, 'TUE': 2, 'WED': 3, 'THU': 4, 'FRI': 5, 'SAT': 6
+      };
+      if (weekdayMap[value.toUpperCase()]) return true;
+    }
+    
+    const num = parseInt(value);
+    if (isNaN(num) || num < min || num > max) {
+      throw new Error(`Invalid value "${value}" in ${name} field (must be ${min}-${max})`);
+    }
+  }
+  
+  expandMonth(month) {
+    const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    
+    if (month === '*') return 'Every month';
+    
+    // Replace month names with numbers for display
+    let expanded = month;
+    monthNames.forEach((name, index) => {
+      expanded = expanded.replace(new RegExp(name, 'gi'), index + 1);
+    });
+    
+    return expanded;
+  }
+  
+  expandWeekday(weekday) {
+    const weekdayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+    
+    if (weekday === '*') return 'Every day';
+    
+    // Replace weekday names with numbers for display
+    let expanded = weekday;
+    weekdayNames.forEach((name, index) => {
+      expanded = expanded.replace(new RegExp(name, 'gi'), index);
+    });
+    
+    // Handle 7 as Sunday
+    expanded = expanded.replace(/7/g, '0');
+    
+    return expanded;
+  }
+  
+  generateDescription(minute, hour, day, month, weekday) {
+    let description = 'Runs ';
+    
+    // Time description
+    if (minute === '*' && hour === '*') {
+      description += 'every minute';
+    } else if (minute === '*') {
+      description += `every minute of hour ${this.describeValue(hour, 'hour')}`;
+    } else if (hour === '*') {
+      description += `at minute ${this.describeValue(minute, 'minute')} of every hour`;
+    } else {
+      description += `at ${this.describeTime(hour, minute)}`;
+    }
+    
+    // Day description
+    if (day !== '*' && weekday === '*') {
+      description += ` on day ${this.describeValue(day, 'day')} of the month`;
+    } else if (day === '*' && weekday !== '*') {
+      description += ` on ${this.describeWeekday(weekday)}`;
+    } else if (day !== '*' && weekday !== '*') {
+      description += ` on day ${this.describeValue(day, 'day')} of the month and on ${this.describeWeekday(weekday)}`;
+    }
+    
+    // Month description
+    if (month !== '*') {
+      description += ` in ${this.describeMonth(month)}`;
+    }
+    
+    return description;
+  }
+  
+  describeValue(value, type) {
+    if (value === '*') return 'every ' + type;
+    
+    if (value.includes('/')) {
+      const [range, step] = value.split('/');
+      if (range === '*') {
+        return `every ${step} ${type}s`;
+      } else {
+        return `every ${step} ${type}s in range ${range}`;
+      }
+    }
+    
+    if (value.includes('-')) {
+      return value;
+    }
+    
+    if (value.includes(',')) {
+      return value;
+    }
+    
+    return value;
+  }
+  
+  describeTime(hour, minute) {
+    const h = this.parseTimeValue(hour);
+    const m = this.parseTimeValue(minute);
+    
+    if (h.includes(',') || m.includes(',')) {
+      return `${hour}:${minute}`;
+    }
+    
+    if (h.includes('every')) {
+      return `minute ${minute} of ${h}`;
+    }
+    
+    if (m.includes('every')) {
+      return `${m} of hour ${hour}`;
+    }
+    
+    // Format as time
+    const hourNum = parseInt(hour);
+    const minuteNum = parseInt(minute);
+    if (!isNaN(hourNum) && !isNaN(minuteNum)) {
+      const period = hourNum >= 12 ? 'PM' : 'AM';
+      const displayHour = hourNum === 0 ? 12 : hourNum > 12 ? hourNum - 12 : hourNum;
+      const displayMinute = minuteNum.toString().padStart(2, '0');
+      return `${displayHour}:${displayMinute} ${period}`;
+    }
+    
+    return `${hour}:${minute}`;
+  }
+  
+  parseTimeValue(value) {
+    if (value === '*') return 'every';
+    if (value.includes('/')) {
+      const [, step] = value.split('/');
+      return `every ${step}`;
+    }
+    return value;
+  }
+  
+  describeWeekday(weekday) {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    // Map day names
+    let normalized = weekday.toUpperCase();
+    normalized = normalized.replace('SUN', '0').replace('MON', '1').replace('TUE', '2')
+                          .replace('WED', '3').replace('THU', '4').replace('FRI', '5')
+                          .replace('SAT', '6');
+    
+    if (normalized === '*') return 'every day';
+    
+    if (normalized.includes('-')) {
+      const [start, end] = normalized.split('-');
+      return `${days[parseInt(start)]} through ${days[parseInt(end)]}`;
+    }
+    
+    if (normalized.includes(',')) {
+      const dayList = normalized.split(',').map(d => days[parseInt(d)]);
+      return dayList.join(', ');
+    }
+    
+    const dayNum = parseInt(normalized);
+    return days[dayNum % 7];
+  }
+  
+  describeMonth(month) {
+    const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                   'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    // Map month names
+    let normalized = month.toUpperCase();
+    const monthMap = {
+      'JAN': '1', 'FEB': '2', 'MAR': '3', 'APR': '4', 'MAY': '5', 'JUN': '6',
+      'JUL': '7', 'AUG': '8', 'SEP': '9', 'OCT': '10', 'NOV': '11', 'DEC': '12'
+    };
+    
+    Object.keys(monthMap).forEach(name => {
+      normalized = normalized.replace(name, monthMap[name]);
+    });
+    
+    if (normalized === '*') return 'every month';
+    
+    if (normalized.includes('-')) {
+      const [start, end] = normalized.split('-');
+      return `${months[parseInt(start) - 1]} through ${months[parseInt(end) - 1]}`;
+    }
+    
+    if (normalized.includes(',')) {
+      const monthList = normalized.split(',').map(m => months[parseInt(m) - 1]);
+      return monthList.join(', ');
+    }
+    
+    return months[parseInt(normalized) - 1];
+  }
+  
+  calculateNextRuns(minute, hour, day, month, weekday) {
+    const runs = [];
+    const now = new Date();
+    let testDate = new Date(now);
+    testDate.setSeconds(0);
+    testDate.setMilliseconds(0);
+    
+    // Start from next minute
+    testDate.setMinutes(testDate.getMinutes() + 1);
+    
+    let count = 0;
+    let iterations = 0;
+    const maxIterations = 525600; // One year of minutes
+    
+    while (count < 10 && iterations < maxIterations) {
+      if (this.matchesCron(testDate, minute, hour, day, month, weekday)) {
+        runs.push(new Date(testDate));
+        count++;
+      }
+      testDate.setMinutes(testDate.getMinutes() + 1);
+      iterations++;
+    }
+    
+    return runs;
+  }
+  
+  matchesCron(date, minute, hour, day, month, weekday) {
+    const dateMinute = date.getMinutes();
+    const dateHour = date.getHours();
+    const dateDay = date.getDate();
+    const dateMonth = date.getMonth() + 1;
+    const dateWeekday = date.getDay();
+    
+    return this.matchesField(dateMinute, minute, 0, 59) &&
+           this.matchesField(dateHour, hour, 0, 23) &&
+           this.matchesField(dateDay, day, 1, 31) &&
+           this.matchesField(dateMonth, month, 1, 12) &&
+           this.matchesField(dateWeekday, weekday, 0, 6);
+  }
+  
+  matchesField(value, pattern, min, max) {
+    if (pattern === '*') return true;
+    
+    // Handle step values
+    if (pattern.includes('/')) {
+      const [range, step] = pattern.split('/');
+      const stepNum = parseInt(step);
+      
+      if (range === '*') {
+        return value % stepNum === 0;
+      } else {
+        const [rangeMin, rangeMax] = this.parseRange(range, min, max);
+        return value >= rangeMin && value <= rangeMax && ((value - rangeMin) % stepNum === 0);
+      }
+    }
+    
+    // Handle lists
+    if (pattern.includes(',')) {
+      const values = pattern.split(',');
+      return values.some(v => this.matchesField(value, v.trim(), min, max));
+    }
+    
+    // Handle ranges
+    if (pattern.includes('-')) {
+      const [rangeMin, rangeMax] = this.parseRange(pattern, min, max);
+      return value >= rangeMin && value <= rangeMax;
+    }
+    
+    // Direct comparison
+    return value === parseInt(pattern);
+  }
+  
+  parseRange(range, min, max) {
+    const [start, end] = range.split('-');
+    return [parseInt(start) || min, parseInt(end) || max];
+  }
+  
+  displayNextRuns(runs) {
+    if (runs.length === 0) {
+      this.container.querySelector('#next-runs-list').innerHTML = 
+        '<div class="no-runs">No upcoming executions found</div>';
+      return;
+    }
+    
+    const html = runs.map((date, index) => {
+      const relative = this.getRelativeTime(date);
+      return `
+        <div class="run-item">
+          <span class="run-number">${index + 1}.</span>
+          <span class="run-date">${date.toLocaleString()}</span>
+          <span class="run-relative">${relative}</span>
+        </div>
+      `;
+    }).join('');
+    
+    this.container.querySelector('#next-runs-list').innerHTML = html;
+  }
+  
+  getRelativeTime(date) {
+    const now = new Date();
+    const diff = date - now;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    
+    if (minutes < 60) {
+      return `in ${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    } else if (hours < 24) {
+      const mins = minutes % 60;
+      return `in ${hours} hour${hours !== 1 ? 's' : ''} ${mins} minute${mins !== 1 ? 's' : ''}`;
+    } else {
+      return `in ${days} day${days !== 1 ? 's' : ''}`;
+    }
+  }
+  
+  clearResults() {
+    this.container.querySelector('#field-minute').textContent = '-';
+    this.container.querySelector('#field-hour').textContent = '-';
+    this.container.querySelector('#field-day').textContent = '-';
+    this.container.querySelector('#field-month').textContent = '-';
+    this.container.querySelector('#field-weekday').textContent = '-';
+    this.container.querySelector('#description-text').textContent = 'Enter a cron expression to see its description';
+    this.container.querySelector('#next-runs-list').innerHTML = 
+      '<div class="no-runs">Parse a cron expression to see upcoming execution times</div>';
+  }
+  
+  showError(message) {
+    this.errorDisplay.textContent = message;
+    this.errorDisplay.hidden = false;
+  }
+  
+  clearError() {
+    this.errorDisplay.textContent = '';
+    this.errorDisplay.hidden = true;
+  }
+}

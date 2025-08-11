@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevToolbox Test Runner</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      padding: 20px;
+    }
+    
+    .test-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      margin-bottom: 20px;
+      color: #4CAF50;
+    }
+    
+    .test-controls {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    button:hover {
+      background: #45a049;
+    }
+    
+    button:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+    
+    .test-summary {
+      padding: 15px;
+      background: #2a2a2a;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 30px;
+    }
+    
+    .summary-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .summary-label {
+      color: #999;
+    }
+    
+    .summary-value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .passed { color: #4CAF50; }
+    .failed { color: #f44336; }
+    .skipped { color: #ff9800; }
+    
+    .test-results {
+      background: #2a2a2a;
+      border-radius: 4px;
+      padding: 20px;
+    }
+    
+    .test-suite {
+      margin-bottom: 20px;
+    }
+    
+    .suite-header {
+      padding: 10px;
+      background: #333;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .suite-header:hover {
+      background: #3a3a3a;
+    }
+    
+    .suite-title {
+      font-weight: bold;
+    }
+    
+    .suite-stats {
+      display: flex;
+      gap: 15px;
+      font-size: 12px;
+    }
+    
+    .test-case {
+      padding: 8px 15px;
+      margin-left: 20px;
+      border-left: 2px solid #444;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .test-case.pass {
+      border-left-color: #4CAF50;
+    }
+    
+    .test-case.fail {
+      border-left-color: #f44336;
+      background: rgba(244, 67, 54, 0.1);
+    }
+    
+    .test-case.skip {
+      border-left-color: #ff9800;
+      opacity: 0.6;
+    }
+    
+    .test-name {
+      flex: 1;
+    }
+    
+    .test-status {
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    
+    .test-status.pass {
+      background: #4CAF50;
+      color: white;
+    }
+    
+    .test-status.fail {
+      background: #f44336;
+      color: white;
+    }
+    
+    .test-status.skip {
+      background: #ff9800;
+      color: white;
+    }
+    
+    .test-duration {
+      color: #999;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    
+    .error-message {
+      margin-top: 10px;
+      padding: 10px;
+      background: rgba(244, 67, 54, 0.1);
+      border: 1px solid #f44336;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #ff9999;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4CAF50, #8BC34A);
+      transition: width 300ms;
+    }
+    
+    #test-output {
+      margin-top: 20px;
+      padding: 15px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>🧪 DevToolbox Test Runner</h1>
+    
+    <div class="test-controls">
+      <button id="run-all">Run All Tests</button>
+      <button id="run-unit">Run Unit Tests</button>
+      <button id="run-integration">Run Integration Tests</button>
+      <button id="run-performance">Run Performance Tests</button>
+      <button id="export-results">Export Results</button>
+    </div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress" style="width: 0%"></div>
+    </div>
+    
+    <div class="test-summary">
+      <div class="summary-item">
+        <span class="summary-label">Total:</span>
+        <span class="summary-value" id="total-tests">0</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Passed:</span>
+        <span class="summary-value passed" id="passed-tests">0</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Failed:</span>
+        <span class="summary-value failed" id="failed-tests">0</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Skipped:</span>
+        <span class="summary-value skipped" id="skipped-tests">0</span>
+      </div>
+      <div class="summary-item">
+        <span class="summary-label">Duration:</span>
+        <span class="summary-value" id="test-duration">0ms</span>
+      </div>
+    </div>
+    
+    <div class="test-results" id="test-results">
+      <div style="text-align: center; color: #666; padding: 40px;">
+        Click "Run All Tests" to start testing
+      </div>
+    </div>
+    
+    <div id="test-output"></div>
+  </div>
+  
+  <script type="module">
+    import { TestSuite } from './test-suite.js';
+    
+    const testSuite = new TestSuite();
+    
+    // UI Elements
+    const elements = {
+      runAll: document.getElementById('run-all'),
+      runUnit: document.getElementById('run-unit'),
+      runIntegration: document.getElementById('run-integration'),
+      runPerformance: document.getElementById('run-performance'),
+      exportResults: document.getElementById('export-results'),
+      progress: document.getElementById('progress'),
+      totalTests: document.getElementById('total-tests'),
+      passedTests: document.getElementById('passed-tests'),
+      failedTests: document.getElementById('failed-tests'),
+      skippedTests: document.getElementById('skipped-tests'),
+      testDuration: document.getElementById('test-duration'),
+      testResults: document.getElementById('test-results'),
+      testOutput: document.getElementById('test-output')
+    };
+    
+    // Event Listeners
+    elements.runAll.addEventListener('click', () => runTests('all'));
+    elements.runUnit.addEventListener('click', () => runTests('unit'));
+    elements.runIntegration.addEventListener('click', () => runTests('integration'));
+    elements.runPerformance.addEventListener('click', () => runTests('performance'));
+    elements.exportResults.addEventListener('click', exportResults);
+    
+    async function runTests(type) {
+      // Disable buttons during test run
+      document.querySelectorAll('button').forEach(btn => btn.disabled = true);
+      
+      // Clear previous results
+      elements.testResults.innerHTML = '<div style="text-align: center; padding: 20px;">Running tests...</div>';
+      elements.testOutput.innerHTML = '';
+      
+      // Reset counters
+      updateSummary(0, 0, 0, 0, 0);
+      
+      try {
+        const results = await testSuite.run(type, {
+          onProgress: updateProgress,
+          onTestComplete: updateTestResult
+        });
+        
+        displayResults(results);
+        updateSummary(
+          results.total,
+          results.passed,
+          results.failed,
+          results.skipped,
+          results.duration
+        );
+      } catch (error) {
+        console.error('Test run failed:', error);
+        elements.testResults.innerHTML = `
+          <div class="error-message">
+            Test run failed: ${error.message}
+          </div>
+        `;
+      } finally {
+        // Re-enable buttons
+        document.querySelectorAll('button').forEach(btn => btn.disabled = false);
+      }
+    }
+    
+    function updateProgress(percent) {
+      elements.progress.style.width = `${percent}%`;
+    }
+    
+    function updateTestResult(test) {
+      // Log to output
+      const output = document.createElement('div');
+      output.textContent = `${test.status === 'pass' ? '✓' : '✗'} ${test.suite} > ${test.name} (${test.duration}ms)`;
+      output.style.color = test.status === 'pass' ? '#4CAF50' : '#f44336';
+      elements.testOutput.appendChild(output);
+      elements.testOutput.scrollTop = elements.testOutput.scrollHeight;
+    }
+    
+    function updateSummary(total, passed, failed, skipped, duration) {
+      elements.totalTests.textContent = total;
+      elements.passedTests.textContent = passed;
+      elements.failedTests.textContent = failed;
+      elements.skippedTests.textContent = skipped;
+      elements.testDuration.textContent = `${duration}ms`;
+    }
+    
+    function displayResults(results) {
+      const html = results.suites.map(suite => `
+        <div class="test-suite">
+          <div class="suite-header">
+            <span class="suite-title">${suite.name}</span>
+            <div class="suite-stats">
+              <span class="passed">✓ ${suite.passed}</span>
+              <span class="failed">✗ ${suite.failed}</span>
+              <span class="skipped">⊘ ${suite.skipped}</span>
+              <span>${suite.duration}ms</span>
+            </div>
+          </div>
+          <div class="suite-tests">
+            ${suite.tests.map(test => `
+              <div class="test-case ${test.status}">
+                <span class="test-name">${test.name}</span>
+                <span class="test-duration">${test.duration}ms</span>
+                <span class="test-status ${test.status}">${test.status.toUpperCase()}</span>
+              </div>
+              ${test.error ? `<div class="error-message">${test.error}</div>` : ''}
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+      
+      elements.testResults.innerHTML = html || '<div style="text-align: center; padding: 20px;">No test results</div>';
+    }
+    
+    function exportResults() {
+      const results = testSuite.getLastResults();
+      if (!results) {
+        alert('No test results to export');
+        return;
+      }
+      
+      const data = {
+        timestamp: new Date().toISOString(),
+        results: results,
+        environment: {
+          userAgent: navigator.userAgent,
+          screen: {
+            width: window.screen.width,
+            height: window.screen.height
+          },
+          url: window.location.href
+        }
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `test-results-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

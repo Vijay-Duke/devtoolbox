@@ -55,14 +55,34 @@ const searchClear = document.querySelector('.search-clear');
 const searchResults = document.querySelector('.search-results');
 const categoryFilter = document.querySelector('.category-filter');
 
-// Enhanced tools data with keywords for better fuzzy matching - Initial Release
+// Enhanced tools data with keywords for better fuzzy matching
 const tools = [
+  { name: 'JSON Formatter', href: '#json-formatter', category: 'Text & Data', keywords: ['json', 'format', 'validate', 'pretty', 'beautify'] },
+  { name: 'JWT Decoder', href: '#jwt-decoder', category: 'Text & Data', keywords: ['jwt', 'token', 'decode', 'verify', 'auth'] },
+  { name: 'Base64 Encode/Decode', href: '#base64', category: 'Text & Data', keywords: ['base64', 'encode', 'decode', 'binary'] },
+  { name: 'URL Encode/Decode', href: '#url-encode', category: 'Text & Data', keywords: ['url', 'uri', 'encode', 'decode', 'percent'] },
   { name: 'UUID Generator', href: '#uuid', category: 'Generators', keywords: ['uuid', 'guid', 'generate', 'random', 'unique'] },
+  { name: 'Unix Time Converter', href: '#unix-time', category: 'Converters', keywords: ['unix', 'timestamp', 'epoch', 'time', 'date'] },
+  { name: 'Regex Tester', href: '#regex', category: 'Developer Tools', keywords: ['regex', 'regexp', 'pattern', 'match', 'test'] },
+  { name: 'Cron Parser', href: '#cron', category: 'Developer Tools', keywords: ['cron', 'schedule', 'job', 'time', 'expression'] },
+  { name: 'Diff Tool', href: '#diff', category: 'Text & Data', keywords: ['diff', 'compare', 'difference', 'merge', 'text'] },
+  { name: 'CSV ↔ JSON Converter', href: '#csv-json', category: 'Converters', keywords: ['csv', 'json', 'convert', 'table', 'data', 'excel'] },
+  { name: 'YAML ↔ JSON Converter', href: '#yaml-json', category: 'Converters', keywords: ['yaml', 'json', 'convert', 'config', 'configuration'] },
+  { name: 'Hash Generator', href: '#hash', category: 'Generators', keywords: ['hash', 'md5', 'sha', 'sha256', 'sha512', 'crypto', 'checksum'] },
+  { name: 'Markdown Preview', href: '#markdown', category: 'Text & Data', keywords: ['markdown', 'md', 'preview', 'render', 'github', 'gfm'] },
+  { name: 'cURL Generator', href: '#curl', category: 'Developer Tools', keywords: ['curl', 'http', 'api', 'request', 'rest', 'command'] },
+  { name: 'API Mock Generator', href: '#api-mock', category: 'Developer Tools', keywords: ['api', 'mock', 'server', 'express', 'json-server', 'postman', 'openapi'] },
+  { name: 'DNS Lookup', href: '#dns-lookup', category: 'Developer Tools', keywords: ['dns', 'lookup', 'domain', 'nameserver', 'mx', 'txt', 'a', 'aaaa', 'cname'] },
+  { name: 'GraphQL Tester', href: '#graphql', category: 'Developer Tools', keywords: ['graphql', 'query', 'mutation', 'introspection', 'api', 'test'] },
+  { name: 'Fake Data Generator', href: '#fake-data', category: 'Generators', keywords: ['fake', 'data', 'mock', 'test', 'generator', 'random', 'person', 'address'] },
+  { name: 'SQL Formatter', href: '#sql-formatter', category: 'Developer Tools', keywords: ['sql', 'format', 'query', 'database', 'beautify', 'minify', 'mysql', 'postgresql'] },
+  { name: 'XML Formatter', href: '#xml-formatter', category: 'Text & Data', keywords: ['xml', 'format', 'validate', 'xpath', 'tree', 'beautify', 'minify'] },
   { name: 'Password Generator', href: '#password-generator', category: 'Generators', keywords: ['password', 'secure', 'random', 'passphrase', 'generator', 'strength'] },
+  { name: 'Binary Converter', href: '#binary-converter', category: 'Converters', keywords: ['binary', 'decimal', 'hex', 'hexadecimal', 'octal', 'ascii', 'base64', 'converter'] },
   { name: 'QR Code Generator', href: '#qr-generator', category: 'Generators', keywords: ['qr', 'code', 'barcode', 'generator', 'wifi', 'vcard', 'contact'] },
   { name: 'ASCII Art Generator', href: '#ascii-art', category: 'Generators', keywords: ['ascii', 'art', 'text', 'banner', 'figlet', 'generator'] },
-  { name: 'cURL Generator', href: '#curl', category: 'Developer Tools', keywords: ['curl', 'http', 'api', 'request', 'rest', 'command'] },
-  { name: 'Fake Data Generator', href: '#fake-data', category: 'Generators', keywords: ['fake', 'data', 'mock', 'test', 'generator', 'random', 'person', 'address'] },
+  { name: 'Image Converter', href: '#image-converter', category: 'Converters', keywords: ['image', 'convert', 'resize', 'compress', 'jpeg', 'png', 'webp', 'format'] },
+  { name: 'Webhook Tester', href: '#webhook-tester', category: 'Developer Tools', keywords: ['webhook', 'test', 'debug', 'http', 'request', 'endpoint', 'api'] },
 ];
 
 let searchDebounceTimer;
@@ -76,144 +96,196 @@ searchInput?.addEventListener('input', (e) => {
     searchClear.hidden = false;
     searchDebounceTimer = setTimeout(() => performSearch(query), 200);
   } else if (!categoryFilter.value) {
-    clearSearch();
+    searchClear.hidden = true;
+    searchResults.hidden = true;
+    selectedResultIndex = -1;
   } else {
+    searchClear.hidden = true;
     searchDebounceTimer = setTimeout(() => performSearch(''), 200);
   }
 });
 
-function performSearch(query) {
-  const category = categoryFilter?.value || '';
-  
-  let filteredTools = tools;
-  if (category) {
-    filteredTools = tools.filter(tool => tool.category === category);
-  }
-  
-  if (query) {
-    const results = searchTools(query, filteredTools);
-    showSearchResults(results, query);
-  } else if (category) {
-    showSearchResults(filteredTools, '');
+// Category filter change
+categoryFilter?.addEventListener('change', () => {
+  const query = searchInput.value.trim();
+  if (query || categoryFilter.value) {
+    performSearch(query);
   } else {
-    clearSearch();
-  }
-}
-
-function showSearchResults(results, query) {
-  selectedResultIndex = -1;
-  
-  if (results.length === 0) {
-    searchResults.innerHTML = '<div class="search-no-results">No tools found</div>';
-  } else {
-    const resultsHtml = results.map((result, index) => {
-      const nameHtml = query ? highlightMatch(result.name, query) : result.name;
-      return `
-        <a href="${result.href}" class="search-result-item" data-index="${index}">
-          <span class="search-result-name">${nameHtml}</span>
-          <span class="search-result-category">${result.category}</span>
-        </a>
-      `;
-    }).join('');
-    
-    searchResults.innerHTML = resultsHtml;
-  }
-  
-  searchResults.hidden = false;
-}
-
-function clearSearch() {
-  searchResults.hidden = true;
-  searchResults.innerHTML = '';
-  selectedResultIndex = -1;
-  if (searchInput) {
-    searchClear.hidden = searchInput.value.length === 0;
-  }
-}
-
-// Search keyboard navigation
-searchInput?.addEventListener('keydown', (e) => {
-  const resultItems = searchResults.querySelectorAll('.search-result-item');
-  
-  if (e.key === 'ArrowDown') {
-    e.preventDefault();
-    selectedResultIndex = Math.min(selectedResultIndex + 1, resultItems.length - 1);
-    updateSelectedResult(resultItems);
-  } else if (e.key === 'ArrowUp') {
-    e.preventDefault();
-    selectedResultIndex = Math.max(selectedResultIndex - 1, -1);
-    updateSelectedResult(resultItems);
-  } else if (e.key === 'Enter') {
-    e.preventDefault();
-    if (selectedResultIndex >= 0 && resultItems[selectedResultIndex]) {
-      resultItems[selectedResultIndex].click();
-    }
-  } else if (e.key === 'Escape') {
-    clearSearch();
-    searchInput.value = '';
-    searchInput.blur();
+    searchResults.hidden = true;
   }
 });
 
-function updateSelectedResult(resultItems) {
-  resultItems.forEach((item, index) => {
-    item.classList.toggle('selected', index === selectedResultIndex);
+searchClear?.addEventListener('click', () => {
+  searchInput.value = '';
+  searchClear.hidden = true;
+  searchResults.hidden = true;
+  searchInput.focus();
+  selectedResultIndex = -1;
+});
+
+function performSearch(query) {
+  let filtered = tools;
+  
+  // Apply category filter
+  const category = categoryFilter.value;
+  if (category) {
+    filtered = filtered.filter(tool => tool.category === category);
+  }
+  
+  // Apply search query
+  if (query) {
+    filtered = searchTools(query, filtered);
+  }
+  
+  if (filtered.length > 0) {
+    displaySearchResults(filtered, query);
+  } else {
+    searchResults.innerHTML = '<div style="padding: 16px; color: var(--color-text-secondary);">No tools found</div>';
+    searchResults.hidden = false;
+  }
+  selectedResultIndex = -1;
+}
+
+function displaySearchResults(results, query) {
+  searchResults.innerHTML = results.map((tool, index) => `
+    <a href="${tool.href}" 
+       class="search-result-item" 
+       data-index="${index}"
+       style="display: block; padding: 12px 16px; color: var(--color-text); transition: background-color 150ms; outline: none;">
+      <div style="font-weight: 500;">${highlightMatch(tool.name, query)}</div>
+      <div style="font-size: 0.875rem; color: var(--color-text-secondary);">${tool.category}</div>
+    </a>
+  `).join('');
+  searchResults.hidden = false;
+  
+  // Add hover and focus effects
+  const resultItems = searchResults.querySelectorAll('.search-result-item');
+  resultItems.forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      clearSelectedResult();
+      item.style.backgroundColor = 'var(--color-bg-secondary)';
+      selectedResultIndex = parseInt(item.dataset.index);
+    });
+    item.addEventListener('mouseleave', () => {
+      item.style.backgroundColor = 'transparent';
+    });
+    item.addEventListener('focus', () => {
+      clearSelectedResult();
+      item.style.backgroundColor = 'var(--color-bg-secondary)';
+      selectedResultIndex = parseInt(item.dataset.index);
+    });
   });
 }
 
-// Clear search button
-searchClear?.addEventListener('click', () => {
-  searchInput.value = '';
-  clearSearch();
-  searchInput.focus();
-});
+function clearSelectedResult() {
+  const results = searchResults.querySelectorAll('.search-result-item');
+  results.forEach(item => {
+    item.style.backgroundColor = 'transparent';
+  });
+}
 
-// Category filter
-categoryFilter?.addEventListener('change', () => {
-  const query = searchInput?.value.trim() || '';
-  performSearch(query);
-});
-
-// Click outside to close search
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.search-container')) {
-    clearSearch();
+function selectResult(index) {
+  const results = searchResults.querySelectorAll('.search-result-item');
+  if (index >= 0 && index < results.length) {
+    clearSelectedResult();
+    results[index].style.backgroundColor = 'var(--color-bg-secondary)';
+    results[index].focus();
+    selectedResultIndex = index;
   }
-});
+}
 
-// Global keyboard shortcuts
+// Enhanced Keyboard Shortcuts
 document.addEventListener('keydown', (e) => {
-  // Focus search with "/"
-  if (e.key === '/' && !e.target.matches('input, textarea, [contenteditable]')) {
+  // Focus search with /
+  if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
     e.preventDefault();
     searchInput?.focus();
-    return;
-  }
-  
-  // Toggle theme with "t"
-  if (e.key === 't' && !e.target.matches('input, textarea, [contenteditable]')) {
-    e.preventDefault();
-    themeToggle?.click();
-    return;
   }
   
   // Clear search with Escape
-  if (e.key === 'Escape' && !searchResults.hidden) {
-    clearSearch();
-    if (searchInput) {
+  if (e.key === 'Escape') {
+    if (document.activeElement === searchInput || searchResults.contains(document.activeElement)) {
       searchInput.value = '';
+      searchClear.hidden = true;
+      searchResults.hidden = true;
       searchInput.blur();
+      selectedResultIndex = -1;
     }
-    return;
+  }
+  
+  // Arrow navigation in search results
+  if (!searchResults.hidden && (document.activeElement === searchInput || searchResults.contains(document.activeElement))) {
+    const results = searchResults.querySelectorAll('.search-result-item');
+    
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedResultIndex = Math.min(selectedResultIndex + 1, results.length - 1);
+      selectResult(selectedResultIndex);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (selectedResultIndex === -1) {
+        selectedResultIndex = results.length - 1;
+      } else {
+        selectedResultIndex = Math.max(selectedResultIndex - 1, 0);
+      }
+      selectResult(selectedResultIndex);
+    } else if (e.key === 'Enter' && selectedResultIndex >= 0) {
+      e.preventDefault();
+      results[selectedResultIndex]?.click();
+    }
+  }
+  
+  // Toggle theme with T
+  if (e.key === 't' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+    themeToggle?.click();
   }
 });
 
-// Initialize the router
+// Active link highlighting
+const navLinks = document.querySelectorAll('.nav-link');
+navLinks.forEach(link => {
+  link.addEventListener('click', () => {
+    navLinks.forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    
+    // Close mobile menu after selection
+    if (window.innerWidth <= 768) {
+      sidebar.classList.remove('active');
+      sidebarOverlay.classList.remove('active');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+});
+
+// Mark styles for search highlighting
+const style = document.createElement('style');
+style.textContent = `
+  mark {
+    background-color: var(--color-warning);
+    color: var(--color-text);
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+`;
+document.head.appendChild(style);
+
+// Initialize router
 const router = new Router();
 
-// Initialize other features
-const keyboardShortcuts = new KeyboardShortcuts();
+// Initialize keyboard shortcuts
+const shortcuts = new KeyboardShortcuts();
+window.shortcuts = shortcuts; // Make available globally for settings
+
+// Initialize shareable links
 const shareableLinks = new ShareableLinks();
+
+
+// Initialize history persistence
 const historyPersistence = new HistoryPersistence();
+window.historyPersistence = historyPersistence; // Make available globally for settings
+
+// Initialize settings manager
 const settingsManager = new SettingsManager();
+
+// Initialize search aliases
 const searchAliases = new SearchAliases();

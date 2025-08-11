@@ -1,0 +1,81 @@
+{
+  "name": "DevToolbox - Developer Utilities",
+  "short_name": "DevToolbox",
+  "description": "Fast, minimal, privacy-first developer utilities in one place",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0066cc",
+  "orientation": "any",
+  "categories": ["developer", "utilities", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "JSON Formatter",
+      "short_name": "JSON",
+      "url": "/#json-formatter",
+      "icons": [{ "src": "/icons/json-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Base64 Encode/Decode",
+      "short_name": "Base64",
+      "url": "/#base64",
+      "icons": [{ "src": "/icons/base64-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "UUID Generator",
+      "short_name": "UUID",
+      "url": "/#uuid",
+      "icons": [{ "src": "/icons/uuid-96x96.png", "sizes": "96x96" }]
+    }
+  ]
+}
