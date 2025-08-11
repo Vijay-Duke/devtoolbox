@@ -1,0 +1,171 @@
+/* ========== Spacious Mode for Password Generator ========== */
+.tool-container.spacious { 
+  --corner: 20px;
+  --pad-xl: 32px;
+  --pad-lg: 24px;
+  --pad-md: 16px;
+  --ring: 0 1px 0 rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.06);
+  --thin-ring: 0 0 0 1px rgba(0,0,0,.06);
+}
+
+/* Header */
+.tool-container.spacious .tool-header { 
+  padding: var(--pad-xl) var(--pad-xl) var(--pad-lg);
+}
+.tool-container.spacious .tool-title { 
+  font-size: clamp(28px, 4vw, 40px); 
+  margin: 0 0 6px; 
+}
+.tool-container.spacious .tool-description { 
+  font-size: 16px; 
+  opacity: .85;
+}
+
+/* Big password card */
+.tool-container.spacious .password-output-container {
+  margin: 0 var(--pad-xl) var(--pad-xl);
+  background: var(--card-bg, #fff);
+  border-radius: calc(var(--corner) + 4px);
+  box-shadow: var(--ring);
+  padding: var(--pad-xl);
+}
+.tool-container.spacious .password-display {
+  padding: 0;
+  box-shadow: none;
+}
+.tool-container.spacious .password-output {
+  border: none;
+  background: transparent;
+  font-size: clamp(28px, 5vw, 42px);
+  padding: 0;
+  letter-spacing: .4px;
+}
+.tool-container.spacious .password-actions .btn-icon {
+  width: 48px; height: 48px; border-radius: 14px;
+  box-shadow: var(--thin-ring);
+  display:inline-grid; place-items:center;
+  transition: transform .12s ease, box-shadow .2s ease, opacity .2s;
+}
+.tool-container.spacious .password-actions { gap: 12px; }
+
+/* Thick strength bar under the big password */
+.tool-container.spacious .strength-meter { margin-top: 14px; }
+.tool-container.spacious .strength-bar { height: 10px; border-radius: 999px; overflow: hidden; }
+.tool-container.spacious .strength-row { margin-top: 10px; font-size: 14px; opacity:.9; }
+.tool-container.spacious .entropy-chip { padding: 6px 10px; border-radius: 999px; box-shadow: var(--thin-ring); }
+
+/* Options card */
+.tool-container.spacious .password-options {
+  margin: 0 var(--pad-xl);
+  background: var(--card-bg, #fff);
+  border-radius: var(--corner);
+  box-shadow: var(--ring);
+  padding: var(--pad-xl);
+}
+.tool-container.spacious .option-group > label {
+  font-size: 18px; font-weight: 600; display:block; margin-bottom: 12px;
+}
+.tool-container.spacious .length-row {
+  display:grid; grid-template-columns: 120px 1fr; gap: 20px; align-items:center;
+}
+.tool-container.spacious .range-input { height: 6px; border-radius: 999px; }
+.tool-container.spacious .length-presets { gap: 8px; margin-top: 12px; }
+.tool-container.spacious .preset-btn { 
+  padding: 8px 12px; border-radius: 10px; box-shadow: var(--thin-ring);
+}
+
+/* Two columns of options */
+.tool-container.spacious .options-grid {
+  display:grid; gap: 28px; margin-top: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.tool-container.spacious .character-options, 
+.tool-container.spacious .advanced-options {
+  padding: var(--pad-lg);
+  border-radius: 16px;
+  box-shadow: var(--thin-ring);
+}
+.tool-container.spacious .character-options h3,
+.tool-container.spacious .advanced-options h3 {
+  font-size: 22px; margin: 0 0 14px;
+}
+.tool-container.spacious .checkbox-label { 
+  padding: 10px 8px; border-radius: 10px; display:flex; gap:10px; align-items:center;
+}
+
+/* Tool buttons (bottom CTA style) */
+.tool-container.spacious .password-tools {
+  display:flex; justify-content:center; padding: var(--pad-xl);
+}
+.tool-container.spacious .tool-buttons {
+  gap: 14px; flex-wrap: wrap; justify-content:center;
+}
+.tool-container.spacious .btn { 
+  border-radius: 14px; padding: 14px 22px; font-size: 16px;
+  box-shadow: var(--thin-ring);
+}
+
+/* Panels (multiple + history + generators) */
+.tool-container.spacious .two-up { 
+  margin: 0 var(--pad-xl) var(--pad-xl); 
+  display:grid; gap: var(--pad-xl);
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+}
+.tool-container.spacious .panel {
+  border-radius: var(--corner); box-shadow: var(--ring); padding: var(--pad-xl);
+}
+.tool-container.spacious .panel-head h3 { font-size: 20px; margin:0; }
+.tool-container.spacious .password-item, 
+.tool-container.spacious .history-item {
+  padding: 12px; border-radius: 12px; box-shadow: var(--thin-ring);
+}
+.tool-container.spacious .password-field { 
+  font-size: 16px; padding: 10px 12px; border-radius: 10px;
+}
+
+/* Passphrase/Memorable blocks */
+.tool-container.spacious #passphrase-mode,
+.tool-container.spacious #memorable-mode {
+  margin: 0 var(--pad-xl) var(--pad-xl);
+}
+.tool-container.spacious .passphrase-options,
+.tool-container.spacious .memorable-pattern {
+  display:flex; flex-wrap:wrap; gap: 16px; align-items:center;
+}
+.tool-container.spacious .input-field { padding: 10px 12px; border-radius: 10px; }
+.tool-container.spacious .input-sm { padding: 8px 10px; }
+
+/* Subtle interaction */
+.tool-container.spacious .btn-icon:hover { transform: translateY(-1px); }
+.tool-container.spacious .preset-btn.active { transform: translateY(-1px); }
+
+/* Dark mode adjustments for spacious mode */
+[data-theme="dark"] .tool-container.spacious {
+  --card-bg: var(--color-bg-secondary);
+  --ring: 0 1px 0 rgba(255,255,255,.06), 0 8px 24px rgba(0,0,0,.3);
+  --thin-ring: 0 0 0 1px rgba(255,255,255,.1);
+}
+
+/* Mobile responsive for spacious mode */
+@media (max-width: 768px) {
+  .tool-container.spacious .password-output-container,
+  .tool-container.spacious .password-options,
+  .tool-container.spacious .two-up,
+  .tool-container.spacious #passphrase-mode,
+  .tool-container.spacious #memorable-mode {
+    margin-left: var(--pad-md);
+    margin-right: var(--pad-md);
+  }
+  
+  .tool-container.spacious .tool-header {
+    padding: var(--pad-lg) var(--pad-md) var(--pad-md);
+  }
+  
+  .tool-container.spacious .two-up {
+    grid-template-columns: 1fr;
+  }
+  
+  .tool-container.spacious .password-output {
+    font-size: clamp(24px, 6vw, 32px);
+  }
+}
