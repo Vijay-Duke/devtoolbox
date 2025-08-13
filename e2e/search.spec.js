@@ -61,7 +61,7 @@ test.describe('Search Functionality', () => {
     await expect(clearButton).toBeHidden();
     
     // Type in search that shows multiple results (won't auto-navigate)
-    await searchInput.fill('gen');
+    await searchInput.fill('generator');
     
     // Wait for debounce and clear button to appear
     await page.waitForTimeout(300);
