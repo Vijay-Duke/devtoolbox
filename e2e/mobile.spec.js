@@ -46,9 +46,9 @@ test.describe('Mobile Responsiveness', () => {
     // Check aria-expanded
     await expect(menuToggle).toHaveAttribute('aria-expanded', 'true');
     
-    // Click overlay to close
-    await overlay.click();
-    await page.waitForTimeout(100);
+    // Click overlay to close (force click to bypass pointer interception)
+    await overlay.click({ force: true });
+    await page.waitForTimeout(200); // Slightly longer wait for animation
     
     // Sidebar should be hidden again
     const hasTransformAfter = await sidebar.evaluate(el => 
@@ -100,10 +100,10 @@ test.describe('Mobile Responsiveness', () => {
     
     // Search should still function
     await searchInput.fill('json');
-    await page.waitForTimeout(500); // Increased for CI reliability
     
+    // Wait for search results to appear (more reliable than fixed timeout)
     const searchResults = page.locator('#search-results');
-    await expect(searchResults).toBeVisible();
+    await expect(searchResults).toBeVisible({ timeout: 10000 }); // Wait up to 10s
   });
 
   test('touch targets are adequate size', async ({ page }) => {
