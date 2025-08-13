@@ -271,12 +271,38 @@ function findSmartMatch(query, toolsList) {
     tool.keywords.some(keyword => keyword.toLowerCase().startsWith(q))
   );
   
-  // Return if exactly one prefix match
   if (prefixMatches.length === 1) {
     return prefixMatches[0];
   }
   
+  // Fuzzy match - check if query letters appear in sequence within tool names
+  const fuzzyMatches = toolsList.filter(tool => {
+    return fuzzyMatch(q, tool.name.toLowerCase()) || 
+           tool.keywords.some(keyword => fuzzyMatch(q, keyword.toLowerCase()));
+  });
+  
+  // Return if exactly one fuzzy match with high confidence
+  if (fuzzyMatches.length === 1) {
+    return fuzzyMatches[0];
+  }
+  
   return null;
+}
+
+// Fuzzy matching function - checks if query letters appear in sequence
+function fuzzyMatch(query, text) {
+  if (query.length === 0) return false;
+  if (query.length > text.length) return false;
+  
+  let queryIndex = 0;
+  
+  for (let i = 0; i < text.length && queryIndex < query.length; i++) {
+    if (text[i] === query[queryIndex]) {
+      queryIndex++;
+    }
+  }
+  
+  return queryIndex === query.length;
 }
 
 function displaySearchResults(results, query) {
