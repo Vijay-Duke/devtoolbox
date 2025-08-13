@@ -119,7 +119,7 @@ searchInput?.addEventListener('input', (e) => {
   if (query) {
     searchClear.hidden = false;
     searchDebounceTimer = setTimeout(() => performSearch(query), 200);
-  } else if (!categoryFilter.value) {
+  } else if (!categoryFilter?.value) {
     searchClear.hidden = true;
     searchResults.hidden = true;
     selectedResultIndex = -1;
@@ -132,7 +132,7 @@ searchInput?.addEventListener('input', (e) => {
 // Category filter change
 categoryFilter?.addEventListener('change', () => {
   const query = searchInput.value.trim();
-  if (query || categoryFilter.value) {
+  if (query || categoryFilter?.value) {
     performSearch(query);
   } else {
     searchResults.hidden = true;
@@ -151,7 +151,7 @@ function performSearch(query) {
   let filtered = tools;
   
   // Apply category filter
-  const category = categoryFilter.value;
+  const category = categoryFilter?.value;
   if (category) {
     filtered = filtered.filter(tool => tool.category === category);
   }

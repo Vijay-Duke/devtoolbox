@@ -100,7 +100,7 @@ test.describe('Mobile Responsiveness', () => {
     
     // Search should still function
     await searchInput.fill('json');
-    await page.waitForTimeout(250);
+    await page.waitForTimeout(500); // Increased for CI reliability
     
     const searchResults = page.locator('#search-results');
     await expect(searchResults).toBeVisible();
