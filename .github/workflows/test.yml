@@ -44,8 +44,16 @@ jobs:
     - name: Install Playwright browsers
       run: npx playwright install --with-deps chromium
     
+    - name: Start dev server
+      run: |
+        npm run dev &
+        sleep 5
+        curl -I http://localhost:8081 || exit 1
+    
     - name: Run Playwright tests
-      run: npm run test:e2e -- --project=chromium --timeout=30000
+      run: npx playwright test --project=chromium --reporter=list
+      env:
+        CI: true
     
     - uses: actions/upload-artifact@v3
       if: always()
