@@ -11,15 +11,15 @@ test.describe('Mobile Responsiveness', () => {
     const menuToggle = page.locator('[data-menu-toggle]');
     await expect(menuToggle).toBeVisible();
     
-    // Desktop elements should adjust
-    const logo = page.locator('.logo');
+    // Logo should be visible
+    const logo = page.locator('.flex.items-center.space-x-2.text-xl.font-bold');
     await expect(logo).toBeVisible();
   });
 
   test('sidebar is hidden by default on mobile', async ({ page }) => {
-    const sidebar = page.locator('.sidebar');
+    const sidebar = page.locator('#sidebar');
     
-    // Check sidebar is off-screen
+    // Check sidebar is off-screen (has -translate-x-full class)
     const transform = await sidebar.evaluate(el => 
       window.getComputedStyle(el).transform
     );
@@ -28,41 +28,62 @@ test.describe('Mobile Responsiveness', () => {
 
   test('sidebar toggles on hamburger click', async ({ page }) => {
     const menuToggle = page.locator('[data-menu-toggle]');
-    const sidebar = page.locator('.sidebar');
+    const sidebar = page.locator('#sidebar');
     const overlay = page.locator('[data-sidebar-overlay]');
     
     // Click hamburger
     await menuToggle.click();
     
-    // Sidebar should slide in
-    await expect(sidebar).toHaveClass(/active/);
-    await expect(overlay).toHaveClass(/active/);
+    // Wait for animation and check sidebar classes
+    await page.waitForTimeout(100);
+    
+    // Sidebar should not have -translate-x-full (should be visible)
+    const hasTransform = await sidebar.evaluate(el => 
+      el.classList.contains('-translate-x-full')
+    );
+    expect(hasTransform).toBeFalsy();
     
     // Check aria-expanded
     await expect(menuToggle).toHaveAttribute('aria-expanded', 'true');
     
     // Click overlay to close
     await overlay.click();
+    await page.waitForTimeout(100);
     
-    // Sidebar should close
-    await expect(sidebar).not.toHaveClass(/active/);
+    // Sidebar should be hidden again
+    const hasTransformAfter = await sidebar.evaluate(el => 
+      el.classList.contains('-translate-x-full')
+    );
+    expect(hasTransformAfter).toBeTruthy();
     await expect(menuToggle).toHaveAttribute('aria-expanded', 'false');
   });
 
   test('navigation links work on mobile', async ({ page }) => {
     const menuToggle = page.locator('[data-menu-toggle]');
-    const sidebar = page.locator('.sidebar');
+    const sidebar = page.locator('#sidebar');
     
     // Open menu
     await menuToggle.click();
-    await expect(sidebar).toHaveClass(/active/);
+    await page.waitForTimeout(100);
+    
+    // Check sidebar is visible
+    const hasTransform = await sidebar.evaluate(el => 
+      el.classList.contains('-translate-x-full')
+    );
+    expect(hasTransform).toBeFalsy();
     
     // Click a nav link
     const jsonLink = page.locator('a[href="#json-formatter"]');
     await jsonLink.click();
     
+    // Wait for navigation and sidebar animation
+    await page.waitForTimeout(100);
+    
     // Sidebar should auto-close after selection
-    await expect(sidebar).not.toHaveClass(/active/);
+    const hasTransformAfter = await sidebar.evaluate(el => 
+      el.classList.contains('-translate-x-full')
+    );
+    expect(hasTransformAfter).toBeTruthy();
     
     // Link should be marked active
     await expect(jsonLink).toHaveClass(/active/);
@@ -72,8 +93,8 @@ test.describe('Mobile Responsiveness', () => {
     const searchInput = page.locator('input[type="search"]');
     await expect(searchInput).toBeVisible();
     
-    // Should be responsive width
-    const searchContainer = page.locator('.search-container');
+    // Should be responsive width  
+    const searchContainer = page.locator('.relative').first();
     const width = await searchContainer.evaluate(el => el.offsetWidth);
     expect(width).toBeLessThan(400);
     
@@ -81,7 +102,7 @@ test.describe('Mobile Responsiveness', () => {
     await searchInput.fill('json');
     await page.waitForTimeout(250);
     
-    const searchResults = page.locator('.search-results');
+    const searchResults = page.locator('#search-results');
     await expect(searchResults).toBeVisible();
   });
 
@@ -114,18 +135,18 @@ test.describe('Tablet Responsiveness', () => {
     await page.goto('/');
     
     // Sidebar should be visible on tablet
-    const sidebar = page.locator('.sidebar');
+    const sidebar = page.locator('#sidebar');
     await expect(sidebar).toBeVisible();
     
-    // Menu toggle should be hidden
+    // Menu toggle should be hidden on large screens
     const menuToggle = page.locator('[data-menu-toggle]');
     await expect(menuToggle).not.toBeVisible();
     
-    // Should use grid layout
-    const appContainer = page.locator('.app-container');
+    // Should use flex layout
+    const appContainer = page.locator('.flex.flex-1.overflow-hidden');
     const display = await appContainer.evaluate(el => 
       window.getComputedStyle(el).display
     );
-    expect(display).toBe('grid');
+    expect(display).toBe('flex');
   });
 });
