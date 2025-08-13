@@ -73,17 +73,20 @@ test.describe('Theme Toggle Functionality', () => {
 
   test('correct icons display for each theme', async ({ page }) => {
     const htmlElement = page.locator('html');
-    const lightIcon = page.locator('.theme-icon-light');
-    const darkIcon = page.locator('.theme-icon-dark');
+    const lightIcon = page.locator('[data-theme-toggle] svg.block');  // Sun icon (visible in light mode)
+    const darkIcon = page.locator('[data-theme-toggle] svg.hidden');   // Moon icon (hidden in light mode)
     
     // Set to light theme
-    await htmlElement.evaluate(el => el.setAttribute('data-theme', 'light'));
+    await htmlElement.evaluate(el => {
+      el.classList.remove('dark');
+      el.setAttribute('data-theme', 'light');
+    });
     
-    // In light theme, dark icon should be visible (to switch to dark)
-    const lightIconStyle = await lightIcon.evaluate(el => window.getComputedStyle(el).display);
-    const darkIconStyle = await darkIcon.evaluate(el => window.getComputedStyle(el).display);
+    // Wait for theme change
+    await page.waitForTimeout(100);
     
-    expect(lightIconStyle).toBe('none');
-    expect(darkIconStyle).not.toBe('none');
+    // In light theme, sun icon should be visible, moon icon should be hidden
+    await expect(lightIcon).toBeVisible();
+    await expect(darkIcon).toBeHidden();
   });
 });

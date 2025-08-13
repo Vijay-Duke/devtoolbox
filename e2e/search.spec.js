@@ -68,7 +68,8 @@ test.describe('Search Functionality', () => {
     // Type in search
     await searchInput.fill('test');
     
-    // Clear button should appear
+    // Wait for debounce and clear button to appear
+    await page.waitForTimeout(300);
     await expect(clearButton).toBeVisible();
     
     // Click clear button
