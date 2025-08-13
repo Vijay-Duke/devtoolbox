@@ -124,6 +124,12 @@ export class Router {
       // Dynamically import the tool module if not loaded
       if (!route.loaded) {
         const module = await import(route.module);
+        
+        // Validate that the expected class exists in the module
+        if (!module[route.className]) {
+          throw new Error(`Class ${route.className} not found in module ${route.module}`);
+        }
+        
         route.ToolClass = module[route.className];
         route.loaded = true;
       }
@@ -136,6 +142,11 @@ export class Router {
       // Clear loading and create container
       this.mainContent.innerHTML = `<div id="tool-root"></div>`;
       
+      // Ensure the tool has an init method
+      if (typeof route.instance.init !== 'function') {
+        throw new Error(`Tool ${route.className} does not have an init method`);
+      }
+      
       // Initialize tool
       route.instance.init('tool-root');
       this.currentTool = route.instance;
@@ -145,9 +156,12 @@ export class Router {
       
       // Track tool usage for favorites
       this.trackToolUsage(route.name);
+      
+      // Prefetch related tools for better performance
+      this.prefetchRelatedTools(route);
     } catch (error) {
       console.error(`Failed to load tool: ${route.name}`, error);
-      this.showError(route.name);
+      this.showError(route.name, error.message);
     }
   }
   
@@ -250,12 +264,14 @@ export class Router {
     `;
   }
   
-  showError(toolName) {
+  showError(toolName, errorMessage = '') {
+    const errorDetails = errorMessage ? `<p class="text-sm text-gray-500 dark:text-gray-500 mt-2">${errorMessage}</p>` : '';
     this.mainContent.innerHTML = `
       <div class="flex items-center justify-center h-64">
         <div class="text-center">
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Failed to Load Tool</h1>
           <p class="text-gray-600 dark:text-gray-400 mb-6">Sorry, we couldn't load ${toolName}. Please try again.</p>
+          ${errorDetails}
           <div class="space-x-4">
             <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" onclick="location.reload()">Reload Page</button>
             <a href="#" class="inline-block px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Go Home</a>
@@ -263,6 +279,36 @@ export class Router {
         </div>
       </div>
     `;
+  }
+  
+  // Prefetch related tools for better performance
+  prefetchRelatedTools(currentRoute) {
+    // Get tools in the same category
+    const relatedTools = [];
+    this.routes.forEach((route, path) => {
+      if (route.category === currentRoute.category && 
+          path !== currentRoute.path && 
+          !route.loaded) {
+        relatedTools.push(route);
+      }
+    });
+    
+    // Prefetch up to 2 related tools
+    const toolsToPrefetch = relatedTools.slice(0, 2);
+    
+    // Use requestIdleCallback for non-blocking prefetch
+    if ('requestIdleCallback' in window && toolsToPrefetch.length > 0) {
+      requestIdleCallback(() => {
+        toolsToPrefetch.forEach(route => {
+          import(route.module).then(module => {
+            if (module[route.className]) {
+              route.ToolClass = module[route.className];
+              route.loaded = true;
+            }
+          }).catch(() => {}); // Silent fail for prefetch
+        });
+      });
+    }
   }
   
   updateActiveNav(hash) {
