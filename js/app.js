@@ -194,39 +194,70 @@ function findSmartMatch(query, toolsList) {
   
   // Abbreviation patterns for quick access
   const abbreviations = {
-    'jd': 'JWT Decoder',
+    // JSON Tools
+    'jf': 'JSON Formatter',
     'json': 'JSON Formatter', 
+    'jd': 'JWT Decoder',
     'jwt': 'JWT Decoder',
+    
+    // Encoders/Decoders  
     'b64': 'Base64 Encode/Decode',
     'base64': 'Base64 Encode/Decode',
     'url': 'URL Encode/Decode',
+    'uri': 'URL Encode/Decode',
+    
+    // Generators
     'uuid': 'UUID Generator',
-    'unix': 'Unix Time Converter',
-    'regex': 'Regex Tester',
-    'cron': 'Cron Parser',
-    'diff': 'Diff Tool',
-    'csv': 'CSV ↔ JSON Converter',
-    'yaml': 'YAML ↔ JSON Converter',
-    'hash': 'Hash Generator',
-    'md': 'Markdown Preview',
-    'curl': 'cURL Generator',
-    'dns': 'DNS Lookup',
-    'graphql': 'GraphQL Tester',
-    'sql': 'SQL Formatter',
-    'xml': 'XML Formatter',
+    'guid': 'UUID Generator',
+    'pg': 'Password Generator',
     'pass': 'Password Generator',
     'pw': 'Password Generator',
-    'binary': 'Binary Converter',
     'qr': 'QR Code Generator',
+    'hash': 'Hash Generator',
     'ascii': 'ASCII Art Generator',
+    'fake': 'Fake Data Generator',
+    
+    // Converters
+    'unix': 'Unix Time Converter',
+    'time': 'Unix Time Converter',
+    'csv': 'CSV ↔ JSON Converter',
+    'yaml': 'YAML ↔ JSON Converter',
+    'yml': 'YAML ↔ JSON Converter',
+    'binary': 'Binary Converter',
+    'bin': 'Binary Converter',
     'img': 'Image Converter',
     'image': 'Image Converter',
+    
+    // Developer Tools
+    'regex': 'Regex Tester',
+    'regexp': 'Regex Tester',
+    're': 'Regex Tester',
+    'cron': 'Cron Parser',
+    'diff': 'Diff Tool',
+    'curl': 'cURL Generator',
+    'graphql': 'GraphQL Tester',
+    'gql': 'GraphQL Tester',
+    'sql': 'SQL Formatter',
+    'xml': 'XML Formatter',
     'webhook': 'Webhook Tester',
+    'wh': 'Webhook Tester',
+    'api': 'API Mock Generator',
+    'mock': 'API Mock Generator',
+    
+    // Text & Data
+    'md': 'Markdown Preview',
+    'markdown': 'Markdown Preview',
+    
+    // Networking & Cloud
     'ip': 'IP Address Lookup',
+    'dns': 'DNS Lookup',
     'cidr': 'CIDR Calculator',
+    'subnet': 'CIDR Calculator',
     'whois': 'WHOIS Lookup',
     's3': 'S3 Pre-signed URL Generator',
-    'iam': 'AWS IAM Policy Visualizer'
+    'aws': 'S3 Pre-signed URL Generator',
+    'iam': 'AWS IAM Policy Visualizer',
+    'policy': 'AWS IAM Policy Visualizer'
   };
   
   // Check for exact abbreviation match
