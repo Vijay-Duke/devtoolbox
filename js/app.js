@@ -81,7 +81,7 @@ const tools = [
   { name: 'URL Encode/Decode', href: '#url-encode', category: 'Text & Data', keywords: ['url', 'uri', 'encode', 'decode', 'percent'] },
   { name: 'UUID Generator', href: '#uuid', category: 'Generators', keywords: ['uuid', 'guid', 'generate', 'random', 'unique'] },
   { name: 'Unix Time Converter', href: '#unix-time', category: 'Converters', keywords: ['unix', 'timestamp', 'epoch', 'time', 'date'] },
-  { name: 'Regex Tester', href: '#regex', category: 'Developer Tools', keywords: ['regex', 'regexp', 'pattern', 'match', 'test'] },
+  { name: 'Regex Tester', href: '#regex-tester', category: 'Developer Tools', keywords: ['regex', 'regexp', 'pattern', 'match', 'test'] },
   { name: 'Cron Parser', href: '#cron', category: 'Developer Tools', keywords: ['cron', 'schedule', 'job', 'time', 'expression'] },
   { name: 'Diff Tool', href: '#diff', category: 'Text & Data', keywords: ['diff', 'compare', 'difference', 'merge', 'text'] },
   { name: 'CSV ↔ JSON Converter', href: '#csv-json', category: 'Converters', keywords: ['csv', 'json', 'convert', 'table', 'data', 'excel'] },
