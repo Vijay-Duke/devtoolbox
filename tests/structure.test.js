@@ -68,9 +68,9 @@ describe('HTML Structure', () => {
 
   describe('Required Components', () => {
     it('should have logo in header', () => {
-      const logo = document.querySelector('.logo');
-      expect(logo).toBeTruthy();
-      expect(logo.textContent).toContain('DevToolbox');
+      const header = document.querySelector('header');
+      expect(header).toBeTruthy();
+      expect(header.textContent).toContain('DevToolbox');
     });
 
     it('should have search input', () => {
@@ -93,11 +93,16 @@ describe('HTML Structure', () => {
     });
   });
 
-  describe('CSS Files', () => {
-    it('should link to base.css', () => {
-      const baseCSS = document.querySelector('link[href*="base.css"]');
-      expect(baseCSS).toBeTruthy();
-      expect(baseCSS.getAttribute('rel')).toBe('stylesheet');
+  describe('CSS Setup', () => {
+    it('should have Tailwind CSS script', () => {
+      const tailwindScript = document.querySelector('script[src*="tailwindcss"]');
+      expect(tailwindScript).toBeTruthy();
+    });
+
+    it('should have inline styles for critical layouts', () => {
+      const styleTag = document.querySelector('style');
+      expect(styleTag).toBeTruthy();
+      expect(styleTag.textContent).toContain('[data-theme="dark"]');
     });
   });
 
@@ -105,7 +110,7 @@ describe('HTML Structure', () => {
     it('should have skip to main content link', () => {
       const skipLink = document.querySelector('a[href="#main"]');
       expect(skipLink).toBeTruthy();
-      expect(skipLink.classList.contains('skip-link')).toBe(true);
+      expect(skipLink.classList.contains('sr-only')).toBe(true);
     });
 
     it('should have proper ARIA labels on interactive elements', () => {
