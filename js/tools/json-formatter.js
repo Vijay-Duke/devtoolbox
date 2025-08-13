@@ -20,15 +20,15 @@ export class JSONFormatter {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>JSON Formatter & Validator</h1>
-          <p class="tool-description">Format, validate, and minify JSON data with syntax highlighting</p>
+      <div class="max-w-7xl mx-auto p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">JSON Formatter & Validator</h1>
+          <p class="text-gray-600 dark:text-gray-400">Format, validate, and minify JSON data with syntax highlighting</p>
         </div>
         
-        <div class="tool-controls">
-          <button class="btn btn-primary" data-action="format">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="flex flex-wrap gap-2 mb-6">
+          <button class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="format">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
               <rect x="3" y="3" width="18" height="18" rx="2"/>
               <line x1="9" y1="9" x2="15" y2="9"/>
               <line x1="9" y1="12" x2="15" y2="12"/>
@@ -36,8 +36,8 @@ export class JSONFormatter {
             </svg>
             Format
           </button>
-          <button class="btn btn-secondary" data-action="minify">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="inline-flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="minify">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
               <polyline points="4 14 10 14 10 20"/>
               <polyline points="20 10 14 10 14 4"/>
               <line x1="14" y1="10" x2="21" y2="3"/>
@@ -45,15 +45,15 @@ export class JSONFormatter {
             </svg>
             Minify
           </button>
-          <button class="btn btn-secondary" data-action="copy">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="inline-flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
               <rect x="9" y="9" width="13" height="13" rx="2"/>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
             Copy
           </button>
-          <button class="btn btn-secondary" data-action="clear">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="inline-flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="clear">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
@@ -61,15 +61,15 @@ export class JSONFormatter {
           </button>
         </div>
         
-        <div class="error-display" data-error hidden></div>
+        <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6 hidden" data-error></div>
         
-        <div class="tool-content">
-          <div class="input-section">
-            <label for="json-input">Input JSON</label>
-            <div class="input-wrapper">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <label for="json-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Input JSON</label>
+            <div class="relative">
               <textarea 
                 id="json-input" 
-                class="code-input" 
+                class="w-full h-96 p-4 font-mono text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                 placeholder="Paste your JSON here..."
                 spellcheck="false"
               >{
@@ -79,22 +79,20 @@ export class JSONFormatter {
     "array": [1, 2, 3]
   }
 }</textarea>
-              <div class="error-overlay" id="error-overlay" hidden></div>
+              <div class="absolute inset-0 pointer-events-none hidden" id="error-overlay"></div>
             </div>
           </div>
           
-          <div class="output-section">
-            <label for="json-output">Formatted Output</label>
-            <pre id="json-output" class="code-output"></pre>
+          <div>
+            <label for="json-output" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Formatted Output</label>
+            <pre id="json-output" class="w-full h-96 p-4 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-auto"></pre>
           </div>
         </div>
         
-        <div class="tool-footer">
-          <div class="stats">
-            <span data-stat="chars">0 characters</span>
-            <span data-stat="lines">0 lines</span>
-            <span data-stat="size">0 bytes</span>
-          </div>
+        <div class="mt-6 flex gap-4 text-sm text-gray-600 dark:text-gray-400">
+          <span data-stat="chars">0 characters</span>
+          <span data-stat="lines">0 lines</span>
+          <span data-stat="size">0 bytes</span>
         </div>
       </div>
     `;

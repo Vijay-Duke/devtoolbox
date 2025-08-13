@@ -20,241 +20,265 @@ export class QRGenerator {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1 class="tool-title">QR Code Generator</h1>
-          <p class="tool-description">Create QR codes for text, URLs, WiFi, contacts, and more with customizable styling</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">QR Code Generator</h1>
+          <p class="text-gray-600 dark:text-gray-300">Create QR codes for text, URLs, WiFi, contacts, and more with customizable styling</p>
         </div>
         
-        <div class="qr-main-container">
-          <div class="qr-input-section">
-            <div class="qr-type-tabs">
-              <button class="type-tab active" data-type="text">
-                <svg class="type-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <div class="flex flex-wrap gap-2 mb-6">
+              <button class="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-tab active" data-type="text">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14,2 14,8 20,8"/>
                   <line x1="16" y1="13" x2="8" y2="13"/>
                   <line x1="16" y1="17" x2="8" y2="17"/>
                   <polyline points="10,9 9,9 8,9"/>
                 </svg>
-                Text
+                <span class="text-sm">Text</span>
               </button>
-              <button class="type-tab" data-type="url">
-                <svg class="type-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-tab" data-type="url">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
                   <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
                 </svg>
-                URL
+                <span class="text-sm">URL</span>
               </button>
-              <button class="type-tab" data-type="email">
-                <svg class="type-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-tab" data-type="email">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                   <polyline points="22,6 12,13 2,6"/>
                 </svg>
-                Email
+                <span class="text-sm">Email</span>
               </button>
-              <button class="type-tab" data-type="phone">
-                <svg class="type-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-tab" data-type="phone">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                 </svg>
-                Phone
+                <span class="text-sm">Phone</span>
               </button>
-              <button class="type-tab" data-type="sms">
-                <svg class="type-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-tab" data-type="sms">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
-                SMS
+                <span class="text-sm">SMS</span>
               </button>
-              <button class="type-tab" data-type="wifi">
-                <svg class="type-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-tab" data-type="wifi">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9z"/>
                   <path d="M5 13l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.24 9.24 8.76 9.24 5 13z"/>
                   <path d="M9 17l2 2c.87-.87 2.13-.87 3 0l2-2C14.24 15.24 9.76 15.24 9 17z"/>
                 </svg>
-                WiFi
+                <span class="text-sm">WiFi</span>
               </button>
-              <button class="type-tab" data-type="vcard">
-                <svg class="type-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-tab" data-type="vcard">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                   <circle cx="12" cy="7" r="4"/>
                 </svg>
-                Contact
+                <span class="text-sm">Contact</span>
               </button>
-              <button class="type-tab" data-type="location">
-                <svg class="type-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-tab" data-type="location">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                   <circle cx="12" cy="10" r="3"/>
                 </svg>
-                Location
+                <span class="text-sm">Location</span>
               </button>
             </div>
         
-            <div class="qr-input-container">
-              <div id="input-text" class="input-panel active">
-                <div class="input-group">
-                  <label class="input-label" for="text-input">Text or Data</label>
+            <div class="mb-6">
+              <div id="input-text" class="input-panel">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="text-input">Text or Data</label>
                   <textarea 
                     id="text-input" 
-                    class="textarea-field" 
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" 
                     placeholder="Enter any text or data..."
                     rows="4"
                   >Hello, World!</textarea>
                 </div>
               </div>
           
-              <div id="input-url" class="input-panel">
-                <div class="input-group">
-                  <label class="input-label" for="url-input">Website URL</label>
+                  <div id="input-url" class="input-panel hidden">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="url-input">Website URL</label>
                   <input 
                     type="url" 
                     id="url-input" 
-                    class="input-field" 
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" 
                     placeholder="https://example.com"
                   />
                 </div>
               </div>
               
-              <div id="input-email" class="input-panel">
-                <div class="input-group">
-                  <label class="input-label" for="email-to">Email Address</label>
-                  <input type="email" id="email-to" class="input-field" placeholder="user@example.com" />
+              <div id="input-email" class="input-panel hidden">
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="email-to">Email Address</label>
+                    <input type="email" id="email-to" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="user@example.com" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="email-subject">Subject (optional)</label>
+                    <input type="text" id="email-subject" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Email subject" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" for="email-body">Message (optional)</label>
+                    <textarea id="email-body" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Email message..." rows="3"></textarea>
+                  </div>
                 </div>
-                <div class="input-group">
-                  <label class="input-label" for="email-subject">Subject (optional)</label>
-                  <input type="text" id="email-subject" class="input-field" placeholder="Email subject" />
+              </div>
+          
+              <div id="input-phone" class="input-panel hidden">
+                <label for="phone-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
+                <input type="tel" id="phone-number" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="+1234567890" />
+              </div>
+          
+              <div id="input-sms" class="input-panel hidden">
+                <div class="space-y-4">
+                  <div>
+                    <label for="sms-number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
+                    <input type="tel" id="sms-number" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="+1234567890" />
+                  </div>
+                  <div>
+                    <label for="sms-message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
+                    <textarea id="sms-message" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="SMS message..." rows="3"></textarea>
+                  </div>
                 </div>
-                <div class="input-group">
-                  <label class="input-label" for="email-body">Message (optional)</label>
-                  <textarea id="email-body" class="textarea-field" placeholder="Email message..." rows="3"></textarea>
+              </div>
+          
+              <div id="input-wifi" class="input-panel hidden">
+                <div class="space-y-4">
+                  <div>
+                    <label for="wifi-ssid" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Network Name (SSID)</label>
+                    <input type="text" id="wifi-ssid" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="MyWiFiNetwork" />
+                  </div>
+                  <div>
+                    <label for="wifi-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+                    <input type="password" id="wifi-password" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Password" />
+                  </div>
+                  <div>
+                    <label for="wifi-security" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Security Type</label>
+                    <select id="wifi-security" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+                      <option value="WPA">WPA/WPA2</option>
+                      <option value="WEP">WEP</option>
+                      <option value="nopass">No Password</option>
+                    </select>
+                  </div>
+                  <label class="flex items-center">
+                    <input type="checkbox" id="wifi-hidden" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Hidden Network</span>
+                  </label>
                 </div>
               </div>
           
-          <div id="input-phone" class="input-panel">
-            <label for="phone-number">Phone Number</label>
-            <input type="tel" id="phone-number" class="input-field" placeholder="+1234567890" />
-          </div>
+              <div id="input-vcard" class="input-panel hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label for="vcard-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                    <input type="text" id="vcard-name" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="John Doe" />
+                  </div>
+                  <div>
+                    <label for="vcard-org" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Organization</label>
+                    <input type="text" id="vcard-org" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Company Inc." />
+                  </div>
+                  <div>
+                    <label for="vcard-phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone</label>
+                    <input type="tel" id="vcard-phone" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="+1234567890" />
+                  </div>
+                  <div>
+                    <label for="vcard-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                    <input type="email" id="vcard-email" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="john@example.com" />
+                  </div>
+                  <div>
+                    <label for="vcard-url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Website</label>
+                    <input type="url" id="vcard-url" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="https://example.com" />
+                  </div>
+                  <div>
+                    <label for="vcard-address" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
+                    <input type="text" id="vcard-address" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="123 Main St, City, Country" />
+                  </div>
+                </div>
+              </div>
           
-          <div id="input-sms" class="input-panel">
-            <label for="sms-number">Phone Number</label>
-            <input type="tel" id="sms-number" class="input-field" placeholder="+1234567890" />
-            <label for="sms-message">Message</label>
-            <textarea id="sms-message" class="input-field" placeholder="SMS message..." rows="3"></textarea>
-          </div>
+              <div id="input-location" class="input-panel hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label for="location-lat" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Latitude</label>
+                    <input type="number" id="location-lat" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="37.7749" step="0.0001" />
+                  </div>
+                  <div>
+                    <label for="location-lng" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Longitude</label>
+                    <input type="number" id="location-lng" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="-122.4194" step="0.0001" />
+                  </div>
+                </div>
+              </div>
+            </div>
+        
+            <div class="space-y-4">
+              <div>
+                <label for="qr-size" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Size: <span id="size-display">256</span>px</label>
+                <input type="range" id="qr-size" min="128" max="512" value="256" step="32" class="w-full" />
+              </div>
           
-          <div id="input-wifi" class="input-panel">
-            <label for="wifi-ssid">Network Name (SSID)</label>
-            <input type="text" id="wifi-ssid" class="input-field" placeholder="MyWiFiNetwork" />
-            <label for="wifi-password">Password</label>
-            <input type="password" id="wifi-password" class="input-field" placeholder="Password" />
-            <label for="wifi-security">Security Type</label>
-            <select id="wifi-security" class="select-input">
-              <option value="WPA">WPA/WPA2</option>
-              <option value="WEP">WEP</option>
-              <option value="nopass">No Password</option>
-            </select>
-            <label class="checkbox-label">
-              <input type="checkbox" id="wifi-hidden">
-              <span>Hidden Network</span>
-            </label>
-          </div>
+              <div>
+                <label for="error-correction" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Error Correction</label>
+                <select id="error-correction" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+                  <option value="L">Low (7%)</option>
+                  <option value="M" selected>Medium (15%)</option>
+                  <option value="Q">Quartile (25%)</option>
+                  <option value="H">High (30%)</option>
+                </select>
+              </div>
           
-          <div id="input-vcard" class="input-panel">
-            <div class="vcard-grid">
-              <div>
-                <label for="vcard-name">Full Name</label>
-                <input type="text" id="vcard-name" class="input-field" placeholder="John Doe" />
-              </div>
-              <div>
-                <label for="vcard-org">Organization</label>
-                <input type="text" id="vcard-org" class="input-field" placeholder="Company Inc." />
-              </div>
-              <div>
-                <label for="vcard-phone">Phone</label>
-                <input type="tel" id="vcard-phone" class="input-field" placeholder="+1234567890" />
-              </div>
-              <div>
-                <label for="vcard-email">Email</label>
-                <input type="email" id="vcard-email" class="input-field" placeholder="john@example.com" />
-              </div>
-              <div>
-                <label for="vcard-url">Website</label>
-                <input type="url" id="vcard-url" class="input-field" placeholder="https://example.com" />
-              </div>
-              <div>
-                <label for="vcard-address">Address</label>
-                <input type="text" id="vcard-address" class="input-field" placeholder="123 Main St, City, Country" />
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="fg-color" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foreground</label>
+                  <input type="color" id="fg-color" value="#000000" class="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md" />
+                </div>
+                <div>
+                  <label for="bg-color" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Background</label>
+                  <input type="color" id="bg-color" value="#FFFFFF" class="w-full h-10 border border-gray-300 dark:border-gray-600 rounded-md" />
+                </div>
               </div>
             </div>
           </div>
-          
-          <div id="input-location" class="input-panel">
-            <label for="location-lat">Latitude</label>
-            <input type="number" id="location-lat" class="input-field" placeholder="37.7749" step="0.0001" />
-            <label for="location-lng">Longitude</label>
-            <input type="number" id="location-lng" class="input-field" placeholder="-122.4194" step="0.0001" />
-          </div>
-        </div>
         
-        <div class="qr-options">
-          <div class="option-group">
-            <label for="qr-size">Size: <span id="size-display">256</span>px</label>
-            <input type="range" id="qr-size" min="128" max="512" value="256" step="32" class="range-input" />
-          </div>
-          
-          <div class="option-group">
-            <label for="error-correction">Error Correction</label>
-            <select id="error-correction" class="select-input">
-              <option value="L">Low (7%)</option>
-              <option value="M" selected>Medium (15%)</option>
-              <option value="Q">Quartile (25%)</option>
-              <option value="H">High (30%)</option>
-            </select>
-          </div>
-          
-          <div class="color-options">
-            <div class="color-group">
-              <label for="fg-color">Foreground</label>
-              <input type="color" id="fg-color" value="#000000" />
-            </div>
-            <div class="color-group">
-              <label for="bg-color">Background</label>
-              <input type="color" id="bg-color" value="#FFFFFF" />
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-center">
+            <canvas id="qr-canvas" width="256" height="256" class="mx-auto border border-gray-200 dark:border-gray-600 rounded"></canvas>
+            <div class="flex justify-center gap-4 mt-3 text-sm text-gray-600 dark:text-gray-400">
+              <span id="qr-data-size">0 bytes</span>
+              <span id="qr-modules">0 modules</span>
             </div>
           </div>
-        </div>
-        
-        <div class="qr-display">
-          <canvas id="qr-canvas" width="256" height="256"></canvas>
-          <div class="qr-info">
-            <span id="qr-data-size">0 bytes</span>
-            <span id="qr-modules">0 modules</span>
+          
+          <div class="flex flex-wrap gap-2 mb-6">
+            <button class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="generate">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+              </svg>
+              Generate QR Code
+            </button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="download-png">Download PNG</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="download-svg">Download SVG</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="copy">Copy Image</button>
           </div>
-        </div>
-        
-        <div class="qr-actions">
-          <button class="btn btn-primary" data-action="generate">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7"/>
-              <rect x="14" y="3" width="7" height="7"/>
-              <rect x="3" y="14" width="7" height="7"/>
-              <rect x="14" y="14" width="7" height="7"/>
-            </svg>
-            Generate QR Code
-          </button>
-          <button class="btn btn-secondary" data-action="download-png">Download PNG</button>
-          <button class="btn btn-secondary" data-action="download-svg">Download SVG</button>
-          <button class="btn btn-secondary" data-action="copy">Copy Image</button>
-        </div>
-        
-        <div class="qr-templates">
-          <h3>Quick Templates</h3>
-          <div class="template-grid">
-            <button class="template-btn" data-template="website">My Website</button>
-            <button class="template-btn" data-template="email">Contact Email</button>
-            <button class="template-btn" data-template="wifi-guest">Guest WiFi</button>
-            <button class="template-btn" data-template="business-card">Business Card</button>
-            <button class="template-btn" data-template="app-store">App Store Link</button>
-            <button class="template-btn" data-template="social">Social Media</button>
+          
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Quick Templates</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+              <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="website">My Website</button>
+              <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="email">Contact Email</button>
+              <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="wifi-guest">Guest WiFi</button>
+              <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="business-card">Business Card</button>
+              <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="app-store">App Store Link</button>
+              <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="social">Social Media</button>
+            </div>
           </div>
         </div>
       </div>
@@ -266,7 +290,7 @@ export class QRGenerator {
   
   attachEventListeners() {
     // Type selector
-    this.container.querySelectorAll('.type-btn').forEach(btn => {
+    this.container.querySelectorAll('.type-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         this.selectType(btn.dataset.type);
       });
@@ -309,13 +333,23 @@ export class QRGenerator {
   
   selectType(type) {
     // Update buttons
-    this.container.querySelectorAll('.type-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.type === type);
+    this.container.querySelectorAll('.type-tab').forEach(btn => {
+      const isActive = btn.dataset.type === type;
+      if (isActive) {
+        btn.className = 'flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-tab active';
+      } else {
+        btn.className = 'flex items-center gap-2 px-3 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-tab';
+      }
     });
     
     // Update panels
     this.container.querySelectorAll('.input-panel').forEach(panel => {
-      panel.classList.toggle('active', panel.id === `input-${type}`);
+      const isActive = panel.id === `input-${type}`;
+      if (isActive) {
+        panel.classList.remove('hidden');
+      } else {
+        panel.classList.add('hidden');
+      }
     });
     
     // Generate new QR
@@ -323,7 +357,7 @@ export class QRGenerator {
   }
   
   generateQR() {
-    const type = this.container.querySelector('.type-btn.active').dataset.type;
+    const type = this.container.querySelector('.type-tab.active').dataset.type;
     const data = this.getDataForType(type);
     
     if (!data) {

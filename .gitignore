@@ -10,6 +10,8 @@ test-results/
 playwright-report/
 playwright/.cache/
 coverage/
+test-*.html
+*.test.js
 
 # IDE
 .vscode/
@@ -22,10 +24,26 @@ coverage/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+logs/
+*.log
 
 # Cache
 .cache/
 .parcel-cache/
+.eslintcache
 
 # Agent OS development files
 .agent-os/
+
+# OS Files
+Thumbs.db
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+temp/

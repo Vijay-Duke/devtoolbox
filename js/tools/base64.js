@@ -16,20 +16,20 @@ export class Base64Tool {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>Base64 Encode/Decode</h1>
-          <p class="tool-description">Encode and decode Base64 strings with support for UTF-8</p>
+      <div class="max-w-7xl mx-auto p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Base64 Encode/Decode</h1>
+          <p class="text-gray-600 dark:text-gray-400">Encode and decode Base64 strings with support for UTF-8</p>
         </div>
         
-        <div class="tool-controls">
-          <div class="mode-toggle">
-            <button class="btn btn-primary" data-mode="encode">Encode</button>
-            <button class="btn btn-secondary" data-mode="decode">Decode</button>
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div class="inline-flex rounded-lg border border-gray-200 dark:border-gray-700">
+            <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-l-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-mode="encode">Encode</button>
+            <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-r-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-mode="decode">Decode</button>
           </div>
-          <div class="action-buttons">
-            <button class="btn btn-secondary" data-action="swap">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <div class="flex gap-2">
+            <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="swap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
                 <polyline points="17 1 21 5 17 9"/>
                 <polyline points="3 11 7 7 11 11"/>
                 <path d="M21 5H9"/>
@@ -38,41 +38,37 @@ export class Base64Tool {
               </svg>
               Swap
             </button>
-            <button class="btn btn-secondary" data-action="copy">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
                 <rect x="9" y="9" width="13" height="13" rx="2"/>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg>
               Copy
             </button>
-            <button class="btn btn-secondary" data-action="clear">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-              Clear
-            </button>
+            <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="clear">Clear</button>
           </div>
         </div>
         
-        <div class="error-display" data-error hidden></div>
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6 hidden" data-error>
+          <p class="text-red-800 dark:text-red-300 text-sm"></p>
+        </div>
         
-        <div class="tool-content">
-          <div class="input-section">
-            <label for="base64-input">Input</label>
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+          <div class="space-y-2">
+            <label for="base64-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Input</label>
             <textarea 
               id="base64-input" 
-              class="code-input" 
+              class="w-full h-64 p-4 font-mono text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
               placeholder="Enter text to encode or Base64 to decode..."
               spellcheck="false"
             >Hello, World!</textarea>
           </div>
           
-          <div class="output-section">
-            <label for="base64-output">Output</label>
+          <div class="space-y-2">
+            <label for="base64-output" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Output</label>
             <textarea 
               id="base64-output" 
-              class="code-input" 
+              class="w-full h-64 p-4 font-mono text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg" 
               placeholder="Result will appear here..."
               spellcheck="false"
               readonly
@@ -80,18 +76,16 @@ export class Base64Tool {
           </div>
         </div>
         
-        <div class="tool-footer">
-          <div class="stats">
-            <span data-stat="input-size">0 bytes</span>
-            <span data-stat="output-size">0 bytes</span>
-            <span data-stat="ratio">Ratio: 0%</span>
+        <div class="flex flex-wrap items-center justify-between gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <div class="flex gap-6 text-sm">
+            <span class="text-gray-600 dark:text-gray-400"><span class="font-medium text-gray-900 dark:text-white" data-stat="input-size">0 bytes</span> input</span>
+            <span class="text-gray-600 dark:text-gray-400"><span class="font-medium text-gray-900 dark:text-white" data-stat="output-size">0 bytes</span> output</span>
+            <span class="text-gray-600 dark:text-gray-400" data-stat="ratio">Ratio: 0%</span>
           </div>
-          <div class="options">
-            <label class="checkbox-label">
-              <input type="checkbox" id="url-safe" />
-              <span>URL Safe (RFC 4648)</span>
-            </label>
-          </div>
+          <label class="flex items-center space-x-2 text-sm">
+            <input type="checkbox" id="url-safe" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+            <span class="text-gray-700 dark:text-gray-300">URL Safe (RFC 4648)</span>
+          </label>
         </div>
       </div>
     `;
@@ -286,12 +280,12 @@ export class Base64Tool {
   }
   
   showError(message) {
-    this.errorDisplay.textContent = message;
-    this.errorDisplay.hidden = false;
+    this.errorDisplay.querySelector('p').textContent = message;
+    this.errorDisplay.classList.remove('hidden');
   }
   
   clearError() {
-    this.errorDisplay.textContent = '';
-    this.errorDisplay.hidden = true;
+    this.errorDisplay.querySelector('p').textContent = '';
+    this.errorDisplay.classList.add('hidden');
   }
 }

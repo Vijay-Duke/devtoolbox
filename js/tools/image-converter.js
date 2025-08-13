@@ -18,36 +18,36 @@ export class ImageConverter {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>Image Converter</h1>
-          <p>Convert images between different formats, resize, and compress</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Image Converter</h1>
+          <p class="text-gray-600 dark:text-gray-300">Convert images between different formats, resize, and compress</p>
         </div>
         
-        <div class="upload-section">
-          <div class="upload-area" id="upload-area">
+        <div class="mb-6">
+          <div class="p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md text-center hover:border-blue-400 cursor-pointer" id="upload-area">
             <input type="file" id="image-input" accept="image/*" hidden>
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mx-auto text-gray-400 mb-4">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
               <polyline points="17 8 12 3 7 8"/>
               <line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
-            <p>Drop image here or click to browse</p>
-            <p class="upload-hint">Supports JPG, PNG, WebP, GIF, BMP</p>
+            <p class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Drop image here or click to browse</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Supports JPG, PNG, WebP, GIF, BMP</p>
           </div>
         </div>
         
-        <div class="image-preview" id="image-preview" hidden>
-          <div class="preview-container">
-            <canvas id="preview-canvas"></canvas>
-            <div class="image-info" id="image-info"></div>
+        <div class="mb-6 bg-gray-50 dark:bg-gray-900 rounded-lg p-4" id="image-preview" hidden>
+          <div>
+            <canvas id="preview-canvas" class="max-w-full h-auto mx-auto rounded border border-gray-200 dark:border-gray-600"></canvas>
+            <div id="image-info" class="mt-4 text-sm text-gray-600 dark:text-gray-400"></div>
           </div>
         </div>
         
-        <div class="conversion-options" id="conversion-options" hidden>
-          <div class="option-group">
-            <label for="output-format">Output Format</label>
-            <select id="output-format" class="select-input">
+        <div class="space-y-6" id="conversion-options" hidden>
+          <div>
+            <label for="output-format" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Output Format</label>
+            <select id="output-format" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               <option value="jpeg">JPEG</option>
               <option value="png">PNG</option>
               <option value="webp">WebP</option>
@@ -55,96 +55,99 @@ export class ImageConverter {
             </select>
           </div>
           
-          <div class="option-group">
-            <label for="quality">Quality: <span id="quality-display">90</span>%</label>
-            <input type="range" id="quality" min="10" max="100" value="90" step="5" class="range-input">
-            <div class="quality-hints">
+          <div>
+            <label for="quality" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quality: <span id="quality-display">90</span>%</label>
+            <input type="range" id="quality" min="10" max="100" value="90" step="5" class="w-full">
+            <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
               <span>Lower file size</span>
               <span>Higher quality</span>
             </div>
           </div>
           
-          <div class="resize-options">
-            <h3>Resize Options</h3>
-            <div class="resize-grid">
-              <div class="option-group">
-                <label for="resize-width">Width (px)</label>
-                <input type="number" id="resize-width" class="input-field" placeholder="Auto">
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Resize Options</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label for="resize-width" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Width (px)</label>
+                <input type="number" id="resize-width" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white" placeholder="Auto">
               </div>
-              <div class="option-group">
-                <label for="resize-height">Height (px)</label>
-                <input type="number" id="resize-height" class="input-field" placeholder="Auto">
+              <div>
+                <label for="resize-height" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Height (px)</label>
+                <input type="number" id="resize-height" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white" placeholder="Auto">
               </div>
-              <label class="checkbox-label">
-                <input type="checkbox" id="maintain-aspect" checked>
-                <span>Maintain aspect ratio</span>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 mb-4">
+              <label class="flex items-center">
+                <input type="checkbox" id="maintain-aspect" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Maintain aspect ratio</span>
               </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="resize-percentage">
-                <span>Use percentage</span>
+              <label class="flex items-center">
+                <input type="checkbox" id="resize-percentage" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Use percentage</span>
               </label>
             </div>
             
-            <div class="preset-sizes">
-              <button class="preset-btn" data-preset="thumbnail">Thumbnail (150x150)</button>
-              <button class="preset-btn" data-preset="small">Small (640x480)</button>
-              <button class="preset-btn" data-preset="medium">Medium (1024x768)</button>
-              <button class="preset-btn" data-preset="large">Large (1920x1080)</button>
-              <button class="preset-btn" data-preset="original">Original Size</button>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+              <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-preset="thumbnail">Thumbnail (150x150)</button>
+              <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-preset="small">Small (640x480)</button>
+              <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-preset="medium">Medium (1024x768)</button>
+              <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-preset="large">Large (1920x1080)</button>
+              <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-preset="original">Original Size</button>
             </div>
           </div>
           
-          <div class="filters-section">
-            <h3>Filters & Adjustments</h3>
-            <div class="filter-controls">
-              <div class="filter-group">
-                <label for="brightness">Brightness</label>
-                <input type="range" id="brightness" min="-100" max="100" value="0" class="range-input">
-                <span class="filter-value">0</span>
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Filters & Adjustments</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label for="brightness" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Brightness</label>
+                <input type="range" id="brightness" min="-100" max="100" value="0" class="w-full">
+                <span class="filter-value text-sm text-gray-600 dark:text-gray-400">0</span>
               </div>
-              <div class="filter-group">
-                <label for="contrast">Contrast</label>
-                <input type="range" id="contrast" min="-100" max="100" value="0" class="range-input">
-                <span class="filter-value">0</span>
+              <div>
+                <label for="contrast" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Contrast</label>
+                <input type="range" id="contrast" min="-100" max="100" value="0" class="w-full">
+                <span class="filter-value text-sm text-gray-600 dark:text-gray-400">0</span>
               </div>
-              <div class="filter-group">
-                <label for="saturation">Saturation</label>
-                <input type="range" id="saturation" min="-100" max="100" value="0" class="range-input">
-                <span class="filter-value">0</span>
+              <div>
+                <label for="saturation" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Saturation</label>
+                <input type="range" id="saturation" min="-100" max="100" value="0" class="w-full">
+                <span class="filter-value text-sm text-gray-600 dark:text-gray-400">0</span>
               </div>
-              <div class="filter-group">
-                <label for="blur">Blur</label>
-                <input type="range" id="blur" min="0" max="20" value="0" class="range-input">
-                <span class="filter-value">0</span>
+              <div>
+                <label for="blur" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Blur</label>
+                <input type="range" id="blur" min="0" max="20" value="0" class="w-full">
+                <span class="filter-value text-sm text-gray-600 dark:text-gray-400">0</span>
               </div>
             </div>
-            <div class="filter-actions">
-              <button class="btn btn-secondary" data-action="reset-filters">Reset Filters</button>
-              <button class="btn btn-secondary" data-action="grayscale">Grayscale</button>
-              <button class="btn btn-secondary" data-action="sepia">Sepia</button>
-              <button class="btn btn-secondary" data-action="invert">Invert</button>
+            <div class="flex flex-wrap gap-2">
+              <button class="px-3 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="reset-filters">Reset Filters</button>
+              <button class="px-3 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="grayscale">Grayscale</button>
+              <button class="px-3 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="sepia">Sepia</button>
+              <button class="px-3 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="invert">Invert</button>
             </div>
           </div>
           
-          <div class="action-buttons">
-            <button class="btn btn-primary" data-action="convert">Convert & Download</button>
-            <button class="btn btn-secondary" data-action="reset">Reset</button>
-            <button class="btn btn-secondary" data-action="compare">Compare</button>
+          <div class="flex flex-wrap gap-3">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="convert">Convert & Download</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="reset">Reset</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="compare">Compare</button>
           </div>
         </div>
         
-        <div class="batch-converter" id="batch-mode" hidden>
-          <h3>Batch Conversion</h3>
-          <div class="batch-list" id="batch-list"></div>
-          <div class="batch-actions">
-            <button class="btn btn-primary" data-action="convert-all">Convert All</button>
-            <button class="btn btn-secondary" data-action="clear-batch">Clear</button>
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4" id="batch-mode" hidden>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Batch Conversion</h3>
+          <div id="batch-list" class="mb-4"></div>
+          <div class="flex gap-3">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="convert-all">Convert All</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="clear-batch">Clear</button>
           </div>
         </div>
         
-        <div class="output-info" id="output-info" hidden>
-          <h3>Conversion Result</h3>
-          <div class="result-stats"></div>
+        <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4" id="output-info" hidden>
+          <h3 class="text-lg font-medium text-green-800 dark:text-green-200 mb-2">Conversion Result</h3>
+          <div class="result-stats text-sm text-green-700 dark:text-green-300"></div>
         </div>
       </div>
     `;

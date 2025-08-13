@@ -17,20 +17,20 @@ export class GraphQLTester {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>GraphQL Tester</h1>
-          <p class="tool-description">Test GraphQL queries and mutations with variables, headers, and introspection</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">GraphQL Tester</h1>
+          <p class="text-gray-600 dark:text-gray-400">Test GraphQL queries and mutations with variables, headers, and introspection</p>
         </div>
         
-        <div class="tool-controls">
-          <button class="btn btn-primary" data-action="execute">
+        <div class="mb-6 flex flex-wrap gap-2">
+          <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="execute">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="5 3 19 12 5 21 5 3"/>
             </svg>
             Execute Query
           </button>
-          <button class="btn btn-secondary" data-action="prettify">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="prettify">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="4 7 4 4 20 4 20 7"/>
               <line x1="9" y1="20" x2="15" y2="20"/>
@@ -38,14 +38,14 @@ export class GraphQLTester {
             </svg>
             Prettify
           </button>
-          <button class="btn btn-secondary" data-action="copy-query">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="copy-query">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="9" y="9" width="13" height="13" rx="2"/>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
             Copy Query
           </button>
-          <button class="btn btn-secondary" data-action="clear">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="clear">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
@@ -54,59 +54,58 @@ export class GraphQLTester {
           </button>
         </div>
         
-        <div class="graphql-container">
-          <div class="config-section">
-            <div class="form-group">
-              <label for="endpoint-input">GraphQL Endpoint</label>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <div class="mb-4">
+              <label for="endpoint-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">GraphQL Endpoint</label>
               <input 
                 type="text" 
                 id="endpoint-input" 
-                class="form-input" 
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" 
                 placeholder="https://api.example.com/graphql"
                 value="https://countries.trevorblades.com/"
               />
             </div>
             
-            <div class="tabs">
-              <div class="tab-buttons">
-                <button class="tab-button active" data-tab="query">Query</button>
-                <button class="tab-button" data-tab="variables">Variables</button>
-                <button class="tab-button" data-tab="headers">Headers</button>
+            <div>
+              <div class="flex mb-2 border-b border-gray-200 dark:border-gray-700">
+                <button class="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400" data-tab="query">Query</button>
+                <button class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" data-tab="variables">Variables</button>
+                <button class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" data-tab="headers">Headers</button>
               </div>
               
-              <div class="tab-content">
-                <div class="tab-pane active" data-pane="query">
-                  <div class="editor-wrapper">
-                    <div class="line-numbers" id="line-numbers"></div>
-                    <textarea 
-                      id="query-editor" 
-                      class="code-editor"
-                      placeholder="# Write your GraphQL query here
+              <div>
+                <div class="tab-pane block" data-pane="query">
+                  <textarea 
+                    id="query-editor" 
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm"
+                    placeholder="# Write your GraphQL query here
 query {
   field
 }"
-                      spellcheck="false"
-                    ></textarea>
-                  </div>
+                    spellcheck="false"
+                    rows="10"
+                  ></textarea>
                 </div>
                 
-                <div class="tab-pane" data-pane="variables">
+                <div class="tab-pane hidden" data-pane="variables">
                   <textarea 
                     id="variables-editor" 
-                    class="code-editor"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm"
                     placeholder='{
   "variableName": "value"
 }'
                     spellcheck="false"
+                    rows="10"
                   >{}</textarea>
                 </div>
                 
-                <div class="tab-pane" data-pane="headers">
-                  <div id="headers-list" class="headers-list">
-                    <div class="header-item">
-                      <input type="text" class="header-key" placeholder="Header name" value="Content-Type" />
-                      <input type="text" class="header-value" placeholder="Header value" value="application/json" />
-                      <button class="btn-icon btn-remove" data-remove="header">
+                <div class="tab-pane hidden" data-pane="headers">
+                  <div id="headers-list" class="space-y-2 mb-3">
+                    <div class="flex gap-2">
+                      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header name" value="Content-Type" />
+                      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header value" value="application/json" />
+                      <button class="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md" data-remove="header">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <line x1="18" y1="6" x2="6" y2="18"/>
                           <line x1="6" y1="6" x2="18" y2="18"/>
@@ -114,40 +113,40 @@ query {
                       </button>
                     </div>
                   </div>
-                  <button class="btn btn-sm" data-add="header">Add Header</button>
+                  <button class="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/30" data-add="header">Add Header</button>
                 </div>
               </div>
             </div>
           </div>
           
-          <div class="response-section">
-            <div class="response-header">
-              <h3>Response</h3>
-              <div class="response-meta" id="response-meta"></div>
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Response</h3>
+              <div class="text-sm text-gray-600 dark:text-gray-400" id="response-meta"></div>
             </div>
-            <pre id="response-output" class="response-output">
-<span class="placeholder">Execute a query to see the response here</span>
+            <pre id="response-output" class="w-full p-4 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white font-mono text-sm overflow-x-auto" style="min-height: 200px; max-height: 400px;">
+<span class="text-gray-500 dark:text-gray-400">Execute a query to see the response here</span>
             </pre>
-            <button class="btn btn-secondary" data-action="copy-response" hidden>
+            <button class="mt-3 px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="copy-response" hidden>
               Copy Response
             </button>
           </div>
         </div>
         
-        <div class="query-history-section">
-          <h3>Query History</h3>
-          <div id="query-history" class="query-history"></div>
+        <div class="mt-6 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Query History</h3>
+          <div id="query-history" class="space-y-2"></div>
         </div>
         
-        <div class="examples-section">
-          <h3>Example Queries</h3>
-          <div class="examples-grid">
-            <button class="example-btn" data-example="countries">Countries API</button>
-            <button class="example-btn" data-example="spacex">SpaceX API</button>
-            <button class="example-btn" data-example="github">GitHub API</button>
-            <button class="example-btn" data-example="pokemon">Pokemon API</button>
-            <button class="example-btn" data-example="introspection">Introspection</button>
-            <button class="example-btn" data-example="mutation">Mutation Example</button>
+        <div class="mt-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Example Queries</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="countries">Countries API</button>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="spacex">SpaceX API</button>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="github">GitHub API</button>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="pokemon">Pokemon API</button>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="introspection">Introspection</button>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="mutation">Mutation Example</button>
           </div>
         </div>
       </div>
@@ -195,7 +194,7 @@ query {
     // Remove header (delegated)
     this.container.addEventListener('click', (e) => {
       if (e.target.closest('[data-remove="header"]')) {
-        e.target.closest('.header-item').remove();
+        e.target.closest('.flex.gap-2').remove();
       }
     });
     
@@ -239,13 +238,23 @@ query {
   
   switchTab(tab) {
     // Update buttons
-    this.container.querySelectorAll('.tab-button').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.tab === tab);
+    this.container.querySelectorAll('[data-tab]').forEach(btn => {
+      if (btn.dataset.tab === tab) {
+        btn.className = 'px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400';
+      } else {
+        btn.className = 'px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white';
+      }
     });
     
     // Update panes
     this.container.querySelectorAll('.tab-pane').forEach(pane => {
-      pane.classList.toggle('active', pane.dataset.pane === tab);
+      if (pane.dataset.pane === tab) {
+        pane.classList.remove('hidden');
+        pane.classList.add('block');
+      } else {
+        pane.classList.remove('block');
+        pane.classList.add('hidden');
+      }
     });
   }
   
@@ -279,16 +288,17 @@ query {
     const headers = {
       'Content-Type': 'application/json'
     };
-    this.container.querySelectorAll('#headers-list .header-item').forEach(item => {
-      const key = item.querySelector('.header-key').value.trim();
-      const value = item.querySelector('.header-value').value.trim();
+    this.container.querySelectorAll('#headers-list .flex.gap-2').forEach(item => {
+      const inputs = item.querySelectorAll('input');
+      const key = inputs[0]?.value.trim();
+      const value = inputs[1]?.value.trim();
       if (key) headers[key] = value;
     });
     
     // Show loading state
     const responseOutput = this.container.querySelector('#response-output');
     const responseMeta = this.container.querySelector('#response-meta');
-    responseOutput.innerHTML = '<span class="loading">Executing query...</span>';
+    responseOutput.innerHTML = '<span class="text-gray-500 dark:text-gray-400">Executing query...</span>';
     responseMeta.textContent = '';
     
     const startTime = performance.now();
@@ -525,11 +535,11 @@ query {
   addHeader() {
     const headersList = this.container.querySelector('#headers-list');
     const headerItem = document.createElement('div');
-    headerItem.className = 'header-item';
+    headerItem.className = 'flex gap-2';
     headerItem.innerHTML = `
-      <input type="text" class="header-key" placeholder="Header name" />
-      <input type="text" class="header-value" placeholder="Header value" />
-      <button class="btn-icon btn-remove" data-remove="header">
+      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header name" />
+      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header value" />
+      <button class="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md" data-remove="header">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"/>
           <line x1="6" y1="6" x2="18" y2="18"/>

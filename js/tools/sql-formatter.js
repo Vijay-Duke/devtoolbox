@@ -18,16 +18,16 @@ export class SQLFormatter {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>SQL Formatter</h1>
-          <p class="tool-description">Format and beautify SQL queries with proper indentation</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">SQL Formatter</h1>
+          <p class="text-gray-600 dark:text-gray-300">Format and beautify SQL queries with proper indentation</p>
         </div>
         
-        <div class="tool-controls">
-          <div class="control-group">
-            <label for="sql-dialect">SQL Dialect:</label>
-            <select id="sql-dialect" class="select-input">
+        <div class="mb-6 flex flex-wrap gap-4">
+          <div>
+            <label for="sql-dialect" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">SQL Dialect:</label>
+            <select id="sql-dialect" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               <option value="standard">Standard SQL</option>
               <option value="mysql">MySQL</option>
               <option value="postgresql">PostgreSQL</option>
@@ -37,9 +37,9 @@ export class SQLFormatter {
             </select>
           </div>
           
-          <div class="control-group">
-            <label for="format-style">Format Style:</label>
-            <select id="format-style" class="select-input">
+          <div>
+            <label for="format-style" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Format Style:</label>
+            <select id="format-style" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               <option value="standard">Standard</option>
               <option value="compact">Compact</option>
               <option value="expanded">Expanded</option>
@@ -47,8 +47,8 @@ export class SQLFormatter {
             </select>
           </div>
           
-          <div class="action-buttons">
-            <button class="btn btn-primary" data-action="format">
+          <div class="flex gap-2 items-end">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="format">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="21" y1="10" x2="7" y2="10"></line>
                 <line x1="21" y1="6" x2="3" y2="6"></line>
@@ -57,35 +57,35 @@ export class SQLFormatter {
               </svg>
               Format SQL
             </button>
-            <button class="btn btn-secondary" data-action="minify">Minify</button>
-            <button class="btn btn-secondary" data-action="clear">Clear</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="minify">Minify</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="clear">Clear</button>
           </div>
         </div>
         
-        <div class="format-options">
-          <label class="checkbox-label">
-            <input type="checkbox" id="uppercase-keywords" checked>
-            <span>Uppercase Keywords</span>
+        <div class="mb-6 flex flex-wrap gap-4">
+          <label class="flex items-center">
+            <input type="checkbox" id="uppercase-keywords" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+            <span class="text-sm text-gray-700 dark:text-gray-300">Uppercase Keywords</span>
           </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="add-semicolon" checked>
-            <span>Add Semicolon</span>
+          <label class="flex items-center">
+            <input type="checkbox" id="add-semicolon" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+            <span class="text-sm text-gray-700 dark:text-gray-300">Add Semicolon</span>
           </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="indent-cte">
-            <span>Indent CTEs</span>
+          <label class="flex items-center">
+            <input type="checkbox" id="indent-cte" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+            <span class="text-sm text-gray-700 dark:text-gray-300">Indent CTEs</span>
           </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="align-aliases">
-            <span>Align Aliases</span>
+          <label class="flex items-center">
+            <input type="checkbox" id="align-aliases" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+            <span class="text-sm text-gray-700 dark:text-gray-300">Align Aliases</span>
           </label>
         </div>
         
-        <div class="input-output-container">
-          <div class="input-section">
-            <div class="section-header">
-              <label for="sql-input">Input SQL</label>
-              <button class="btn-icon" data-action="paste" title="Paste from clipboard">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label for="sql-input" class="text-sm font-medium text-gray-700 dark:text-gray-300">Input SQL</label>
+              <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" data-action="paste" title="Paste from clipboard">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -94,20 +94,21 @@ export class SQLFormatter {
             </div>
             <textarea 
               id="sql-input" 
-              class="code-input" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" 
               placeholder="Paste or type your SQL query here..."
               spellcheck="false"
+              rows="10"
             >select u.id,u.name,u.email,o.order_id,o.total_amount,o.created_at from users u inner join orders o on u.id=o.user_id where o.status='completed' and o.created_at >= '2024-01-01' order by o.created_at desc limit 10</textarea>
-            <div class="input-stats">
+            <div class="mt-2 text-sm text-gray-600 dark:text-gray-400 flex gap-4">
               <span data-stat="lines">1 lines</span>
               <span data-stat="chars">0 characters</span>
             </div>
           </div>
           
-          <div class="output-section">
-            <div class="section-header">
-              <label for="sql-output">Formatted SQL</label>
-              <button class="btn-icon" data-action="copy" title="Copy to clipboard">
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label for="sql-output" class="text-sm font-medium text-gray-700 dark:text-gray-300">Formatted SQL</label>
+              <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" data-action="copy" title="Copy to clipboard">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -116,20 +117,21 @@ export class SQLFormatter {
             </div>
             <textarea 
               id="sql-output" 
-              class="code-output" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" 
               readonly
               spellcheck="false"
+              rows="10"
             ></textarea>
-            <div class="output-actions">
-              <button class="btn btn-sm" data-action="download">Download SQL</button>
-              <button class="btn btn-sm" data-action="explain">Explain Query</button>
+            <div class="mt-2 flex gap-2">
+              <button class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="download">Download SQL</button>
+              <button class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="explain">Explain Query</button>
             </div>
           </div>
         </div>
         
-        <div class="sql-analysis" id="sql-analysis" hidden>
-          <h3>Query Analysis</h3>
-          <div class="analysis-content"></div>
+        <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg" id="sql-analysis" hidden>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Query Analysis</h3>
+          <div class="analysis-content text-sm text-gray-700 dark:text-gray-300"></div>
         </div>
       </div>
     `;

@@ -17,19 +17,19 @@ export class CSVJSONConverter {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>CSV ↔ JSON Converter</h1>
-          <p class="tool-description">Convert between CSV and JSON formats with automatic type detection</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">CSV ↔ JSON Converter</h1>
+          <p class="text-gray-600 dark:text-gray-400">Convert between CSV and JSON formats with automatic type detection</p>
         </div>
         
-        <div class="tool-controls">
-          <div class="mode-toggle">
-            <button class="btn btn-primary" data-mode="csv-to-json">CSV → JSON</button>
-            <button class="btn btn-secondary" data-mode="json-to-csv">JSON → CSV</button>
+        <div class="mb-6 flex flex-wrap justify-between gap-4">
+          <div class="flex gap-2">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-mode="csv-to-json">CSV → JSON</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-mode="json-to-csv">JSON → CSV</button>
           </div>
-          <div class="action-buttons">
-            <button class="btn btn-secondary" data-action="swap">
+          <div class="flex gap-2">
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="swap">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="17 1 21 5 17 9"/>
                 <polyline points="3 11 7 7 11 11"/>
@@ -39,14 +39,14 @@ export class CSVJSONConverter {
               </svg>
               Swap
             </button>
-            <button class="btn btn-secondary" data-action="copy">
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="copy">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2"/>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg>
               Copy
             </button>
-            <button class="btn btn-secondary" data-action="clear">
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="clear">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"/>
                 <line x1="6" y1="6" x2="18" y2="18"/>
@@ -56,24 +56,24 @@ export class CSVJSONConverter {
           </div>
         </div>
         
-        <div class="conversion-options">
-          <div class="options-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="has-headers" checked />
-              <span>First row contains headers</span>
+        <div class="mb-6 flex flex-wrap gap-6">
+          <div class="flex flex-wrap gap-4">
+            <label class="flex items-center">
+              <input type="checkbox" id="has-headers" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+              <span class="text-sm text-gray-700 dark:text-gray-300">First row contains headers</span>
             </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="auto-type" checked />
-              <span>Auto-detect data types</span>
+            <label class="flex items-center">
+              <input type="checkbox" id="auto-type" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+              <span class="text-sm text-gray-700 dark:text-gray-300">Auto-detect data types</span>
             </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="pretty-print" checked />
-              <span>Pretty print JSON</span>
+            <label class="flex items-center">
+              <input type="checkbox" id="pretty-print" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+              <span class="text-sm text-gray-700 dark:text-gray-300">Pretty print JSON</span>
             </label>
           </div>
-          <div class="delimiter-group">
-            <label for="delimiter">Delimiter:</label>
-            <select id="delimiter" class="delimiter-select">
+          <div class="flex items-center gap-2">
+            <label for="delimiter" class="text-sm font-medium text-gray-700 dark:text-gray-300">Delimiter:</label>
+            <select id="delimiter" class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               <option value=",">Comma (,)</option>
               <option value=";">Semicolon (;)</option>
               <option value="\t">Tab</option>
@@ -82,36 +82,37 @@ export class CSVJSONConverter {
           </div>
         </div>
         
-        <div class="error-display" data-error hidden></div>
+        <div class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded hidden" data-error></div>
         
-        <div class="tool-content">
-          <div class="input-section">
-            <label for="csv-json-input">
-              <span class="input-label">CSV</span>
-              <span class="example-hint">Example: name,age,city</span>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <label for="csv-json-input" class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">CSV</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">Example: name,age,city</span>
             </label>
             <textarea 
               id="csv-json-input" 
-              class="code-input" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" 
               placeholder="Enter CSV data or JSON array..."
               spellcheck="false"
+              rows="12"
             >name,age,city,active
 John Doe,30,New York,true
 Jane Smith,25,Los Angeles,false
 Bob Johnson,35,Chicago,true</textarea>
           </div>
           
-          <div class="output-section">
-            <label for="csv-json-output">
-              <span class="output-label">JSON</span>
-              <span class="stats-label">0 rows, 0 columns</span>
+          <div>
+            <label for="csv-json-output" class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">JSON</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">0 rows, 0 columns</span>
             </label>
-            <pre id="csv-json-output" class="code-output"></pre>
+            <pre id="csv-json-output" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm overflow-auto" style="min-height: 288px; max-height: 400px;"></pre>
           </div>
         </div>
         
-        <div class="tool-footer">
-          <div class="stats">
+        <div class="mt-4 flex justify-between text-sm text-gray-600 dark:text-gray-400">
+          <div class="flex gap-4">
             <span data-stat="input-size">0 bytes</span>
             <span data-stat="output-size">0 bytes</span>
             <span data-stat="conversion-ratio">Ratio: 0%</span>
@@ -177,28 +178,26 @@ Bob Johnson,35,Chicago,true</textarea>
     // Update button states
     this.container.querySelectorAll('[data-mode]').forEach(btn => {
       if (btn.dataset.mode === mode) {
-        btn.classList.add('btn-primary');
-        btn.classList.remove('btn-secondary');
+        btn.className = 'px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
       } else {
-        btn.classList.remove('btn-primary');
-        btn.classList.add('btn-secondary');
+        btn.className = 'px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
       }
     });
     
-    // Update labels
-    const inputLabel = this.container.querySelector('.input-label');
-    const outputLabel = this.container.querySelector('.output-label');
-    const exampleHint = this.container.querySelector('.example-hint');
+    // Update labels - use proper selectors
+    const inputLabel = this.container.querySelector('label[for="csv-json-input"] span:first-child');
+    const outputLabel = this.container.querySelector('label[for="csv-json-output"] span:first-child');
+    const exampleHint = this.container.querySelector('label[for="csv-json-input"] span:last-child');
     
     if (mode === 'csv-to-json') {
-      inputLabel.textContent = 'CSV';
-      outputLabel.textContent = 'JSON';
-      exampleHint.textContent = 'Example: name,age,city';
+      if (inputLabel) inputLabel.textContent = 'CSV';
+      if (outputLabel) outputLabel.textContent = 'JSON';
+      if (exampleHint) exampleHint.textContent = 'Example: name,age,city';
       this.inputArea.placeholder = 'Enter CSV data...';
     } else {
-      inputLabel.textContent = 'JSON';
-      outputLabel.textContent = 'CSV';
-      exampleHint.textContent = 'Example: [{"name": "John", "age": 30}]';
+      if (inputLabel) inputLabel.textContent = 'JSON';
+      if (outputLabel) outputLabel.textContent = 'CSV';
+      if (exampleHint) exampleHint.textContent = 'Example: [{"name": "John", "age": 30}]';
       this.inputArea.placeholder = 'Enter JSON array...';
     }
   }
@@ -410,25 +409,8 @@ Bob Johnson,35,Chicago,true</textarea>
   
   displayOutput(output) {
     if (this.mode === 'csv-to-json') {
-      // Syntax highlight JSON
-      const highlighted = output
-        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
-          let cls = 'json-number';
-          if (/^"/.test(match)) {
-            if (/:$/.test(match)) {
-              cls = 'json-key';
-            } else {
-              cls = 'json-string';
-            }
-          } else if (/true|false/.test(match)) {
-            cls = 'json-boolean';
-          } else if (/null/.test(match)) {
-            cls = 'json-null';
-          }
-          return `<span class="${cls}">${match}</span>`;
-        });
-      
-      this.outputArea.innerHTML = highlighted;
+      // For JSON output, just display as text since pre elements don't support HTML
+      this.outputArea.textContent = output;
     } else {
       // Display CSV as plain text
       this.outputArea.textContent = output;
@@ -436,7 +418,7 @@ Bob Johnson,35,Chicago,true</textarea>
   }
   
   updateStatsLabel(rows, columns) {
-    const statsLabel = this.container.querySelector('.stats-label');
+    const statsLabel = this.container.querySelector('label[for="csv-json-output"] span:last-child');
     if (statsLabel) {
       statsLabel.textContent = `${rows} rows, ${columns} columns`;
     }
@@ -488,12 +470,18 @@ Bob Johnson,35,Chicago,true</textarea>
     navigator.clipboard.writeText(output).then(() => {
       const btn = this.container.querySelector('[data-action="copy"]');
       const originalHTML = btn.innerHTML;
-      btn.innerHTML = 'Copied!';
-      btn.classList.add('btn-success');
+      const originalClasses = btn.className;
+      btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Copied!
+      `;
+      btn.className = 'px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center gap-2';
       
       setTimeout(() => {
         btn.innerHTML = originalHTML;
-        btn.classList.remove('btn-success');
+        btn.className = originalClasses;
       }, 2000);
     });
   }

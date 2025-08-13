@@ -17,19 +17,19 @@ export class YAMLJSONConverter {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>YAML ↔ JSON Converter</h1>
-          <p class="tool-description">Convert between YAML and JSON formats for configuration files</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">YAML ↔ JSON Converter</h1>
+          <p class="text-gray-600 dark:text-gray-400">Convert between YAML and JSON formats for configuration files</p>
         </div>
         
-        <div class="tool-controls">
-          <div class="mode-toggle">
-            <button class="btn btn-primary" data-mode="yaml-to-json">YAML → JSON</button>
-            <button class="btn btn-secondary" data-mode="json-to-yaml">JSON → YAML</button>
+        <div class="mb-6 flex flex-wrap justify-between gap-4">
+          <div class="flex gap-2">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-mode="yaml-to-json">YAML → JSON</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-mode="json-to-yaml">JSON → YAML</button>
           </div>
-          <div class="action-buttons">
-            <button class="btn btn-secondary" data-action="swap">
+          <div class="flex gap-2">
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="swap">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="17 1 21 5 17 9"/>
                 <polyline points="3 11 7 7 11 11"/>
@@ -39,14 +39,14 @@ export class YAMLJSONConverter {
               </svg>
               Swap
             </button>
-            <button class="btn btn-secondary" data-action="copy">
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="copy">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2"/>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg>
               Copy
             </button>
-            <button class="btn btn-secondary" data-action="clear">
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="clear">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"/>
                 <line x1="6" y1="6" x2="18" y2="18"/>
@@ -56,29 +56,31 @@ export class YAMLJSONConverter {
           </div>
         </div>
         
-        <div class="yaml-options">
-          <label class="checkbox-label">
-            <input type="checkbox" id="pretty-print" checked />
-            <span>Pretty print output</span>
+        <div class="mb-6 flex flex-wrap gap-4">
+          <label class="flex items-center">
+            <input type="checkbox" id="pretty-print" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Pretty print output</span>
           </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="preserve-comments" />
-            <span>Preserve comments (limited support)</span>
+          <label class="flex items-center">
+            <input type="checkbox" id="preserve-comments" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Preserve comments (limited support)</span>
           </label>
         </div>
         
-        <div class="error-display" data-error hidden></div>
+        <div class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded hidden" data-error></div>
         
-        <div class="tool-content">
-          <div class="input-section">
-            <label for="yaml-json-input">
-              <span class="input-label">YAML</span>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <label for="yaml-json-input" class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">YAML</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">Example: key: value</span>
             </label>
             <textarea 
               id="yaml-json-input" 
-              class="code-input" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" 
               placeholder="Enter YAML or JSON..."
               spellcheck="false"
+              rows="15"
             >name: John Doe
 age: 30
 city: New York
@@ -95,16 +97,17 @@ settings:
   notifications: true</textarea>
           </div>
           
-          <div class="output-section">
-            <label for="yaml-json-output">
-              <span class="output-label">JSON</span>
+          <div>
+            <label for="yaml-json-output" class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">JSON</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">0 lines</span>
             </label>
-            <pre id="yaml-json-output" class="code-output"></pre>
+            <pre id="yaml-json-output" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm overflow-auto" style="min-height: 360px; max-height: 500px;"></pre>
           </div>
         </div>
         
-        <div class="tool-footer">
-          <div class="stats">
+        <div class="mt-4 flex justify-between text-sm text-gray-600 dark:text-gray-400">
+          <div class="flex gap-4">
             <span data-stat="input-lines">0 lines</span>
             <span data-stat="output-lines">0 lines</span>
             <span data-stat="nesting-depth">Depth: 0</span>
@@ -167,25 +170,26 @@ settings:
     // Update button states
     this.container.querySelectorAll('[data-mode]').forEach(btn => {
       if (btn.dataset.mode === mode) {
-        btn.classList.add('btn-primary');
-        btn.classList.remove('btn-secondary');
+        btn.className = 'px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
       } else {
-        btn.classList.remove('btn-primary');
-        btn.classList.add('btn-secondary');
+        btn.className = 'px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
       }
     });
     
     // Update labels
-    const inputLabel = this.container.querySelector('.input-label');
-    const outputLabel = this.container.querySelector('.output-label');
+    const inputLabel = this.container.querySelector('label[for="yaml-json-input"] span:first-child');
+    const outputLabel = this.container.querySelector('label[for="yaml-json-output"] span:first-child');
+    const inputExample = this.container.querySelector('label[for="yaml-json-input"] span:last-child');
     
     if (mode === 'yaml-to-json') {
-      inputLabel.textContent = 'YAML';
-      outputLabel.textContent = 'JSON';
+      if (inputLabel) inputLabel.textContent = 'YAML';
+      if (outputLabel) outputLabel.textContent = 'JSON';
+      if (inputExample) inputExample.textContent = 'Example: key: value';
       this.inputArea.placeholder = 'Enter YAML data...';
     } else {
-      inputLabel.textContent = 'JSON';
-      outputLabel.textContent = 'YAML';
+      if (inputLabel) inputLabel.textContent = 'JSON';
+      if (outputLabel) outputLabel.textContent = 'YAML';
+      if (inputExample) inputExample.textContent = 'Example: {"key": "value"}';
       this.inputArea.placeholder = 'Enter JSON data...';
     }
   }
@@ -195,6 +199,7 @@ settings:
     if (!input) {
       this.outputArea.textContent = '';
       this.clearError();
+      this.updateStatsLabel(0);
       return;
     }
     
@@ -212,6 +217,7 @@ settings:
     } catch (error) {
       this.outputArea.textContent = '';
       this.showError(`Conversion failed: ${error.message}`);
+      this.updateStatsLabel(0);
     }
   }
   
@@ -431,37 +437,18 @@ settings:
   }
   
   displayOutput(output) {
-    if (this.mode === 'yaml-to-json') {
-      // Syntax highlight JSON
-      const highlighted = output
-        .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
-          let cls = 'json-number';
-          if (/^"/.test(match)) {
-            if (/:$/.test(match)) {
-              cls = 'json-key';
-            } else {
-              cls = 'json-string';
-            }
-          } else if (/true|false/.test(match)) {
-            cls = 'json-boolean';
-          } else if (/null/.test(match)) {
-            cls = 'json-null';
-          }
-          return `<span class="${cls}">${match}</span>`;
-        });
-      
-      this.outputArea.innerHTML = highlighted;
-    } else {
-      // Display YAML with basic syntax highlighting
-      const highlighted = output
-        .replace(/^(\s*)([a-zA-Z0-9_-]+):/gm, '$1<span class="yaml-key">$2</span>:')
-        .replace(/:\s*(true|false|yes|no|on|off)\b/g, ': <span class="yaml-boolean">$1</span>')
-        .replace(/:\s*(null|~)/g, ': <span class="yaml-null">$1</span>')
-        .replace(/:\s*(-?\d+(?:\.\d+)?)/g, ': <span class="yaml-number">$1</span>')
-        .replace(/^(\s*)- /gm, '$1<span class="yaml-list">-</span> ')
-        .replace(/#.*/g, '<span class="yaml-comment">$&</span>');
-      
-      this.outputArea.innerHTML = highlighted;
+    // Display as plain text (pre elements don't support HTML)
+    this.outputArea.textContent = output;
+    
+    // Update output lines count
+    const lines = output.split('\n').length;
+    this.updateStatsLabel(lines);
+  }
+  
+  updateStatsLabel(lines) {
+    const statsLabel = this.container.querySelector('label[for="yaml-json-output"] span:last-child');
+    if (statsLabel) {
+      statsLabel.textContent = `${lines} lines`;
     }
   }
   
@@ -511,12 +498,18 @@ settings:
     navigator.clipboard.writeText(output).then(() => {
       const btn = this.container.querySelector('[data-action="copy"]');
       const originalHTML = btn.innerHTML;
-      btn.innerHTML = 'Copied!';
-      btn.classList.add('btn-success');
+      const originalClasses = btn.className;
+      btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Copied!
+      `;
+      btn.className = 'px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center gap-2';
       
       setTimeout(() => {
         btn.innerHTML = originalHTML;
-        btn.classList.remove('btn-success');
+        btn.className = originalClasses;
       }, 2000);
     });
   }
@@ -526,6 +519,7 @@ settings:
     this.outputArea.textContent = '';
     this.clearError();
     this.updateStats();
+    this.updateStatsLabel(0);
   }
   
   showError(message) {

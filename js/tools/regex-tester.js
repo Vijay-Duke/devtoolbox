@@ -19,73 +19,73 @@ export class RegexTester {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>Regex Tester</h1>
-          <p class="tool-description">Test regular expressions with real-time pattern matching and highlighting</p>
+      <div class="max-w-7xl mx-auto p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Regex Tester</h1>
+          <p class="text-gray-600 dark:text-gray-400">Test regular expressions with real-time pattern matching and highlighting</p>
         </div>
         
-        <div class="regex-pattern-section">
-          <div class="pattern-input-group">
-            <label for="regex-pattern">Regular Expression</label>
-            <div class="pattern-wrapper">
-              <span class="pattern-delimiter">/</span>
+        <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <div class="mb-4">
+            <label for="regex-pattern" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Regular Expression</label>
+            <div class="flex items-center bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg p-2">
+              <span class="text-gray-500 font-mono text-lg">/</span>
               <input 
                 type="text" 
                 id="regex-pattern" 
-                class="pattern-input"
+                class="flex-1 px-2 py-1 bg-transparent font-mono text-sm focus:outline-none"
                 placeholder="[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z]+"
                 spellcheck="false"
               />
-              <span class="pattern-delimiter">/</span>
-              <div class="flags-container">
-                <label class="flag-label" title="Global match">
-                  <input type="checkbox" id="flag-g" checked />
-                  <span>g</span>
+              <span class="text-gray-500 font-mono text-lg">/</span>
+              <div class="flex gap-1 ml-2">
+                <label class="flex items-center px-2 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer" title="Global match">
+                  <input type="checkbox" id="flag-g" class="mr-1" checked />
+                  <span class="font-mono">g</span>
                 </label>
-                <label class="flag-label" title="Case insensitive">
-                  <input type="checkbox" id="flag-i" />
-                  <span>i</span>
+                <label class="flex items-center px-2 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer" title="Case insensitive">
+                  <input type="checkbox" id="flag-i" class="mr-1" />
+                  <span class="font-mono">i</span>
                 </label>
-                <label class="flag-label" title="Multiline">
-                  <input type="checkbox" id="flag-m" />
-                  <span>m</span>
+                <label class="flex items-center px-2 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer" title="Multiline">
+                  <input type="checkbox" id="flag-m" class="mr-1" />
+                  <span class="font-mono">m</span>
                 </label>
-                <label class="flag-label" title="Dot matches newline">
-                  <input type="checkbox" id="flag-s" />
-                  <span>s</span>
+                <label class="flex items-center px-2 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer" title="Dot matches newline">
+                  <input type="checkbox" id="flag-s" class="mr-1" />
+                  <span class="font-mono">s</span>
                 </label>
-                <label class="flag-label" title="Unicode">
-                  <input type="checkbox" id="flag-u" />
-                  <span>u</span>
+                <label class="flex items-center px-2 py-1 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer" title="Unicode">
+                  <input type="checkbox" id="flag-u" class="mr-1" />
+                  <span class="font-mono">u</span>
                 </label>
               </div>
             </div>
           </div>
           
-          <div class="common-patterns">
-            <label>Common Patterns:</label>
-            <div class="pattern-buttons">
-              <button class="btn btn-sm" data-pattern="email">Email</button>
-              <button class="btn btn-sm" data-pattern="url">URL</button>
-              <button class="btn btn-sm" data-pattern="phone">Phone</button>
-              <button class="btn btn-sm" data-pattern="ipv4">IPv4</button>
-              <button class="btn btn-sm" data-pattern="date">Date</button>
-              <button class="btn btn-sm" data-pattern="hex">Hex Color</button>
-              <button class="btn btn-sm" data-pattern="uuid">UUID</button>
-              <button class="btn btn-sm" data-pattern="creditcard">Credit Card</button>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Common Patterns:</label>
+            <div class="flex flex-wrap gap-2">
+              <button class="px-3 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded text-sm" data-pattern="email">Email</button>
+              <button class="px-3 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded text-sm" data-pattern="url">URL</button>
+              <button class="px-3 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded text-sm" data-pattern="phone">Phone</button>
+              <button class="px-3 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded text-sm" data-pattern="ipv4">IPv4</button>
+              <button class="px-3 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded text-sm" data-pattern="date">Date</button>
+              <button class="px-3 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded text-sm" data-pattern="hex">Hex Color</button>
+              <button class="px-3 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded text-sm" data-pattern="uuid">UUID</button>
+              <button class="px-3 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded text-sm" data-pattern="creditcard">Credit Card</button>
             </div>
           </div>
         </div>
         
-        <div class="error-display" data-error hidden></div>
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6" data-error hidden></div>
         
-        <div class="tool-content">
-          <div class="input-section">
-            <label for="test-string">Test String</label>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label for="test-string" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Test String</label>
             <textarea 
               id="test-string" 
-              class="code-input" 
+              class="w-full h-40 p-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
               placeholder="Enter text to test against the regex pattern..."
               spellcheck="false"
             >Contact us at support@example.com or sales@company.org for more information.
@@ -93,78 +93,78 @@ Our phone numbers are (555) 123-4567 and 555-987-6543.
 Visit our website at https://www.example.com</textarea>
           </div>
           
-          <div class="output-section">
-            <label>Highlighted Matches</label>
-            <div id="highlighted-output" class="highlighted-output"></div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Highlighted Matches</label>
+            <div id="highlighted-output" class="h-40 p-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg font-mono text-sm whitespace-pre-wrap overflow-auto"></div>
           </div>
         </div>
         
-        <div class="matches-section">
-          <h3>Match Information</h3>
-          <div class="match-stats">
-            <span class="stat-item">
+        <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Match Information</h3>
+          <div class="flex gap-6 mb-4 text-sm">
+            <span class="text-gray-700 dark:text-gray-300">
               <strong>Total Matches:</strong>
-              <span id="match-count">0</span>
+              <span id="match-count" class="ml-1 font-mono">0</span>
             </span>
-            <span class="stat-item">
+            <span class="text-gray-700 dark:text-gray-300">
               <strong>Pattern Valid:</strong>
-              <span id="pattern-valid" class="status-indicator">✓</span>
+              <span id="pattern-valid" class="ml-1 font-mono text-green-600 dark:text-green-400">✓</span>
             </span>
           </div>
           
-          <div class="matches-grid" id="matches-grid"></div>
+          <div class="space-y-3" id="matches-grid"></div>
         </div>
         
-        <div class="regex-reference">
-          <h3>Quick Reference</h3>
-          <div class="reference-grid">
-            <div class="reference-item">
-              <code>.</code>
-              <span>Any character except newline</span>
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Reference</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">.</code>
+              <span class="text-gray-700 dark:text-gray-300">Any character except newline</span>
             </div>
-            <div class="reference-item">
-              <code>\\d</code>
-              <span>Digit (0-9)</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">\\d</code>
+              <span class="text-gray-700 dark:text-gray-300">Digit (0-9)</span>
             </div>
-            <div class="reference-item">
-              <code>\\w</code>
-              <span>Word character (a-z, A-Z, 0-9, _)</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">\\w</code>
+              <span class="text-gray-700 dark:text-gray-300">Word character (a-z, A-Z, 0-9, _)</span>
             </div>
-            <div class="reference-item">
-              <code>\\s</code>
-              <span>Whitespace</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">\\s</code>
+              <span class="text-gray-700 dark:text-gray-300">Whitespace</span>
             </div>
-            <div class="reference-item">
-              <code>^</code>
-              <span>Start of string</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">^</code>
+              <span class="text-gray-700 dark:text-gray-300">Start of string</span>
             </div>
-            <div class="reference-item">
-              <code>$</code>
-              <span>End of string</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">$</code>
+              <span class="text-gray-700 dark:text-gray-300">End of string</span>
             </div>
-            <div class="reference-item">
-              <code>*</code>
-              <span>0 or more</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">*</code>
+              <span class="text-gray-700 dark:text-gray-300">0 or more</span>
             </div>
-            <div class="reference-item">
-              <code>+</code>
-              <span>1 or more</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">+</code>
+              <span class="text-gray-700 dark:text-gray-300">1 or more</span>
             </div>
-            <div class="reference-item">
-              <code>?</code>
-              <span>0 or 1</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">?</code>
+              <span class="text-gray-700 dark:text-gray-300">0 or 1</span>
             </div>
-            <div class="reference-item">
-              <code>{n,m}</code>
-              <span>Between n and m</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">{n,m}</code>
+              <span class="text-gray-700 dark:text-gray-300">Between n and m</span>
             </div>
-            <div class="reference-item">
-              <code>[abc]</code>
-              <span>Character class</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">[abc]</code>
+              <span class="text-gray-700 dark:text-gray-300">Character class</span>
             </div>
-            <div class="reference-item">
-              <code>(abc)</code>
-              <span>Capture group</span>
+            <div class="flex items-center gap-2">
+              <code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">(abc)</code>
+              <span class="text-gray-700 dark:text-gray-300">Capture group</span>
             </div>
           </div>
         </div>
@@ -276,8 +276,9 @@ Visit our website at https://www.example.com</textarea>
       const regex = new RegExp(pattern, flags);
       
       // Mark pattern as valid
-      this.container.querySelector('#pattern-valid').textContent = '✓';
-      this.container.querySelector('#pattern-valid').style.color = 'var(--color-success)';
+      const validIndicator = this.container.querySelector('#pattern-valid');
+      validIndicator.textContent = '✓';
+      validIndicator.className = 'ml-1 font-mono text-green-600 dark:text-green-400';
       this.clearError();
       
       // Find all matches
@@ -313,8 +314,9 @@ Visit our website at https://www.example.com</textarea>
       this.displayMatches(matches);
       
     } catch (error) {
-      this.container.querySelector('#pattern-valid').textContent = '✗';
-      this.container.querySelector('#pattern-valid').style.color = 'var(--color-error)';
+      const validIndicator = this.container.querySelector('#pattern-valid');
+      validIndicator.textContent = '✗';
+      validIndicator.className = 'ml-1 font-mono text-red-600 dark:text-red-400';
       this.showError(`Invalid regex: ${error.message}`);
       this.clearResults();
     }
@@ -341,7 +343,7 @@ Visit our website at https://www.example.com</textarea>
       // Add text before match
       html += this.escapeHtml(text.substring(lastIndex, match.index));
       // Add highlighted match
-      html += `<mark class="regex-match">${this.escapeHtml(match.text)}</mark>`;
+      html += `<mark class="bg-yellow-200 dark:bg-yellow-800 text-gray-900 dark:text-white px-1 rounded">${this.escapeHtml(match.text)}</mark>`;
       lastIndex = match.index + match.text.length;
     });
     
@@ -353,28 +355,30 @@ Visit our website at https://www.example.com</textarea>
   
   displayMatches(matches) {
     if (matches.length === 0) {
-      this.matchesArea.innerHTML = '<div class="no-matches">No matches found</div>';
+      this.matchesArea.innerHTML = '<div class="text-gray-500 dark:text-gray-400 text-center py-4">No matches found</div>';
       return;
     }
     
     const matchesHtml = matches.map((match, index) => `
-      <div class="match-item">
-        <div class="match-header">
-          <span class="match-number">Match ${index + 1}</span>
-          <span class="match-position">Position: ${match.index}</span>
+      <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-semibold text-blue-600 dark:text-blue-400">Match ${index + 1}</span>
+          <span class="text-sm text-gray-500 dark:text-gray-400">Position: ${match.index}</span>
         </div>
-        <div class="match-text">
-          <code>${this.escapeHtml(match.text)}</code>
+        <div class="mb-3">
+          <code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded font-mono text-sm">${this.escapeHtml(match.text)}</code>
         </div>
         ${match.groups.length > 0 ? `
-          <div class="match-groups">
-            <span class="groups-label">Groups:</span>
-            ${match.groups.map((group, i) => `
-              <span class="group-item">
-                <span class="group-number">${i + 1}:</span>
-                <code>${group ? this.escapeHtml(group) : '(empty)'}</code>
-              </span>
-            `).join('')}
+          <div>
+            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Groups:</span>
+            <div class="flex flex-wrap gap-2">
+              ${match.groups.map((group, i) => `
+                <div class="flex items-center gap-1">
+                  <span class="text-xs text-gray-500 dark:text-gray-400">${i + 1}:</span>
+                  <code class="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs font-mono">${group ? this.escapeHtml(group) : '(empty)'}</code>
+                </div>
+              `).join('')}
+            </div>
           </div>
         ` : ''}
       </div>
@@ -385,7 +389,7 @@ Visit our website at https://www.example.com</textarea>
   
   clearResults() {
     this.outputArea.textContent = this.testInput.value;
-    this.matchesArea.innerHTML = '<div class="no-matches">No matches found</div>';
+    this.matchesArea.innerHTML = '<div class="text-gray-500 dark:text-gray-400 text-center py-4">No matches found</div>';
     this.container.querySelector('#match-count').textContent = '0';
   }
   

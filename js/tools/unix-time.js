@@ -20,125 +20,178 @@ export class UnixTimeConverter {
     const unixNow = Math.floor(now.getTime() / 1000);
     
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>Unix Time Converter</h1>
-          <p class="tool-description">Convert between Unix timestamps and human-readable dates</p>
+      <div class="max-w-7xl mx-auto p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Unix Time Converter</h1>
+          <p class="text-gray-600 dark:text-gray-400">Convert between Unix timestamps and human-readable dates</p>
         </div>
         
-        <div class="live-time">
-          <div class="live-time-item">
-            <span class="live-label">Current Unix Time:</span>
-            <span class="live-value" id="live-unix">${unixNow}</span>
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div class="text-sm font-medium text-blue-600 dark:text-blue-300 mb-1">Current Unix Time</div>
+            <div class="text-2xl font-mono font-bold text-blue-900 dark:text-blue-100" id="live-unix">${unixNow}</div>
           </div>
-          <div class="live-time-item">
-            <span class="live-label">Current Time:</span>
-            <span class="live-value" id="live-date">${now.toLocaleString()}</span>
+          <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <div class="text-sm font-medium text-green-600 dark:text-green-300 mb-1">Current Time</div>
+            <div class="text-lg font-medium text-green-900 dark:text-green-100" id="live-date">${now.toLocaleString()}</div>
           </div>
         </div>
         
-        <div class="converter-grid">
-          <div class="converter-section">
-            <h3>Unix Timestamp → Date</h3>
-            <div class="converter-input">
-              <label for="unix-input">Unix Timestamp</label>
-              <input 
-                type="text" 
-                id="unix-input" 
-                placeholder="1516239022"
-                value="${unixNow}"
-              />
-              <div class="input-options">
-                <label class="radio-label">
-                  <input type="radio" name="unix-unit" value="seconds" checked />
-                  <span>Seconds</span>
-                </label>
-                <label class="radio-label">
-                  <input type="radio" name="unix-unit" value="milliseconds" />
-                  <span>Milliseconds</span>
-                </label>
+        <div class="grid lg:grid-cols-2 gap-8 mb-8">
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Unix Timestamp → Date</h3>
+            
+            <div class="space-y-4 mb-6">
+              <div>
+                <label for="unix-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Unix Timestamp</label>
+                <input 
+                  type="text" 
+                  id="unix-input" 
+                  placeholder="1516239022 or 1516239022000"
+                  value="${unixNow}"
+                  class="w-full px-3 py-2 font-mono text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  <span id="detected-unit">Auto-detected: Seconds</span>
+                </div>
               </div>
             </div>
             
-            <button class="btn btn-primary" data-action="unix-to-date">Convert to Date</button>
-            
-            <div class="converter-output" id="unix-output">
-              <div class="output-row">
-                <span class="output-label">Local:</span>
-                <span class="output-value" id="unix-local"></span>
+            <div class="space-y-3" id="unix-output">
+              <div class="flex justify-between items-center py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Local:</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-mono text-gray-900 dark:text-white" id="unix-local"></span>
+                  <button class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" data-copy="unix-local" title="Copy">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div class="output-row">
-                <span class="output-label">UTC:</span>
-                <span class="output-value" id="unix-utc"></span>
+              <div class="flex justify-between items-center py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">UTC:</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-mono text-gray-900 dark:text-white" id="unix-utc"></span>
+                  <button class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" data-copy="unix-utc" title="Copy">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div class="output-row">
-                <span class="output-label">ISO 8601:</span>
-                <span class="output-value" id="unix-iso"></span>
+              <div class="flex justify-between items-center py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">ISO 8601:</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-mono text-gray-900 dark:text-white" id="unix-iso"></span>
+                  <button class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" data-copy="unix-iso" title="Copy">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div class="output-row">
-                <span class="output-label">Relative:</span>
-                <span class="output-value" id="unix-relative"></span>
+              <div class="flex justify-between items-center py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Relative:</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm text-gray-900 dark:text-white" id="unix-relative"></span>
+                  <button class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" data-copy="unix-relative" title="Copy">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
           
-          <div class="converter-section">
-            <h3>Date → Unix Timestamp</h3>
-            <div class="converter-input">
-              <label for="date-input">Date & Time</label>
-              <input 
-                type="datetime-local" 
-                id="date-input"
-                value="${this.formatDateTimeLocal(now)}"
-              />
-              <div class="input-options">
-                <button class="btn btn-secondary btn-sm" data-action="date-now">Now</button>
-                <button class="btn btn-secondary btn-sm" data-action="date-today">Today</button>
-                <button class="btn btn-secondary btn-sm" data-action="date-yesterday">Yesterday</button>
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-6">Date → Unix Timestamp</h3>
+            
+            <div class="space-y-4 mb-6">
+              <div>
+                <label for="date-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date & Time</label>
+                <input 
+                  type="datetime-local" 
+                  id="date-input"
+                  value="${this.formatDateTimeLocal(now)}"
+                  class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div class="flex gap-2">
+                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-600" data-action="date-now">Now</button>
+                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-600" data-action="date-today">Today</button>
+                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-600" data-action="date-yesterday">Yesterday</button>
               </div>
             </div>
             
-            <button class="btn btn-primary" data-action="date-to-unix">Convert to Unix</button>
-            
-            <div class="converter-output" id="date-output">
-              <div class="output-row">
-                <span class="output-label">Seconds:</span>
-                <span class="output-value" id="date-seconds"></span>
+            <div class="space-y-3" id="date-output">
+              <div class="flex justify-between items-center py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Seconds:</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-mono text-gray-900 dark:text-white" id="date-seconds"></span>
+                  <button class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" data-copy="date-seconds" title="Copy">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div class="output-row">
-                <span class="output-label">Milliseconds:</span>
-                <span class="output-value" id="date-milliseconds"></span>
+              <div class="flex justify-between items-center py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Milliseconds:</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-mono text-gray-900 dark:text-white" id="date-milliseconds"></span>
+                  <button class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" data-copy="date-milliseconds" title="Copy">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
-              <div class="output-row">
-                <span class="output-label">Hex:</span>
-                <span class="output-value" id="date-hex"></span>
+              <div class="flex justify-between items-center py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Hex:</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-mono text-gray-900 dark:text-white" id="date-hex"></span>
+                  <button class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" data-copy="date-hex" title="Copy">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
         
-        <div class="common-timestamps">
-          <h3>Common Timestamps</h3>
-          <div class="timestamp-grid">
-            <div class="timestamp-item" data-unix="0">
-              <span class="timestamp-label">Unix Epoch</span>
-              <span class="timestamp-value">0</span>
-              <span class="timestamp-date">Jan 1, 1970</span>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Common Timestamps</h3>
+          <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white dark:bg-gray-900 p-4 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" data-unix="0">
+              <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Unix Epoch</div>
+              <div class="text-lg font-mono font-bold text-gray-900 dark:text-white mb-1">0</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">Jan 1, 1970</div>
             </div>
-            <div class="timestamp-item" data-unix="1000000000">
-              <span class="timestamp-label">1 Billion Seconds</span>
-              <span class="timestamp-value">1000000000</span>
-              <span class="timestamp-date">Sep 9, 2001</span>
+            <div class="bg-white dark:bg-gray-900 p-4 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" data-unix="1000000000">
+              <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">1 Billion Seconds</div>
+              <div class="text-lg font-mono font-bold text-gray-900 dark:text-white mb-1">1000000000</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">Sep 9, 2001</div>
             </div>
-            <div class="timestamp-item" data-unix="2147483647">
-              <span class="timestamp-label">32-bit Max</span>
-              <span class="timestamp-value">2147483647</span>
-              <span class="timestamp-date">Jan 19, 2038</span>
+            <div class="bg-white dark:bg-gray-900 p-4 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" data-unix="2147483647">
+              <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">32-bit Max</div>
+              <div class="text-lg font-mono font-bold text-gray-900 dark:text-white mb-1">2147483647</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">Jan 19, 2038</div>
             </div>
-            <div class="timestamp-item" data-unix="1234567890">
-              <span class="timestamp-label">1234567890</span>
-              <span class="timestamp-value">1234567890</span>
-              <span class="timestamp-date">Feb 13, 2009</span>
+            <div class="bg-white dark:bg-gray-900 p-4 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" data-unix="1234567890">
+              <div class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">1234567890</div>
+              <div class="text-lg font-mono font-bold text-gray-900 dark:text-white mb-1">1234567890</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">Feb 13, 2009</div>
             </div>
           </div>
         </div>
@@ -152,28 +205,11 @@ export class UnixTimeConverter {
   attachEventListeners() {
     // Auto-convert Unix to Date on input
     this.unixInput.addEventListener('input', () => {
-      this.convertUnixToDate();
-    });
-    
-    // Auto-convert when radio buttons change
-    this.container.querySelectorAll('input[name="unix-unit"]').forEach(radio => {
-      radio.addEventListener('change', () => {
-        this.convertUnixToDate();
-      });
-    });
-    
-    // Unix to Date conversion button (kept for explicit conversion)
-    this.container.querySelector('[data-action="unix-to-date"]').addEventListener('click', () => {
-      this.convertUnixToDate();
+      this.detectUnitAndConvert();
     });
     
     // Auto-convert Date to Unix on input
     this.dateInput.addEventListener('input', () => {
-      this.convertDateToUnix();
-    });
-    
-    // Date to Unix conversion button (kept for explicit conversion)
-    this.container.querySelector('[data-action="date-to-unix"]').addEventListener('click', () => {
       this.convertDateToUnix();
     });
     
@@ -199,18 +235,28 @@ export class UnixTimeConverter {
       this.convertDateToUnix();
     });
     
-    // Common timestamps
-    this.container.querySelectorAll('.timestamp-item').forEach(item => {
-      item.style.cursor = 'pointer';
+    // Common timestamps - use the data-unix attribute directly
+    this.container.querySelectorAll('[data-unix]').forEach(item => {
       item.addEventListener('click', () => {
         const unix = item.dataset.unix;
         this.unixInput.value = unix;
-        this.convertUnixToDate();
+        this.detectUnitAndConvert();
+      });
+    });
+    
+    // Copy buttons
+    this.container.querySelectorAll('[data-copy]').forEach(button => {
+      button.addEventListener('click', () => {
+        const targetId = button.dataset.copy;
+        const targetElement = this.container.querySelector(`#${targetId}`);
+        if (targetElement && targetElement.textContent) {
+          this.copyToClipboard(targetElement.textContent, button);
+        }
       });
     });
     
     // Auto-convert on load
-    this.convertUnixToDate();
+    this.detectUnitAndConvert();
     this.convertDateToUnix();
   }
   
@@ -227,11 +273,35 @@ export class UnixTimeConverter {
     }, 1000);
   }
   
-  convertUnixToDate() {
+  detectUnitAndConvert() {
     const input = this.unixInput.value.trim();
     if (!input) return;
     
-    const isMilliseconds = this.container.querySelector('input[name="unix-unit"]:checked').value === 'milliseconds';
+    const timestamp = parseInt(input);
+    
+    if (isNaN(timestamp)) {
+      this.clearUnixOutput();
+      return;
+    }
+    
+    // Auto-detect: timestamps before year 3000 in seconds would be < 32503680000
+    // timestamps in milliseconds for reasonable dates are > 1000000000000 (Sep 2001)
+    // So we can use a threshold around 10000000000 (10 digits vs 13 digits)
+    const isMilliseconds = timestamp > 10000000000;
+    
+    // Update the detection indicator
+    const detectedUnit = this.container.querySelector('#detected-unit');
+    if (detectedUnit) {
+      detectedUnit.textContent = `Auto-detected: ${isMilliseconds ? 'Milliseconds' : 'Seconds'}`;
+    }
+    
+    this.convertUnixToDate(isMilliseconds);
+  }
+  
+  convertUnixToDate(isMilliseconds = false) {
+    const input = this.unixInput.value.trim();
+    if (!input) return;
+    
     const timestamp = parseInt(input);
     
     if (isNaN(timestamp)) {
@@ -317,6 +387,32 @@ export class UnixTimeConverter {
     this.container.querySelector('#date-seconds').textContent = '';
     this.container.querySelector('#date-milliseconds').textContent = '';
     this.container.querySelector('#date-hex').textContent = '';
+  }
+  
+  async copyToClipboard(text, button) {
+    try {
+      await navigator.clipboard.writeText(text);
+      
+      // Change icon to checkmark
+      const svg = button.querySelector('svg');
+      const originalSvg = svg.outerHTML;
+      
+      svg.outerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      `;
+      
+      // Restore original icon after 2 seconds
+      setTimeout(() => {
+        const newSvg = button.querySelector('svg');
+        if (newSvg) {
+          newSvg.outerHTML = originalSvg;
+        }
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy:', error);
+    }
   }
   
   destroy() {

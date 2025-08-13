@@ -20,21 +20,21 @@ export class APIMockGenerator {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>API Mock Generator</h1>
-          <p class="tool-description">Create mock API endpoints with custom responses, status codes, and headers for testing</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">API Mock Generator</h1>
+          <p class="text-gray-600 dark:text-gray-400">Create mock API endpoints with custom responses, status codes, and headers for testing</p>
         </div>
         
-        <div class="tool-controls">
-          <button class="btn btn-primary" data-action="add-endpoint">
+        <div class="mb-6 flex flex-wrap gap-2">
+          <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="add-endpoint">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
             Add Endpoint
           </button>
-          <button class="btn btn-secondary" data-action="export">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="export">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
               <polyline points="7 10 12 15 17 10"/>
@@ -42,7 +42,7 @@ export class APIMockGenerator {
             </svg>
             Export
           </button>
-          <button class="btn btn-secondary" data-action="import">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="import">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
               <polyline points="17 8 12 3 7 8"/>
@@ -50,7 +50,7 @@ export class APIMockGenerator {
             </svg>
             Import
           </button>
-          <button class="btn btn-secondary" data-action="clear">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="clear">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
@@ -59,57 +59,63 @@ export class APIMockGenerator {
           </button>
         </div>
         
-        <div class="api-mock-container">
-          <div class="global-settings">
-            <h3>Global Settings</h3>
-            <div class="form-group">
-              <label for="base-url">Base URL</label>
-              <input type="text" id="base-url" class="form-input" placeholder="https://api.example.com" value="https://api.example.com" />
-            </div>
-            <div class="form-group">
-              <label for="response-delay">Response Delay (ms)</label>
-              <input type="number" id="response-delay" class="form-input" placeholder="0" value="0" min="0" max="5000" />
-            </div>
-            <div class="form-group">
-              <label>Global Headers</label>
-              <div id="global-headers" class="headers-list"></div>
-              <button class="btn btn-sm" data-add="global-header">Add Header</button>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div class="lg:col-span-1">
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Global Settings</h3>
+              <div class="space-y-4">
+                <div>
+                  <label for="base-url" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Base URL</label>
+                  <input type="text" id="base-url" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="https://api.example.com" value="https://api.example.com" />
+                </div>
+                <div>
+                  <label for="response-delay" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Response Delay (ms)</label>
+                  <input type="number" id="response-delay" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="0" value="0" min="0" max="5000" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Global Headers</label>
+                  <div id="global-headers" class="space-y-2 mb-2"></div>
+                  <button class="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/30" data-add="global-header">Add Header</button>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div class="endpoints-section">
-            <h3>Endpoints</h3>
-            <div id="endpoints-list" class="endpoints-list"></div>
-          </div>
-          
-          <div class="preview-section">
-            <h3>Mock Server Code</h3>
-            <div class="code-type-selector">
-              <button class="code-type-btn active" data-type="express">Express.js</button>
-              <button class="code-type-btn" data-type="json-server">JSON Server</button>
-              <button class="code-type-btn" data-type="postman">Postman</button>
-              <button class="code-type-btn" data-type="openapi">OpenAPI</button>
+          <div class="lg:col-span-2">
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Endpoints</h3>
+              <div id="endpoints-list" class="space-y-3"></div>
             </div>
-            <pre id="code-output" class="code-output"></pre>
-            <button class="btn btn-primary" data-action="copy-code">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-              Copy Code
-            </button>
           </div>
         </div>
+          
+        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Mock Server Code</h3>
+          <div class="flex flex-wrap gap-2 mb-4">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" data-type="express">Express.js</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500" data-type="json-server">JSON Server</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500" data-type="postman">Postman</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500" data-type="openapi">OpenAPI</button>
+          </div>
+          <pre id="code-output" class="w-full p-4 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white font-mono text-sm overflow-x-auto mb-4" style="max-height: 400px;"></pre>
+          <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="copy-code">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy Code
+          </button>
+        </div>
         
-        <div class="examples-section">
-          <h3>Quick Examples</h3>
-          <div class="examples-grid">
-            <button class="example-btn" data-example="rest-api">REST API</button>
-            <button class="example-btn" data-example="graphql">GraphQL</button>
-            <button class="example-btn" data-example="auth-api">Auth API</button>
-            <button class="example-btn" data-example="crud">CRUD Operations</button>
-            <button class="example-btn" data-example="pagination">Paginated API</button>
-            <button class="example-btn" data-example="errors">Error Responses</button>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Examples</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="rest-api">REST API</button>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="graphql">GraphQL</button>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="auth-api">Auth API</button>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="crud">CRUD Operations</button>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="pagination">Paginated API</button>
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="errors">Error Responses</button>
           </div>
         </div>
         

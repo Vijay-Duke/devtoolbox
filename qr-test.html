@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Generator Test - DevToolbox</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/tools.css">
+  <link rel="stylesheet" href="css/ui-improvements.css">
+  <link rel="stylesheet" href="css/qr-generator-redesign.css">
+  <style>
+    body {
+      background: var(--color-bg);
+      min-height: 100vh;
+      padding: 20px;
+      font-family: var(--font-sans);
+      transition: background-color var(--transition-base);
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      padding: 12px 20px;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .theme-toggle:hover {
+      background: var(--color-bg-tertiary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding-top: 40px;
+    }
+    
+    .intro {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .intro h1 {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--color-text);
+    }
+    
+    .intro p {
+      font-size: 18px;
+      color: var(--color-text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 40px 0;
+      text-align: center;
+    }
+    
+    .feature {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      transition: all var(--transition-fast);
+    }
+    
+    .feature:hover {
+      background: var(--color-bg-tertiary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 16px;
+      color: var(--color-accent);
+    }
+    
+    .feature h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: 8px;
+    }
+    
+    .feature p {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" onclick="toggleTheme()">
+    🌙 Toggle Theme
+  </button>
+  
+  <div class="container">
+    <div class="intro">
+      <h1>QR Code Generator</h1>
+      <p>Professional QR code generation with customizable design options, inspired by the best QR generators</p>
+    </div>
+    
+    <div class="features">
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <h3>Multiple Types</h3>
+        <p>Text, URL, Email, WiFi credentials, and more</p>
+      </div>
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <h3>Customizable</h3>
+        <p>Colors, sizes, and error correction levels</p>
+      </div>
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7,10 12,15 17,10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <h3>Download Options</h3>
+        <p>PNG and SVG formats for all your needs</p>
+      </div>
+      <div class="feature">
+        <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+        </svg>
+        <h3>Professional Design</h3>
+        <p>Clean, modern interface inspired by the best</p>
+      </div>
+    </div>
+    
+    <div id="qr-generator"></div>
+  </div>
+  
+  <script type="module">
+    import { QRGeneratorRedesigned } from './js/tools/qr-generator-redesigned.js';
+    
+    // Initialize the QR generator
+    const qrGenerator = new QRGeneratorRedesigned();
+    qrGenerator.init('qr-generator');
+    
+    // Theme toggle functionality
+    window.toggleTheme = function() {
+      const html = document.documentElement;
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      
+      // Update button text
+      const btn = document.querySelector('.theme-toggle');
+      btn.textContent = newTheme === 'dark' ? '☀️ Toggle Theme' : '🌙 Toggle Theme';
+      
+      console.log('Theme switched to:', newTheme);
+    };
+    
+    // Add entrance animation
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const container = document.querySelector('.qr-generator .tool-container');
+        if (container) {
+          container.style.opacity = '0';
+          container.style.transform = 'translateY(20px)';
+          container.style.transition = 'all 0.8s ease';
+          
+          setTimeout(() => {
+            container.style.opacity = '1';
+            container.style.transform = 'translateY(0)';
+          }, 200);
+        }
+      }, 300);
+    });
+  </script>
+</body>
+</html>

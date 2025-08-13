@@ -17,33 +17,33 @@ export class ASCIIArtGenerator {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>ASCII Art Generator</h1>
-          <p class="tool-description">Create ASCII art from text, images, and shapes</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">ASCII Art Generator</h1>
+          <p class="text-gray-600 dark:text-gray-300">Create ASCII art from text, images, and shapes</p>
         </div>
         
-        <div class="art-type-selector">
-          <button class="type-btn active" data-type="text">Text Art</button>
-          <button class="type-btn" data-type="image">Image to ASCII</button>
-          <button class="type-btn" data-type="shapes">Shapes</button>
-          <button class="type-btn" data-type="banner">Banner</button>
-          <button class="type-btn" data-type="table">Table</button>
+        <div class="flex flex-wrap gap-2 mb-6">
+          <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-btn active" data-type="text">Text Art</button>
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-btn" data-type="image">Image to ASCII</button>
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-btn" data-type="shapes">Shapes</button>
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-btn" data-type="banner">Banner</button>
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-btn" data-type="table">Table</button>
         </div>
         
-        <div class="art-input-container">
+        <div class="mb-6">
           <div id="input-text" class="input-panel active">
-            <label for="text-input">Enter Text</label>
+            <label for="text-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Enter Text</label>
             <input 
               type="text" 
               id="text-input" 
-              class="input-field" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" 
               placeholder="Enter text to convert..."
               value="ASCII"
             />
             
-            <label for="font-select">Font Style</label>
-            <select id="font-select" class="select-input">
+            <label for="font-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mt-4">Font Style</label>
+            <select id="font-select" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               <option value="standard">Standard</option>
               <option value="big">Big</option>
               <option value="block">Block</option>
@@ -57,47 +57,51 @@ export class ASCIIArtGenerator {
             </select>
           </div>
           
-          <div id="input-image" class="input-panel">
-            <label for="image-upload">Upload Image</label>
+          <div id="input-image" class="input-panel hidden">
+            <label for="image-upload" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Upload Image</label>
             <input 
               type="file" 
               id="image-upload" 
               accept="image/*"
-              class="file-input"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
             />
-            <div class="upload-area" id="upload-area">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <div class="mt-4 p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-md text-center hover:border-blue-400 cursor-pointer" id="upload-area">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mx-auto text-gray-400">
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 <circle cx="8.5" cy="8.5" r="1.5"></circle>
                 <polyline points="21 15 16 10 5 21"></polyline>
               </svg>
-              <p>Drop image here or click to upload</p>
+              <p class="mt-2 text-gray-600 dark:text-gray-400">Drop image here or click to upload</p>
             </div>
             
             <canvas id="image-canvas" width="200" height="200" hidden></canvas>
             
-            <div class="image-options">
-              <label for="ascii-width">Width: <span id="width-display">80</span> chars</label>
-              <input type="range" id="ascii-width" min="40" max="200" value="80" step="10" />
+            <div class="mt-4 space-y-4">
+              <div>
+                <label for="ascii-width" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Width: <span id="width-display">80</span> chars</label>
+                <input type="range" id="ascii-width" min="40" max="200" value="80" step="10" class="w-full" />
+              </div>
               
-              <label for="char-set">Character Set</label>
-              <select id="char-set" class="select-input">
-                <option value="standard">Standard</option>
-                <option value="detailed">Detailed</option>
-                <option value="blocks">Blocks</option>
-                <option value="binary">Binary</option>
-              </select>
+              <div>
+                <label for="char-set" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Character Set</label>
+                <select id="char-set" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+                  <option value="standard">Standard</option>
+                  <option value="detailed">Detailed</option>
+                  <option value="blocks">Blocks</option>
+                  <option value="binary">Binary</option>
+                </select>
+              </div>
               
-              <label class="checkbox-label">
-                <input type="checkbox" id="invert-chars">
-                <span>Invert (for dark backgrounds)</span>
+              <label class="flex items-center">
+                <input type="checkbox" id="invert-chars" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Invert (for dark backgrounds)</span>
               </label>
             </div>
           </div>
           
-          <div id="input-shapes" class="input-panel">
-            <label for="shape-select">Select Shape</label>
-            <select id="shape-select" class="select-input">
+          <div id="input-shapes" class="input-panel hidden">
+            <label for="shape-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select Shape</label>
+            <select id="shape-select" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               <option value="rectangle">Rectangle</option>
               <option value="triangle">Triangle</option>
               <option value="circle">Circle</option>
@@ -108,30 +112,36 @@ export class ASCIIArtGenerator {
               <option value="tree">Tree</option>
             </select>
             
-            <div class="shape-options">
-              <label for="shape-width">Width: <span id="shape-width-display">20</span></label>
-              <input type="range" id="shape-width" min="5" max="50" value="20" />
+            <div class="mt-4 space-y-4">
+              <div>
+                <label for="shape-width" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Width: <span id="shape-width-display">20</span></label>
+                <input type="range" id="shape-width" min="5" max="50" value="20" class="w-full" />
+              </div>
               
-              <label for="shape-height">Height: <span id="shape-height-display">10</span></label>
-              <input type="range" id="shape-height" min="5" max="30" value="10" />
+              <div>
+                <label for="shape-height" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Height: <span id="shape-height-display">10</span></label>
+                <input type="range" id="shape-height" min="5" max="30" value="10" class="w-full" />
+              </div>
               
-              <label for="shape-char">Fill Character</label>
-              <input type="text" id="shape-char" class="input-field" value="*" maxlength="1" />
+              <div>
+                <label for="shape-char" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fill Character</label>
+                <input type="text" id="shape-char" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" value="*" maxlength="1" />
+              </div>
             </div>
           </div>
           
-          <div id="input-banner" class="input-panel">
-            <label for="banner-text">Banner Text</label>
+          <div id="input-banner" class="input-panel hidden">
+            <label for="banner-text" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Banner Text</label>
             <input 
               type="text" 
               id="banner-text" 
-              class="input-field" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" 
               placeholder="Enter banner text..."
               value="WELCOME"
             />
             
-            <label for="banner-style">Banner Style</label>
-            <select id="banner-style" class="select-input">
+            <label for="banner-style" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mt-4">Banner Style</label>
+            <select id="banner-style" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               <option value="simple">Simple</option>
               <option value="double">Double Line</option>
               <option value="ascii">ASCII Border</option>
@@ -139,15 +149,17 @@ export class ASCIIArtGenerator {
               <option value="dashed">Dashed</option>
             </select>
             
-            <label for="banner-width">Width: <span id="banner-width-display">60</span></label>
-            <input type="range" id="banner-width" min="30" max="100" value="60" />
+            <div class="mt-4">
+              <label for="banner-width" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Width: <span id="banner-width-display">60</span></label>
+              <input type="range" id="banner-width" min="30" max="100" value="60" class="w-full" />
+            </div>
           </div>
           
-          <div id="input-table" class="input-panel">
-            <label for="table-data">Table Data (CSV format)</label>
+          <div id="input-table" class="input-panel hidden">
+            <label for="table-data" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Table Data (CSV format)</label>
             <textarea 
               id="table-data" 
-              class="input-field" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" 
               placeholder="Header1,Header2,Header3&#10;Data1,Data2,Data3"
               rows="5"
             >Name,Age,City
@@ -155,8 +167,8 @@ John Doe,30,New York
 Jane Smith,25,Los Angeles
 Bob Johnson,35,Chicago</textarea>
             
-            <label for="table-style">Table Style</label>
-            <select id="table-style" class="select-input">
+            <label for="table-style" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 mt-4">Table Style</label>
+            <select id="table-style" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               <option value="simple">Simple</option>
               <option value="grid">Grid</option>
               <option value="pipe">Pipe</option>
@@ -165,17 +177,17 @@ Bob Johnson,35,Chicago</textarea>
           </div>
         </div>
         
-        <div class="art-output">
-          <div class="output-header">
-            <h3>ASCII Art Output</h3>
-            <div class="output-actions">
-              <button class="btn-icon" data-action="copy" title="Copy ASCII Art">
+        <div class="mb-6 bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">ASCII Art Output</h3>
+            <div class="flex gap-2">
+              <button class="p-2 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md" data-action="copy" title="Copy ASCII Art">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                 </svg>
               </button>
-              <button class="btn-icon" data-action="download" title="Download as Text">
+              <button class="p-2 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md" data-action="download" title="Download as Text">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                   <polyline points="7 10 12 15 17 10"/>
@@ -184,32 +196,32 @@ Bob Johnson,35,Chicago</textarea>
               </button>
             </div>
           </div>
-          <pre id="ascii-output" class="ascii-display"></pre>
-          <div class="output-info">
+          <pre id="ascii-output" class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded p-4 font-mono text-sm overflow-auto max-h-96"></pre>
+          <div class="flex gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
             <span id="output-lines">0 lines</span>
             <span id="output-chars">0 characters</span>
           </div>
         </div>
         
-        <div class="art-actions">
-          <button class="btn btn-primary" data-action="generate">
+        <div class="flex gap-3 mb-6">
+          <button class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="generate">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="5 3 19 12 5 21 5 3"/>
             </svg>
             Generate ASCII Art
           </button>
-          <button class="btn btn-secondary" data-action="clear">Clear</button>
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="clear">Clear</button>
         </div>
         
-        <div class="art-gallery">
-          <h3>Quick Examples</h3>
-          <div class="gallery-grid">
-            <button class="gallery-item" data-example="smiley">Smiley Face</button>
-            <button class="gallery-item" data-example="cat">Cat</button>
-            <button class="gallery-item" data-example="coffee">Coffee Cup</button>
-            <button class="gallery-item" data-example="computer">Computer</button>
-            <button class="gallery-item" data-example="music">Music Note</button>
-            <button class="gallery-item" data-example="rocket">Rocket</button>
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Quick Examples</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
+            <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-example="smiley">Smiley Face</button>
+            <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-example="cat">Cat</button>
+            <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-example="coffee">Coffee Cup</button>
+            <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-example="computer">Computer</button>
+            <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-example="music">Music Note</button>
+            <button class="px-3 py-2 text-sm bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-example="rocket">Rocket</button>
           </div>
         </div>
       </div>
@@ -290,12 +302,22 @@ Bob Johnson,35,Chicago</textarea>
   selectType(type) {
     // Update buttons
     this.container.querySelectorAll('.type-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.type === type);
+      const isActive = btn.dataset.type === type;
+      if (isActive) {
+        btn.className = 'px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-btn active';
+      } else {
+        btn.className = 'px-4 py-2 bg-gray-200 dark:bg-gray-900 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 type-btn';
+      }
     });
     
     // Update panels
     this.container.querySelectorAll('.input-panel').forEach(panel => {
-      panel.classList.toggle('active', panel.id === `input-${type}`);
+      const isActive = panel.id === `input-${type}`;
+      if (isActive) {
+        panel.classList.remove('hidden');
+      } else {
+        panel.classList.add('hidden');
+      }
     });
     
     // Generate initial art for the type

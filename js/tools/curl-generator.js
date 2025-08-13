@@ -17,28 +17,28 @@ export class CurlGenerator {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>cURL Command Generator</h1>
-          <p class="tool-description">Build cURL commands visually with support for headers, authentication, and request bodies</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">cURL Command Generator</h1>
+          <p class="text-gray-600 dark:text-gray-400">Build cURL commands visually with support for headers, authentication, and request bodies</p>
         </div>
         
-        <div class="tool-controls">
-          <button class="btn btn-primary" data-action="generate">
+        <div class="mb-6 flex flex-wrap gap-2">
+          <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="generate">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="4 17 10 11 4 5"/>
               <line x1="12" y1="19" x2="20" y2="19"/>
             </svg>
             Generate cURL
           </button>
-          <button class="btn btn-secondary" data-action="copy">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="copy">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="9" y="9" width="13" height="13" rx="2"/>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
             Copy
           </button>
-          <button class="btn btn-secondary" data-action="clear">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="clear">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
@@ -47,13 +47,15 @@ export class CurlGenerator {
           </button>
         </div>
         
-        <div class="curl-builder">
-          <div class="request-section">
-            <h3>Request Configuration</h3>
-            
-            <div class="form-group">
-              <label for="method-select">Method</label>
-              <select id="method-select" class="form-select">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="space-y-6">
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Request Configuration</h3>
+              
+              <div class="space-y-4">
+                <div>
+                  <label for="method-select" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Method</label>
+                  <select id="method-select" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                 <option value="GET">GET</option>
                 <option value="POST">POST</option>
                 <option value="PUT">PUT</option>
@@ -61,151 +63,155 @@ export class CurlGenerator {
                 <option value="DELETE">DELETE</option>
                 <option value="HEAD">HEAD</option>
                 <option value="OPTIONS">OPTIONS</option>
-              </select>
-            </div>
+                  </select>
+                </div>
+                
+                <div>
+                  <label for="url-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">URL</label>
+                  <input 
+                    type="text" 
+                    id="url-input" 
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" 
+                    placeholder="https://api.example.com/endpoint"
+                    value="https://api.example.com/users"
+                  />
+                </div>
             
-            <div class="form-group">
-              <label for="url-input">URL</label>
-              <input 
-                type="text" 
-                id="url-input" 
-                class="form-input" 
-                placeholder="https://api.example.com/endpoint"
-                value="https://api.example.com/users"
-              />
-            </div>
-            
-            <div class="form-group">
-              <label>Authentication</label>
-              <select id="auth-type" class="form-select">
-                <option value="none">None</option>
-                <option value="bearer">Bearer Token</option>
-                <option value="basic">Basic Auth</option>
-                <option value="api-key">API Key</option>
-              </select>
-              <div id="auth-fields" class="auth-fields" hidden></div>
-            </div>
-          </div>
-          
-          <div class="headers-section">
-            <h3>Headers</h3>
-            <div id="headers-list" class="param-list">
-              <div class="param-item">
-                <input type="text" class="param-key" placeholder="Header name" value="Content-Type" />
-                <input type="text" class="param-value" placeholder="Header value" value="application/json" />
-                <button class="btn-icon btn-remove" data-remove="header">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                  </svg>
-                </button>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Authentication</label>
+                  <select id="auth-type" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+                    <option value="none">None</option>
+                    <option value="bearer">Bearer Token</option>
+                    <option value="basic">Basic Auth</option>
+                    <option value="api-key">API Key</option>
+                  </select>
+                  <div id="auth-fields" class="mt-2" hidden></div>
+                </div>
               </div>
             </div>
-            <button class="btn btn-sm" data-add="header">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-              Add Header
-            </button>
-          </div>
           
-          <div class="params-section">
-            <h3>Query Parameters</h3>
-            <div id="params-list" class="param-list"></div>
-            <button class="btn btn-sm" data-add="param">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-              Add Parameter
-            </button>
-          </div>
-          
-          <div class="body-section">
-            <h3>Request Body</h3>
-            <div class="body-type-selector">
-              <label class="radio-label">
-                <input type="radio" name="body-type" value="none" checked />
-                <span>None</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="body-type" value="json" />
-                <span>JSON</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="body-type" value="form" />
-                <span>Form Data</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="body-type" value="raw" />
-                <span>Raw</span>
-              </label>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Headers</h3>
+              <div id="headers-list" class="space-y-2 mb-3">
+                <div class="flex gap-2">
+                  <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header name" value="Content-Type" />
+                  <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header value" value="application/json" />
+                  <button class="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md" data-remove="header">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <button class="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/30 flex items-center gap-2" data-add="header">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Add Header
+              </button>
             </div>
-            <div id="body-content" class="body-content" hidden></div>
+          
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Query Parameters</h3>
+              <div id="params-list" class="space-y-2 mb-3"></div>
+              <button class="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/30 flex items-center gap-2" data-add="param">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"/>
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Add Parameter
+              </button>
+            </div>
           </div>
           
-          <div class="options-section">
-            <h3>Options</h3>
-            <div class="options-grid">
-              <label class="checkbox-label">
-                <input type="checkbox" id="opt-verbose" />
-                <span>Verbose (-v)</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="opt-follow" checked />
-                <span>Follow redirects (-L)</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="opt-insecure" />
-                <span>Allow insecure (-k)</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="opt-include" />
-                <span>Include headers (-i)</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="opt-silent" />
-                <span>Silent mode (-s)</span>
-              </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="opt-compressed" checked />
-                <span>Compressed (--compressed)</span>
-              </label>
+          <div class="space-y-6">
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Request Body</h3>
+              <div class="flex flex-wrap gap-4 mb-4">
+                <label class="flex items-center">
+                  <input type="radio" name="body-type" value="none" checked class="mr-2 text-blue-600 focus:ring-blue-500" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">None</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="body-type" value="json" class="mr-2 text-blue-600 focus:ring-blue-500" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">JSON</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="body-type" value="form" class="mr-2 text-blue-600 focus:ring-blue-500" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Form Data</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="body-type" value="raw" class="mr-2 text-blue-600 focus:ring-blue-500" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Raw</span>
+                </label>
+              </div>
+              <div id="body-content" hidden></div>
             </div>
-            <div class="form-group">
-              <label for="timeout-input">Timeout (seconds)</label>
-              <input type="number" id="timeout-input" class="form-input" placeholder="30" />
+          
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Options</h3>
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                <label class="flex items-center">
+                  <input type="checkbox" id="opt-verbose" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Verbose (-v)</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" id="opt-follow" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Follow redirects (-L)</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" id="opt-insecure" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Allow insecure (-k)</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" id="opt-include" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Include headers (-i)</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" id="opt-silent" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Silent mode (-s)</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" id="opt-compressed" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Compressed</span>
+                </label>
+              </div>
+              <div>
+                <label for="timeout-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Timeout (seconds)</label>
+                <input type="number" id="timeout-input" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="30" />
+              </div>
             </div>
           </div>
         </div>
         
-        <div class="error-display" data-error hidden></div>
+        <div class="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded hidden" data-error></div>
         
-        <div class="output-section">
-          <h3>Generated cURL Command</h3>
-          <pre id="curl-output" class="code-output curl-output"></pre>
+        <div class="mt-6 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Generated cURL Command</h3>
+          <pre id="curl-output" class="w-full p-4 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-md text-gray-900 dark:text-white font-mono text-sm overflow-x-auto"></pre>
         </div>
         
-        <div class="examples-section">
-          <h3>Quick Examples</h3>
-          <div class="examples-grid">
-            <button class="example-btn" data-example="get-json">
+        <div class="mt-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Examples</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="get-json">
               GET JSON API
             </button>
-            <button class="example-btn" data-example="post-json">
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="post-json">
               POST JSON Data
             </button>
-            <button class="example-btn" data-example="auth-bearer">
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="auth-bearer">
               Bearer Auth
             </button>
-            <button class="example-btn" data-example="form-upload">
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="form-upload">
               Form Upload
             </button>
-            <button class="example-btn" data-example="graphql">
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="graphql">
               GraphQL Query
             </button>
-            <button class="example-btn" data-example="rest-crud">
+            <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="rest-crud">
               REST CRUD
             </button>
           </div>
@@ -257,11 +263,11 @@ export class CurlGenerator {
     // Remove buttons (delegated)
     this.container.addEventListener('click', (e) => {
       if (e.target.closest('[data-remove="header"]')) {
-        e.target.closest('.param-item').remove();
+        e.target.closest('.flex.gap-2').remove();
         this.generateCurl();
       }
       if (e.target.closest('[data-remove="param"]')) {
-        e.target.closest('.param-item').remove();
+        e.target.closest('.flex.gap-2').remove();
         this.generateCurl();
       }
     });
@@ -288,7 +294,7 @@ export class CurlGenerator {
     
     // Auto-generate on input changes (delegated)
     this.container.addEventListener('input', (e) => {
-      if (e.target.matches('.param-key, .param-value, .body-input, #auth-fields input')) {
+      if (e.target.matches('#headers-list input, #params-list input, textarea, #auth-fields input')) {
         this.generateCurl();
       }
     });
@@ -391,9 +397,10 @@ export class CurlGenerator {
   
   getHeaders() {
     const headers = [];
-    this.container.querySelectorAll('#headers-list .param-item').forEach(item => {
-      const key = item.querySelector('.param-key').value;
-      const value = item.querySelector('.param-value').value;
+    this.container.querySelectorAll('#headers-list .flex.gap-2').forEach(item => {
+      const inputs = item.querySelectorAll('input');
+      const key = inputs[0]?.value;
+      const value = inputs[1]?.value;
       if (key) headers.push({ key, value });
     });
     return headers;
@@ -417,9 +424,10 @@ export class CurlGenerator {
         break;
       case 'form':
         const formData = [];
-        bodyContent.querySelectorAll('.param-item').forEach(item => {
-          const key = item.querySelector('.param-key').value;
-          const value = item.querySelector('.param-value').value;
+        bodyContent.querySelectorAll('.flex.gap-2').forEach(item => {
+          const inputs = item.querySelectorAll('input');
+          const key = inputs[0]?.value;
+          const value = inputs[1]?.value;
           if (key) formData.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
         });
         if (formData.length > 0) {
@@ -436,9 +444,10 @@ export class CurlGenerator {
   
   buildUrlWithParams(baseUrl) {
     const params = [];
-    this.container.querySelectorAll('#params-list .param-item').forEach(item => {
-      const key = item.querySelector('.param-key').value;
-      const value = item.querySelector('.param-value').value;
+    this.container.querySelectorAll('#params-list .flex.gap-2').forEach(item => {
+      const inputs = item.querySelectorAll('input');
+      const key = inputs[0]?.value;
+      const value = inputs[1]?.value;
       if (key) params.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
     });
     
@@ -459,24 +468,24 @@ export class CurlGenerator {
       case 'bearer':
         authFields.hidden = false;
         authFields.innerHTML = `
-          <input type="text" id="auth-token" class="form-input" placeholder="Enter bearer token" />
+          <input type="text" id="auth-token" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Enter bearer token" />
         `;
         break;
       case 'basic':
         authFields.hidden = false;
         authFields.innerHTML = `
-          <div class="auth-basic-fields">
-            <input type="text" id="auth-username" class="form-input" placeholder="Username" />
-            <input type="password" id="auth-password" class="form-input" placeholder="Password" />
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="auth-username" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Username" />
+            <input type="password" id="auth-password" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Password" />
           </div>
         `;
         break;
       case 'api-key':
         authFields.hidden = false;
         authFields.innerHTML = `
-          <div class="auth-api-fields">
-            <input type="text" id="api-key-name" class="form-input" placeholder="Header name (e.g., X-API-Key)" value="X-API-Key" />
-            <input type="text" id="api-key-value" class="form-input" placeholder="API key value" />
+          <div class="space-y-2">
+            <input type="text" id="api-key-name" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header name (e.g., X-API-Key)" value="X-API-Key" />
+            <input type="text" id="api-key-value" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="API key value" />
           </div>
         `;
         break;
@@ -499,7 +508,7 @@ export class CurlGenerator {
       case 'json':
         bodyContent.hidden = false;
         bodyContent.innerHTML = `
-          <textarea id="json-body" class="body-input" placeholder='{"key": "value"}' rows="8">{
+          <textarea id="json-body" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" placeholder='{"key": "value"}' rows="8">{
   "name": "John Doe",
   "email": "john@example.com"
 }</textarea>
@@ -508,11 +517,11 @@ export class CurlGenerator {
       case 'form':
         bodyContent.hidden = false;
         bodyContent.innerHTML = `
-          <div id="form-fields" class="param-list">
-            <div class="param-item">
-              <input type="text" class="param-key" placeholder="Field name" value="name" />
-              <input type="text" class="param-value" placeholder="Field value" value="John Doe" />
-              <button class="btn-icon btn-remove" data-remove="form">
+          <div id="form-fields" class="space-y-2 mb-3">
+            <div class="flex gap-2">
+              <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Field name" value="name" />
+              <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Field value" value="John Doe" />
+              <button class="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md" data-remove="form">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <line x1="18" y1="6" x2="6" y2="18"/>
                   <line x1="6" y1="6" x2="18" y2="18"/>
@@ -520,13 +529,13 @@ export class CurlGenerator {
               </button>
             </div>
           </div>
-          <button class="btn btn-sm" onclick="this.parentElement.querySelector('#form-fields').insertAdjacentHTML('beforeend', this.parentElement.querySelector('.param-item').outerHTML)">Add Field</button>
+          <button class="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/30" onclick="this.parentElement.querySelector('#form-fields').insertAdjacentHTML('beforeend', this.parentElement.querySelector('.flex.gap-2').outerHTML)">Add Field</button>
         `;
         break;
       case 'raw':
         bodyContent.hidden = false;
         bodyContent.innerHTML = `
-          <textarea id="raw-body" class="body-input" placeholder="Raw body content" rows="8"></textarea>
+          <textarea id="raw-body" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" placeholder="Raw body content" rows="8"></textarea>
         `;
         break;
     }
@@ -540,11 +549,11 @@ export class CurlGenerator {
   addHeader() {
     const headersList = this.container.querySelector('#headers-list');
     const newHeader = document.createElement('div');
-    newHeader.className = 'param-item';
+    newHeader.className = 'flex gap-2';
     newHeader.innerHTML = `
-      <input type="text" class="param-key" placeholder="Header name" />
-      <input type="text" class="param-value" placeholder="Header value" />
-      <button class="btn-icon btn-remove" data-remove="header">
+      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header name" />
+      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header value" />
+      <button class="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md" data-remove="header">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"/>
           <line x1="6" y1="6" x2="18" y2="18"/>
@@ -554,17 +563,17 @@ export class CurlGenerator {
     headersList.appendChild(newHeader);
     
     // Focus on the new input
-    newHeader.querySelector('.param-key').focus();
+    newHeader.querySelector('input').focus();
   }
   
   addQueryParam() {
     const paramsList = this.container.querySelector('#params-list');
     const newParam = document.createElement('div');
-    newParam.className = 'param-item';
+    newParam.className = 'flex gap-2';
     newParam.innerHTML = `
-      <input type="text" class="param-key" placeholder="Parameter name" />
-      <input type="text" class="param-value" placeholder="Parameter value" />
-      <button class="btn-icon btn-remove" data-remove="param">
+      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Parameter name" />
+      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Parameter value" />
+      <button class="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md" data-remove="param">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"/>
           <line x1="6" y1="6" x2="18" y2="18"/>
@@ -574,7 +583,7 @@ export class CurlGenerator {
     paramsList.appendChild(newParam);
     
     // Focus on the new input
-    newParam.querySelector('.param-key').focus();
+    newParam.querySelector('input').focus();
   }
   
   loadExample(example) {
@@ -653,13 +662,13 @@ export class CurlGenerator {
   
   addHeaderWithValues(key, value) {
     const headersList = this.container.querySelector('#headers-list');
-    const existingHeaders = headersList.querySelectorAll('.param-item');
+    const existingHeaders = headersList.querySelectorAll('.flex.gap-2');
     
     // Check if we need to use the existing empty header or create new
     let headerItem = null;
     for (const item of existingHeaders) {
-      const keyInput = item.querySelector('.param-key');
-      if (!keyInput.value) {
+      const inputs = item.querySelectorAll('input');
+      if (!inputs[0].value) {
         headerItem = item;
         break;
       }
@@ -670,8 +679,9 @@ export class CurlGenerator {
       headerItem = headersList.lastElementChild;
     }
     
-    headerItem.querySelector('.param-key').value = key;
-    headerItem.querySelector('.param-value').value = value;
+    const inputs = headerItem.querySelectorAll('input');
+    inputs[0].value = key;
+    inputs[1].value = value;
   }
   
   copyCurl() {
@@ -683,13 +693,19 @@ export class CurlGenerator {
     
     navigator.clipboard.writeText(command).then(() => {
       const btn = this.container.querySelector('[data-action="copy"]');
-      const originalText = btn.textContent;
-      btn.textContent = 'Copied!';
-      btn.classList.add('btn-success');
+      const originalHTML = btn.innerHTML;
+      const originalClasses = btn.className;
+      btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Copied!
+      `;
+      btn.className = 'px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center gap-2';
       
       setTimeout(() => {
-        btn.textContent = originalText;
-        btn.classList.remove('btn-success');
+        btn.innerHTML = originalHTML;
+        btn.className = originalClasses;
       }, 2000);
     });
   }
@@ -704,17 +720,17 @@ export class CurlGenerator {
     // Clear headers (except first)
     const headersList = this.container.querySelector('#headers-list');
     headersList.innerHTML = `
-      <div class="param-item">
-        <input type="text" class="param-key" placeholder="Header name" />
-        <input type="text" class="param-value" placeholder="Header value" />
-        <button class="btn-icon btn-remove" data-remove="header">
+      <div class="flex gap-2">
+        <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header name" />
+        <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header value" />
+        <button class="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md" data-remove="header">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>
             <line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
         </button>
       </div>
-    `;
+    `;}
     
     // Clear params
     this.container.querySelector('#params-list').innerHTML = '';

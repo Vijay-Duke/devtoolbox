@@ -17,88 +17,82 @@ export class MarkdownPreview {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>Markdown Preview</h1>
-          <p class="tool-description">Live markdown rendering with syntax highlighting and GitHub flavored markdown support</p>
+      <div class="max-w-7xl mx-auto p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Markdown Preview</h1>
+          <p class="text-gray-600 dark:text-gray-400">Live markdown rendering with syntax highlighting and GitHub flavored markdown support</p>
         </div>
         
-        <div class="tool-controls">
-          <div class="view-toggle">
-            <button class="btn btn-secondary" data-view="edit">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div class="inline-flex rounded-lg border border-gray-200 dark:border-gray-700">
+            <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-l-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-view="edit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
               </svg>
               Edit
             </button>
-            <button class="btn btn-primary" data-view="split">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-view="split">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
                 <rect x="3" y="3" width="18" height="18" rx="2"/>
                 <line x1="12" y1="3" x2="12" y2="21"/>
               </svg>
               Split
             </button>
-            <button class="btn btn-secondary" data-view="preview">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-r-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-view="preview">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                 <circle cx="12" cy="12" r="3"/>
               </svg>
               Preview
             </button>
           </div>
-          <div class="action-buttons">
-            <button class="btn btn-secondary" data-action="copy-md">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <div class="flex gap-2">
+            <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy-md">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
                 <rect x="9" y="9" width="13" height="13" rx="2"/>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg>
               Copy MD
             </button>
-            <button class="btn btn-secondary" data-action="copy-html">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy-html">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
                 <polyline points="16 18 22 12 16 6"/>
                 <polyline points="8 6 2 12 8 18"/>
               </svg>
               Copy HTML
             </button>
-            <button class="btn btn-secondary" data-action="clear">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18"/>
-                <line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-              Clear
-            </button>
+            <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="clear">Clear</button>
           </div>
         </div>
         
-        <div class="markdown-toolbar">
-          <button class="toolbar-btn" data-format="bold" title="Bold (Ctrl+B)">
+        <div class="flex flex-wrap items-center gap-1 p-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg mb-4">
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="bold" title="Bold (Ctrl+B)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
               <path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
             </svg>
           </button>
-          <button class="toolbar-btn" data-format="italic" title="Italic (Ctrl+I)">
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="italic" title="Italic (Ctrl+I)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="19" y1="4" x2="10" y2="4"/>
               <line x1="14" y1="20" x2="5" y2="20"/>
               <line x1="15" y1="4" x2="9" y2="20"/>
             </svg>
           </button>
-          <button class="toolbar-btn" data-format="strikethrough" title="Strikethrough">
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="strikethrough" title="Strikethrough">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="4" y1="12" x2="20" y2="12"/>
               <path d="M7.5 7.5c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5c0 1.5-.5 2.5-2 3.5"/>
               <path d="M16.5 16.5c0 2.5-2 4.5-4.5 4.5s-4.5-2-4.5-4.5"/>
             </svg>
           </button>
-          <div class="toolbar-separator"></div>
-          <button class="toolbar-btn" data-format="h1" title="Heading 1">H1</button>
-          <button class="toolbar-btn" data-format="h2" title="Heading 2">H2</button>
-          <button class="toolbar-btn" data-format="h3" title="Heading 3">H3</button>
-          <div class="toolbar-separator"></div>
-          <button class="toolbar-btn" data-format="ul" title="Unordered List">
+          <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+          <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="h1" title="Heading 1">H1</button>
+          <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="h2" title="Heading 2">H2</button>
+          <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="h3" title="Heading 3">H3</button>
+          <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="ul" title="Unordered List">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="8" y1="6" x2="21" y2="6"/>
               <line x1="8" y1="12" x2="21" y2="12"/>
@@ -108,7 +102,7 @@ export class MarkdownPreview {
               <line x1="3" y1="18" x2="3.01" y2="18"/>
             </svg>
           </button>
-          <button class="toolbar-btn" data-format="ol" title="Ordered List">
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="ol" title="Ordered List">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="10" y1="6" x2="21" y2="6"/>
               <line x1="10" y1="12" x2="21" y2="12"/>
@@ -118,51 +112,51 @@ export class MarkdownPreview {
               <path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/>
             </svg>
           </button>
-          <button class="toolbar-btn" data-format="checklist" title="Checklist">
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="checklist" title="Checklist">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="9 11 12 14 22 4"/>
               <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
             </svg>
           </button>
-          <div class="toolbar-separator"></div>
-          <button class="toolbar-btn" data-format="link" title="Link (Ctrl+K)">
+          <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="link" title="Link (Ctrl+K)">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
               <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
             </svg>
           </button>
-          <button class="toolbar-btn" data-format="image" title="Image">
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="image" title="Image">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="18" height="18" rx="2"/>
               <circle cx="8.5" cy="8.5" r="1.5"/>
               <polyline points="21 15 16 10 5 21"/>
             </svg>
           </button>
-          <button class="toolbar-btn" data-format="code" title="Inline Code">
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="code" title="Inline Code">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="16 18 22 12 16 6"/>
               <polyline points="8 6 2 12 8 18"/>
             </svg>
           </button>
-          <button class="toolbar-btn" data-format="codeblock" title="Code Block">
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="codeblock" title="Code Block">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="18" height="18" rx="2"/>
               <path d="M8 12h.01M12 12h.01M16 12h.01"/>
             </svg>
           </button>
-          <div class="toolbar-separator"></div>
-          <button class="toolbar-btn" data-format="quote" title="Blockquote">
+          <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="quote" title="Blockquote">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
               <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/>
             </svg>
           </button>
-          <button class="toolbar-btn" data-format="hr" title="Horizontal Rule">
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="hr" title="Horizontal Rule">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
           </button>
-          <button class="toolbar-btn" data-format="table" title="Table">
+          <button class="p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors" data-format="table" title="Table">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="18" height="18" rx="2"/>
               <line x1="3" y1="9" x2="21" y2="9"/>
@@ -172,14 +166,14 @@ export class MarkdownPreview {
           </button>
         </div>
         
-        <div class="error-display" data-error hidden></div>
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-4" data-error hidden></div>
         
-        <div class="markdown-content" data-view-mode="split">
-          <div class="markdown-editor">
-            <label for="markdown-input">Markdown</label>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" data-view-mode="split">
+          <div class="markdown-editor" data-editor>
+            <label for="markdown-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Markdown</label>
             <textarea 
               id="markdown-input" 
-              class="code-input markdown-input" 
+              class="w-full h-96 p-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none" 
               placeholder="Type your markdown here..."
               spellcheck="false"
             ># Welcome to Markdown Preview
@@ -252,16 +246,16 @@ console.log(fibonacci(10)); // 55
 ---
 
 *Happy writing!* 🎉</textarea>
-            <div class="editor-stats">
+            <div class="flex gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
               <span data-stat="words">0 words</span>
               <span data-stat="chars">0 characters</span>
               <span data-stat="lines">0 lines</span>
             </div>
           </div>
           
-          <div class="markdown-preview">
-            <label>Preview</label>
-            <div id="markdown-output" class="markdown-output"></div>
+          <div class="markdown-preview" data-preview>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preview</label>
+            <div id="markdown-output" class="h-96 p-4 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg overflow-auto prose prose-sm dark:prose-invert max-w-none"></div>
           </div>
         </div>
       </div>
@@ -330,17 +324,42 @@ console.log(fibonacci(10)); // 55
   
   setViewMode(mode) {
     this.viewMode = mode;
-    const contentArea = this.container.querySelector('.markdown-content');
+    const contentArea = this.container.querySelector('[data-view-mode]');
+    const editorDiv = this.container.querySelector('[data-editor]');
+    const previewDiv = this.container.querySelector('[data-preview]');
+    
+    // Update layout based on mode
+    if (mode === 'edit') {
+      contentArea.className = 'grid grid-cols-1 gap-4';
+      editorDiv.style.display = 'block';
+      previewDiv.style.display = 'none';
+    } else if (mode === 'preview') {
+      contentArea.className = 'grid grid-cols-1 gap-4';
+      editorDiv.style.display = 'none';
+      previewDiv.style.display = 'block';
+    } else { // split
+      contentArea.className = 'grid grid-cols-1 lg:grid-cols-2 gap-4';
+      editorDiv.style.display = 'block';
+      previewDiv.style.display = 'block';
+    }
+    
     contentArea.setAttribute('data-view-mode', mode);
     
     // Update button states
     this.container.querySelectorAll('[data-view]').forEach(btn => {
       if (btn.dataset.view === mode) {
-        btn.classList.add('btn-primary');
-        btn.classList.remove('btn-secondary');
+        btn.className = btn.dataset.view === 'split' 
+          ? 'px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
+          : 'px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-l-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+        if (btn.dataset.view === 'preview') {
+          btn.className = 'px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+        }
       } else {
-        btn.classList.remove('btn-primary');
-        btn.classList.add('btn-secondary');
+        btn.className = btn.dataset.view === 'edit'
+          ? 'px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-l-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
+          : btn.dataset.view === 'preview'
+          ? 'px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-r-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500'
+          : 'px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
       }
     });
   }

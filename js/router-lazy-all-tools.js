@@ -3,13 +3,11 @@ export class Router {
   constructor() {
     this.routes = new Map();
     this.currentTool = null;
-    this.mainContent = document.querySelector('#main');
+    this.mainContent = document.querySelector('.main');
     this.loadingTemplate = `
-      <div class="flex items-center justify-center h-64">
-        <div class="text-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-white mb-4 mx-auto"></div>
-          <p class="text-gray-600 dark:text-gray-400">Loading tool...</p>
-        </div>
+      <div class="tool-loading">
+        <div class="loading-spinner"></div>
+        <p>Loading tool...</p>
       </div>
     `;
     
@@ -45,13 +43,7 @@ export class Router {
       { path: 'qr-generator', name: 'QR Code Generator', module: './tools/qr-generator.js', className: 'QRGenerator' },
       { path: 'ascii-art', name: 'ASCII Art Generator', module: './tools/ascii-art.js', className: 'ASCIIArtGenerator' },
       { path: 'image-converter', name: 'Image Converter', module: './tools/image-converter.js', className: 'ImageConverter' },
-      { path: 'webhook-tester', name: 'Webhook Tester', module: './tools/webhook-tester.js', className: 'WebhookTester' },
-      // Networking & Cloud Tools
-      { path: 'ip-lookup', name: 'IP Address Lookup', module: './tools/ip-lookup.js', className: 'IPLookup' },
-      { path: 'cidr-calculator', name: 'CIDR Calculator', module: './tools/cidr-calculator.js', className: 'CIDRCalculator' },
-      { path: 'whois-lookup', name: 'WHOIS Lookup', module: './tools/whois-lookup.js', className: 'WHOISLookup' },
-      { path: 's3-presigned-url', name: 'S3 Pre-signed URL Generator', module: './tools/s3-presigned-url.js', className: 'S3PresignedURL' },
-      { path: 'iam-policy-visualizer', name: 'AWS IAM Policy Visualizer', module: './tools/iam-policy-visualizer.js', className: 'IAMPolicyVisualizer' }
+      { path: 'webhook-tester', name: 'Webhook Tester', module: './tools/webhook-tester.js', className: 'WebhookTester' }
     ];
     
     toolConfigs.forEach(config => {
@@ -173,33 +165,23 @@ export class Router {
   
   showWelcome() {
     this.mainContent.innerHTML = `
-      <div class="max-w-4xl mx-auto px-6 py-12">
-        <div class="text-center">
-          <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Welcome to DevToolbox</h1>
-          <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">Select a tool from the sidebar or use search to get started.</p>
-          
-          <div class="inline-block text-left bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 mb-8">
-            <p class="font-semibold text-gray-900 dark:text-white mb-3">Keyboard shortcuts:</p>
-            <ul class="space-y-2 text-sm">
-              <li class="flex items-center space-x-2">
-                <kbd class="px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">/</kbd>
-                <span class="text-gray-600 dark:text-gray-400">Focus search</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <kbd class="px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">Esc</kbd>
-                <span class="text-gray-600 dark:text-gray-400">Clear search</span>
-              </li>
-              <li class="flex items-center space-x-2">
-                <kbd class="px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">T</kbd>
-                <span class="text-gray-600 dark:text-gray-400">Toggle theme</span>
-              </li>
-            </ul>
-          </div>
-          
-          <div class="mt-8">
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Frequently Used Tools</h3>
-            <div id="frequent-tools"></div>
-          </div>
+      <div class="welcome-message">
+        <h1>Welcome to DevToolbox</h1>
+        <p>Select a tool from the sidebar or use search to get started.</p>
+        <div class="shortcuts-hint">
+          <p>Keyboard shortcuts:</p>
+          <ul>
+            <li><kbd>/</kbd> Focus search</li>
+            <li><kbd>Esc</kbd> Clear search</li>
+            <li><kbd>T</kbd> Toggle theme</li>
+            <li><kbd>Ctrl+K</kbd> Quick tool search</li>
+            <li><kbd>Ctrl+D</kbd> Add to favorites</li>
+            <li><kbd>?</kbd> Show all shortcuts</li>
+          </ul>
+        </div>
+        <div class="frequently-used">
+          <h3>Frequently Used Tools</h3>
+          <div id="frequent-tools"></div>
         </div>
       </div>
     `;
@@ -223,14 +205,14 @@ export class Router {
     }
     
     container.innerHTML = `
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div class="frequent-tools-grid">
         ${sorted.map(([name, count]) => {
           const route = Array.from(this.routes.values()).find(r => r.name === name);
           const path = Array.from(this.routes.entries()).find(([_, r]) => r.name === name)?.[0];
           return route ? `
-            <a href="#${path}" class="block p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-lg transition-shadow">
-              <div class="font-medium text-gray-900 dark:text-white">${name}</div>
-              <div class="text-sm text-gray-500 dark:text-gray-400">${count} uses</div>
+            <a href="#${path}" class="frequent-tool-card">
+              <div class="tool-name">${name}</div>
+              <div class="tool-usage">${count} uses</div>
             </a>
           ` : '';
         }).join('')}
@@ -240,27 +222,21 @@ export class Router {
   
   show404() {
     this.mainContent.innerHTML = `
-      <div class="flex items-center justify-center h-64">
-        <div class="text-center">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Tool Not Found</h1>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">The tool you're looking for doesn't exist yet.</p>
-          <a href="#" class="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Go Home</a>
-        </div>
+      <div class="error-page">
+        <h1>Tool Not Found</h1>
+        <p>The tool you're looking for doesn't exist yet.</p>
+        <a href="#" class="btn btn-primary">Go Home</a>
       </div>
     `;
   }
   
   showError(toolName) {
     this.mainContent.innerHTML = `
-      <div class="flex items-center justify-center h-64">
-        <div class="text-center">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Failed to Load Tool</h1>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">Sorry, we couldn't load ${toolName}. Please try again.</p>
-          <div class="space-x-4">
-            <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" onclick="location.reload()">Reload Page</button>
-            <a href="#" class="inline-block px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Go Home</a>
-          </div>
-        </div>
+      <div class="error-page">
+        <h1>Failed to Load Tool</h1>
+        <p>Sorry, we couldn't load ${toolName}. Please try again.</p>
+        <button class="btn btn-primary" onclick="location.reload()">Reload Page</button>
+        <a href="#" class="btn btn-secondary">Go Home</a>
       </div>
     `;
   }

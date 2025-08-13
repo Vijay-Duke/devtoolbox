@@ -35,7 +35,7 @@ A fast, minimal, privacy-first collection of developer utilities in one place. N
 - UUID Generator - Generate v4 UUIDs
 - Hash Generator - MD5, SHA-1, SHA-256, SHA-512
 - Fake Data Generator - Generate test data
-- Password Generator - Secure passwords with strength meter
+- Password Generator - Secure passwords with entropy-based strength meter
 - QR Code Generator - Generate QR codes for various data types
 - ASCII Art Generator - Create ASCII art from text and images
 
@@ -51,10 +51,17 @@ A fast, minimal, privacy-first collection of developer utilities in one place. N
 - Cron Parser - Parse and explain cron expressions
 - cURL Generator - Generate cURL commands from requests
 - API Mock Generator - Generate mock API responses
-- DNS Lookup - DNS record lookup tool
 - GraphQL Tester - Test GraphQL queries
 - SQL Formatter - Format and analyze SQL queries
 - Webhook Tester - Test and debug webhooks locally
+
+#### Networking & Cloud
+- IP Address Lookup - Real-time geolocation with ip-api.com
+- CIDR Calculator - Subnet calculator and IP range tools
+- DNS Lookup - Real DNS queries via Cloudflare DoH
+- WHOIS Lookup - Domain and IP registration info
+- S3 Pre-signed URL Generator - Generate AWS S3 URLs
+- AWS IAM Policy Visualizer - Analyze and visualize IAM policies
 
 ### 🎨 User Experience
 

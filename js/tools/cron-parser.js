@@ -16,188 +16,188 @@ export class CronParser {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>Cron Parser</h1>
-          <p class="tool-description">Parse and understand cron expressions with human-readable explanations</p>
+      <div class="max-w-7xl mx-auto p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Cron Parser</h1>
+          <p class="text-gray-600 dark:text-gray-400">Parse and understand cron expressions with human-readable explanations</p>
         </div>
         
-        <div class="cron-input-section">
-          <label for="cron-expression">Cron Expression</label>
-          <div class="cron-input-wrapper">
+        <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <label for="cron-expression" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Cron Expression</label>
+          <div class="flex gap-2 mb-3">
             <input 
               type="text" 
               id="cron-expression" 
-              class="cron-expression-input"
+              class="flex-1 p-3 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="0 0 * * MON-FRI"
               value="0 0 * * MON-FRI"
               spellcheck="false"
             />
-            <button class="btn btn-primary" data-action="parse">Parse</button>
+            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors" data-action="parse">Parse</button>
           </div>
           
-          <div class="cron-format-hint">
-            Format: <code>minute hour day month weekday</code> or <code>@yearly</code>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            Format: <code class="px-2 py-1 bg-white dark:bg-gray-900 rounded font-mono">minute hour day month weekday</code> or <code class="px-2 py-1 bg-white dark:bg-gray-900 rounded font-mono">@yearly</code>
           </div>
         </div>
         
-        <div class="error-display" data-error hidden></div>
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded-lg mb-6" data-error hidden></div>
         
-        <div class="cron-breakdown" id="cron-breakdown">
-          <h3>Expression Breakdown</h3>
-          <div class="field-grid">
-            <div class="field-item">
-              <span class="field-label">Minute</span>
-              <span class="field-value" id="field-minute">-</span>
-              <span class="field-range">(0-59)</span>
+        <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6" id="cron-breakdown">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Expression Breakdown</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+              <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Minute</span>
+              <span class="block font-mono text-lg text-gray-900 dark:text-white" id="field-minute">-</span>
+              <span class="block text-xs text-gray-500 dark:text-gray-400">(0-59)</span>
             </div>
-            <div class="field-item">
-              <span class="field-label">Hour</span>
-              <span class="field-value" id="field-hour">-</span>
-              <span class="field-range">(0-23)</span>
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+              <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Hour</span>
+              <span class="block font-mono text-lg text-gray-900 dark:text-white" id="field-hour">-</span>
+              <span class="block text-xs text-gray-500 dark:text-gray-400">(0-23)</span>
             </div>
-            <div class="field-item">
-              <span class="field-label">Day of Month</span>
-              <span class="field-value" id="field-day">-</span>
-              <span class="field-range">(1-31)</span>
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+              <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Day of Month</span>
+              <span class="block font-mono text-lg text-gray-900 dark:text-white" id="field-day">-</span>
+              <span class="block text-xs text-gray-500 dark:text-gray-400">(1-31)</span>
             </div>
-            <div class="field-item">
-              <span class="field-label">Month</span>
-              <span class="field-value" id="field-month">-</span>
-              <span class="field-range">(1-12 or JAN-DEC)</span>
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+              <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Month</span>
+              <span class="block font-mono text-lg text-gray-900 dark:text-white" id="field-month">-</span>
+              <span class="block text-xs text-gray-500 dark:text-gray-400">(1-12 or JAN-DEC)</span>
             </div>
-            <div class="field-item">
-              <span class="field-label">Day of Week</span>
-              <span class="field-value" id="field-weekday">-</span>
-              <span class="field-range">(0-7 or SUN-SAT)</span>
+            <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+              <span class="block text-sm font-medium text-gray-700 dark:text-gray-300">Day of Week</span>
+              <span class="block font-mono text-lg text-gray-900 dark:text-white" id="field-weekday">-</span>
+              <span class="block text-xs text-gray-500 dark:text-gray-400">(0-7 or SUN-SAT)</span>
             </div>
           </div>
         </div>
         
-        <div class="cron-description">
-          <h3>Human-Readable Description</h3>
-          <div class="description-text" id="description-text">
+        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">Human-Readable Description</h3>
+          <div class="text-gray-700 dark:text-gray-300" id="description-text">
             Enter a cron expression to see its description
           </div>
         </div>
         
-        <div class="next-runs">
-          <h3>Next Execution Times</h3>
-          <div class="next-runs-list" id="next-runs-list">
-            <div class="no-runs">Parse a cron expression to see upcoming execution times</div>
+        <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Next Execution Times</h3>
+          <div class="space-y-2" id="next-runs-list">
+            <div class="text-gray-500 dark:text-gray-400 text-center py-4">Parse a cron expression to see upcoming execution times</div>
           </div>
         </div>
         
-        <div class="common-expressions">
-          <h3>Common Expressions</h3>
-          <div class="expressions-grid">
-            <button class="expression-card" data-cron="* * * * *">
-              <span class="expression-value">* * * * *</span>
-              <span class="expression-desc">Every minute</span>
+        <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-6 mb-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Common Expressions</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="* * * * *">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">* * * * *</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Every minute</span>
             </button>
-            <button class="expression-card" data-cron="0 * * * *">
-              <span class="expression-value">0 * * * *</span>
-              <span class="expression-desc">Every hour</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="0 * * * *">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">0 * * * *</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Every hour</span>
             </button>
-            <button class="expression-card" data-cron="0 0 * * *">
-              <span class="expression-value">0 0 * * *</span>
-              <span class="expression-desc">Daily at midnight</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="0 0 * * *">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">0 0 * * *</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Daily at midnight</span>
             </button>
-            <button class="expression-card" data-cron="0 9 * * MON-FRI">
-              <span class="expression-value">0 9 * * MON-FRI</span>
-              <span class="expression-desc">Weekdays at 9 AM</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="0 9 * * MON-FRI">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">0 9 * * MON-FRI</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Weekdays at 9 AM</span>
             </button>
-            <button class="expression-card" data-cron="0 0 1 * *">
-              <span class="expression-value">0 0 1 * *</span>
-              <span class="expression-desc">Monthly on the 1st</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="0 0 1 * *">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">0 0 1 * *</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Monthly on the 1st</span>
             </button>
-            <button class="expression-card" data-cron="0 0 1 1 *">
-              <span class="expression-value">0 0 1 1 *</span>
-              <span class="expression-desc">Yearly on Jan 1st</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="0 0 1 1 *">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">0 0 1 1 *</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Yearly on Jan 1st</span>
             </button>
-            <button class="expression-card" data-cron="*/5 * * * *">
-              <span class="expression-value">*/5 * * * *</span>
-              <span class="expression-desc">Every 5 minutes</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="*/5 * * * *">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">*/5 * * * *</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Every 5 minutes</span>
             </button>
-            <button class="expression-card" data-cron="0 */2 * * *">
-              <span class="expression-value">0 */2 * * *</span>
-              <span class="expression-desc">Every 2 hours</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="0 */2 * * *">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">0 */2 * * *</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Every 2 hours</span>
             </button>
-            <button class="expression-card" data-cron="0 0 * * SUN">
-              <span class="expression-value">0 0 * * SUN</span>
-              <span class="expression-desc">Every Sunday</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="0 0 * * SUN">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">0 0 * * SUN</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Every Sunday</span>
             </button>
-            <button class="expression-card" data-cron="30 3 15 * *">
-              <span class="expression-value">30 3 15 * *</span>
-              <span class="expression-desc">15th at 3:30 AM</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="30 3 15 * *">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">30 3 15 * *</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">15th at 3:30 AM</span>
             </button>
-            <button class="expression-card" data-cron="@hourly">
-              <span class="expression-value">@hourly</span>
-              <span class="expression-desc">Start of every hour</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="@hourly">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">@hourly</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Start of every hour</span>
             </button>
-            <button class="expression-card" data-cron="@daily">
-              <span class="expression-value">@daily</span>
-              <span class="expression-desc">Start of every day</span>
+            <button class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left" data-cron="@daily">
+              <span class="block font-mono text-sm text-gray-900 dark:text-white">@daily</span>
+              <span class="block text-xs text-gray-600 dark:text-gray-400 mt-1">Start of every day</span>
             </button>
           </div>
         </div>
         
-        <div class="cron-reference">
-          <h3>Quick Reference</h3>
-          <div class="reference-table">
-            <table>
+        <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Reference</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
               <thead>
-                <tr>
-                  <th>Character</th>
-                  <th>Description</th>
-                  <th>Example</th>
+                <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <th class="text-left py-2 pr-4 font-medium text-gray-700 dark:text-gray-300">Character</th>
+                  <th class="text-left py-2 pr-4 font-medium text-gray-700 dark:text-gray-300">Description</th>
+                  <th class="text-left py-2 font-medium text-gray-700 dark:text-gray-300">Example</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td><code>*</code></td>
-                  <td>Any value</td>
-                  <td>* in hour field = every hour</td>
+              <tbody class="text-gray-700 dark:text-gray-300">
+                <tr class="border-b border-gray-100 dark:border-gray-800">
+                  <td class="py-2 pr-4"><code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">*</code></td>
+                  <td class="py-2 pr-4">Any value</td>
+                  <td class="py-2">* in hour field = every hour</td>
+                </tr>
+                <tr class="border-b border-gray-100 dark:border-gray-800">
+                  <td class="py-2 pr-4"><code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">,</code></td>
+                  <td class="py-2 pr-4">Value list separator</td>
+                  <td class="py-2">1,3,5 = at 1, 3, and 5</td>
+                </tr>
+                <tr class="border-b border-gray-100 dark:border-gray-800">
+                  <td class="py-2 pr-4"><code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">-</code></td>
+                  <td class="py-2 pr-4">Range of values</td>
+                  <td class="py-2">1-5 = 1 through 5</td>
+                </tr>
+                <tr class="border-b border-gray-100 dark:border-gray-800">
+                  <td class="py-2 pr-4"><code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">/</code></td>
+                  <td class="py-2 pr-4">Step values</td>
+                  <td class="py-2">*/15 = every 15 units</td>
+                </tr>
+                <tr class="border-b border-gray-100 dark:border-gray-800">
+                  <td class="py-2 pr-4"><code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">@yearly</code></td>
+                  <td class="py-2 pr-4">Annually</td>
+                  <td class="py-2">0 0 1 1 *</td>
+                </tr>
+                <tr class="border-b border-gray-100 dark:border-gray-800">
+                  <td class="py-2 pr-4"><code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">@monthly</code></td>
+                  <td class="py-2 pr-4">Monthly</td>
+                  <td class="py-2">0 0 1 * *</td>
+                </tr>
+                <tr class="border-b border-gray-100 dark:border-gray-800">
+                  <td class="py-2 pr-4"><code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">@weekly</code></td>
+                  <td class="py-2 pr-4">Weekly</td>
+                  <td class="py-2">0 0 * * 0</td>
+                </tr>
+                <tr class="border-b border-gray-100 dark:border-gray-800">
+                  <td class="py-2 pr-4"><code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">@daily</code></td>
+                  <td class="py-2 pr-4">Daily</td>
+                  <td class="py-2">0 0 * * *</td>
                 </tr>
                 <tr>
-                  <td><code>,</code></td>
-                  <td>Value list separator</td>
-                  <td>1,3,5 = at 1, 3, and 5</td>
-                </tr>
-                <tr>
-                  <td><code>-</code></td>
-                  <td>Range of values</td>
-                  <td>1-5 = 1 through 5</td>
-                </tr>
-                <tr>
-                  <td><code>/</code></td>
-                  <td>Step values</td>
-                  <td>*/15 = every 15 units</td>
-                </tr>
-                <tr>
-                  <td><code>@yearly</code></td>
-                  <td>Annually</td>
-                  <td>0 0 1 1 *</td>
-                </tr>
-                <tr>
-                  <td><code>@monthly</code></td>
-                  <td>Monthly</td>
-                  <td>0 0 1 * *</td>
-                </tr>
-                <tr>
-                  <td><code>@weekly</code></td>
-                  <td>Weekly</td>
-                  <td>0 0 * * 0</td>
-                </tr>
-                <tr>
-                  <td><code>@daily</code></td>
-                  <td>Daily</td>
-                  <td>0 0 * * *</td>
-                </tr>
-                <tr>
-                  <td><code>@hourly</code></td>
-                  <td>Hourly</td>
-                  <td>0 * * * *</td>
+                  <td class="py-2 pr-4"><code class="px-2 py-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded font-mono">@hourly</code></td>
+                  <td class="py-2 pr-4">Hourly</td>
+                  <td class="py-2">0 * * * *</td>
                 </tr>
               </tbody>
             </table>
@@ -614,17 +614,17 @@ export class CronParser {
   displayNextRuns(runs) {
     if (runs.length === 0) {
       this.container.querySelector('#next-runs-list').innerHTML = 
-        '<div class="no-runs">No upcoming executions found</div>';
+        '<div class="text-gray-500 dark:text-gray-400 text-center py-4">No upcoming executions found</div>';
       return;
     }
     
     const html = runs.map((date, index) => {
       const relative = this.getRelativeTime(date);
       return `
-        <div class="run-item">
-          <span class="run-number">${index + 1}.</span>
-          <span class="run-date">${date.toLocaleString()}</span>
-          <span class="run-relative">${relative}</span>
+        <div class="flex items-center justify-between p-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg">
+          <span class="font-semibold text-green-600 dark:text-green-400 text-sm">${index + 1}.</span>
+          <span class="font-mono text-sm text-gray-900 dark:text-white">${date.toLocaleString()}</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400">${relative}</span>
         </div>
       `;
     }).join('');
@@ -657,7 +657,7 @@ export class CronParser {
     this.container.querySelector('#field-weekday').textContent = '-';
     this.container.querySelector('#description-text').textContent = 'Enter a cron expression to see its description';
     this.container.querySelector('#next-runs-list').innerHTML = 
-      '<div class="no-runs">Parse a cron expression to see upcoming execution times</div>';
+      '<div class="text-gray-500 dark:text-gray-400 text-center py-4">Parse a cron expression to see upcoming execution times</div>';
   }
   
   showError(message) {

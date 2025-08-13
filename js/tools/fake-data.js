@@ -14,27 +14,27 @@ export class FakeDataGenerator {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>Fake Data Generator</h1>
-          <p class="tool-description">Generate realistic fake data for testing including names, emails, addresses, and custom datasets</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Fake Data Generator</h1>
+          <p class="text-gray-600 dark:text-gray-400">Generate realistic fake data for testing including names, emails, addresses, and custom datasets</p>
         </div>
         
-        <div class="tool-controls">
-          <button class="btn btn-primary" data-action="generate">
+        <div class="mb-6 flex flex-wrap gap-2">
+          <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="generate">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
             </svg>
             Generate Data
           </button>
-          <button class="btn btn-secondary" data-action="copy">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="copy">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="9" y="9" width="13" height="13" rx="2"/>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
             Copy
           </button>
-          <button class="btn btn-secondary" data-action="export">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="export">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
               <polyline points="7 10 12 15 17 10"/>
@@ -42,7 +42,7 @@ export class FakeDataGenerator {
             </svg>
             Export
           </button>
-          <button class="btn btn-secondary" data-action="clear">
+          <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="clear">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
@@ -51,14 +51,14 @@ export class FakeDataGenerator {
           </button>
         </div>
         
-        <div class="fake-data-container">
-          <div class="config-section">
-            <h3>Data Configuration</h3>
+        <div class="grid lg:grid-cols-2 gap-6">
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Data Configuration</h3>
             
-            <div class="form-row">
-              <div class="form-group">
-                <label for="data-type">Data Type</label>
-                <select id="data-type" class="form-select">
+            <div class="grid sm:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label for="data-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data Type</label>
+                <select id="data-type" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                   <option value="person">Person</option>
                   <option value="company">Company</option>
                   <option value="product">Product</option>
@@ -68,14 +68,14 @@ export class FakeDataGenerator {
                 </select>
               </div>
               
-              <div class="form-group">
-                <label for="count">Count</label>
-                <input type="number" id="count" class="form-input" value="10" min="1" max="1000" />
+              <div>
+                <label for="count" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Count</label>
+                <input type="number" id="count" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" value="10" min="1" max="1000" />
               </div>
               
-              <div class="form-group">
-                <label for="format">Format</label>
-                <select id="format" class="form-select">
+              <div>
+                <label for="format" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Format</label>
+                <select id="format" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                   <option value="json">JSON</option>
                   <option value="csv">CSV</option>
                   <option value="sql">SQL Insert</option>
@@ -84,9 +84,9 @@ export class FakeDataGenerator {
               </div>
             </div>
             
-            <div class="form-group">
-              <label for="locale">Locale</label>
-              <select id="locale" class="form-select">
+            <div class="mb-4">
+              <label for="locale" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Locale</label>
+              <select id="locale" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                 <option value="en_US">English (US)</option>
                 <option value="en_GB">English (UK)</option>
                 <option value="es_ES">Spanish</option>
@@ -99,16 +99,16 @@ export class FakeDataGenerator {
               </select>
             </div>
             
-            <div id="type-options" class="type-options">
+            <div id="type-options" class="space-y-2 mb-4">
               <!-- Dynamic options based on data type -->
             </div>
             
-            <div id="custom-schema" class="custom-schema" hidden>
-              <h4>Custom Schema</h4>
-              <div id="schema-fields" class="schema-fields">
-                <div class="schema-field">
-                  <input type="text" class="field-name" placeholder="Field name" value="id" />
-                  <select class="field-type">
+            <div id="custom-schema" class="space-y-4" hidden>
+              <h4 class="text-md font-semibold text-gray-900 dark:text-white">Custom Schema</h4>
+              <div id="schema-fields" class="space-y-2">
+                <div class="flex gap-2 items-center">
+                  <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Field name" value="id" />
+                  <select class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
                     <option value="uuid">UUID</option>
                     <option value="number">Number</option>
                     <option value="string">String</option>
@@ -120,8 +120,8 @@ export class FakeDataGenerator {
                     <option value="url">URL</option>
                     <option value="ip">IP Address</option>
                   </select>
-                  <input type="text" class="field-options" placeholder="Options (optional)" />
-                  <button class="btn-icon btn-remove" data-remove="field">
+                  <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Options (optional)" />
+                  <button class="p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" data-remove="field">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                       <line x1="18" y1="6" x2="6" y2="18"/>
                       <line x1="6" y1="6" x2="18" y2="18"/>
@@ -129,37 +129,37 @@ export class FakeDataGenerator {
                   </button>
                 </div>
               </div>
-              <button class="btn btn-sm" data-add="field">Add Field</button>
+              <button class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-add="field">Add Field</button>
             </div>
           </div>
           
-          <div class="output-section">
-            <h3>Generated Data</h3>
-            <div class="output-controls">
-              <label class="checkbox-label">
-                <input type="checkbox" id="pretty-print" checked>
-                <span>Pretty Print</span>
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Generated Data</h3>
+            <div class="flex gap-4 mb-4">
+              <label class="flex items-center">
+                <input type="checkbox" id="pretty-print" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Pretty Print</span>
               </label>
-              <label class="checkbox-label">
-                <input type="checkbox" id="include-null">
-                <span>Include Null Values</span>
+              <label class="flex items-center">
+                <input type="checkbox" id="include-null" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Include Null Values</span>
               </label>
             </div>
-            <pre id="data-output" class="data-output">
-<span class="placeholder">Click "Generate Data" to create fake data</span>
+            <pre id="data-output" class="w-full h-96 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm overflow-auto">
+<span class="text-gray-500 dark:text-gray-400">Click "Generate Data" to create fake data</span>
             </pre>
           </div>
         </div>
         
-        <div class="templates-section">
-          <h3>Quick Templates</h3>
-          <div class="templates-grid">
-            <button class="template-btn" data-template="users">User Database</button>
-            <button class="template-btn" data-template="ecommerce">E-commerce</button>
-            <button class="template-btn" data-template="blog">Blog Posts</button>
-            <button class="template-btn" data-template="employees">Employees</button>
-            <button class="template-btn" data-template="transactions">Transactions</button>
-            <button class="template-btn" data-template="iot">IoT Sensors</button>
+        <div class="mt-6">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Templates</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            <button class="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="users">User Database</button>
+            <button class="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="ecommerce">E-commerce</button>
+            <button class="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="blog">Blog Posts</button>
+            <button class="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="employees">Employees</button>
+            <button class="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="transactions">Transactions</button>
+            <button class="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-template="iot">IoT Sensors</button>
           </div>
         </div>
       </div>
@@ -215,7 +215,7 @@ export class FakeDataGenerator {
     // Remove field (delegated)
     this.container.addEventListener('click', (e) => {
       if (e.target.closest('[data-remove="field"]')) {
-        e.target.closest('.schema-field').remove();
+        e.target.closest('.flex').remove();
       }
     });
     
@@ -242,9 +242,9 @@ export class FakeDataGenerator {
       
       const options = this.getTypeOptions(type);
       optionsDiv.innerHTML = options.map(option => `
-        <label class="checkbox-label">
-          <input type="checkbox" data-field="${option.field}" ${option.default ? 'checked' : ''}>
-          <span>${option.label}</span>
+        <label class="flex items-center">
+          <input type="checkbox" data-field="${option.field}" ${option.default ? 'checked' : ''} class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+          <span class="text-sm text-gray-700 dark:text-gray-300">${option.label}</span>
         </label>
       `).join('');
     }
@@ -410,12 +410,13 @@ export class FakeDataGenerator {
   
   generateCustomData(index) {
     const data = {};
-    const fields = this.container.querySelectorAll('.schema-field');
+    const fields = this.container.querySelectorAll('#schema-fields .flex');
     
     fields.forEach(field => {
-      const name = field.querySelector('.field-name').value || 'field';
-      const type = field.querySelector('.field-type').value;
-      const options = field.querySelector('.field-options').value;
+      const inputs = field.querySelectorAll('input, select');
+      const name = inputs[0].value || 'field';
+      const type = inputs[1].value;
+      const options = inputs[2].value;
       
       data[name] = this.generateCustomFieldValue(type, options, index);
     });
@@ -707,10 +708,10 @@ export class FakeDataGenerator {
   addCustomField() {
     const schemaFields = this.container.querySelector('#schema-fields');
     const fieldDiv = document.createElement('div');
-    fieldDiv.className = 'schema-field';
+    fieldDiv.className = 'flex gap-2 items-center';
     fieldDiv.innerHTML = `
-      <input type="text" class="field-name" placeholder="Field name" />
-      <select class="field-type">
+      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Field name" />
+      <select class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
         <option value="uuid">UUID</option>
         <option value="number">Number</option>
         <option value="string">String</option>
@@ -722,8 +723,8 @@ export class FakeDataGenerator {
         <option value="url">URL</option>
         <option value="ip">IP Address</option>
       </select>
-      <input type="text" class="field-options" placeholder="Options (optional)" />
-      <button class="btn-icon btn-remove" data-remove="field">
+      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" placeholder="Options (optional)" />
+      <button class="p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" data-remove="field">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"/>
           <line x1="6" y1="6" x2="18" y2="18"/>
@@ -737,12 +738,18 @@ export class FakeDataGenerator {
     const output = this.container.querySelector('#data-output').textContent;
     navigator.clipboard.writeText(output).then(() => {
       const btn = this.container.querySelector('[data-action="copy"]');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = 'Copied!';
-      btn.classList.add('btn-success');
+      const originalHTML = btn.innerHTML;
+      const originalClasses = btn.className;
+      btn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Copied!
+      `;
+      btn.className = 'px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center gap-2';
       setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.classList.remove('btn-success');
+        btn.innerHTML = originalHTML;
+        btn.className = originalClasses;
       }, 2000);
     });
   }
@@ -776,7 +783,7 @@ export class FakeDataGenerator {
   
   clear() {
     this.generatedData = [];
-    this.container.querySelector('#data-output').innerHTML = '<span class="placeholder">Click "Generate Data" to create fake data</span>';
+    this.container.querySelector('#data-output').innerHTML = '<span class="text-gray-500 dark:text-gray-400">Click "Generate Data" to create fake data</span>';
     this.container.querySelector('#count').value = '10';
     this.container.querySelector('#data-type').value = 'person';
     this.container.querySelector('#format').value = 'json';
@@ -853,16 +860,16 @@ export class FakeDataGenerator {
         
         tmpl.fields.forEach(field => {
           const fieldDiv = document.createElement('div');
-          fieldDiv.className = 'schema-field';
+          fieldDiv.className = 'flex gap-2 items-center';
           fieldDiv.innerHTML = `
-            <input type="text" class="field-name" value="${field.name}" />
-            <select class="field-type">
+            <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" value="${field.name}" />
+            <select class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
               ${['uuid', 'number', 'string', 'name', 'email', 'phone', 'date', 'boolean', 'url', 'ip'].map(t => 
                 `<option value="${t}" ${t === field.type ? 'selected' : ''}>${t.charAt(0).toUpperCase() + t.slice(1)}</option>`
               ).join('')}
             </select>
-            <input type="text" class="field-options" value="${field.options || ''}" placeholder="Options (optional)" />
-            <button class="btn-icon btn-remove" data-remove="field">
+            <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white" value="${field.options || ''}" placeholder="Options (optional)" />
+            <button class="p-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" data-remove="field">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"/>
                 <line x1="6" y1="6" x2="18" y2="18"/>

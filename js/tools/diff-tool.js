@@ -26,50 +26,50 @@ export class DiffTool {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>Diff Tool</h1>
-          <p class="tool-description">Compare two texts and visualize the differences</p>
+      <div class="max-w-7xl mx-auto p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Diff Tool</h1>
+          <p class="text-gray-600 dark:text-gray-400">Compare two texts and visualize the differences</p>
         </div>
         
-        <div class="tool-controls">
-          <div class="mode-toggle">
-            <button class="btn btn-primary" data-view="unified">Unified</button>
-            <button class="btn btn-secondary" data-view="split">Split</button>
-            <button class="btn btn-secondary" data-view="inline">Inline</button>
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+          <div class="inline-flex rounded-lg border border-gray-200 dark:border-gray-700">
+            <button class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-l-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-view="unified">Unified</button>
+            <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-view="split">Split</button>
+            <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-r-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-view="inline">Inline</button>
           </div>
-          <div class="action-buttons">
-            <button class="btn btn-secondary" data-action="swap">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <div class="flex gap-2">
+            <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="swap">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
                 <path d="M7 16V4M7 4L3 8M7 4L11 8M17 8V20M17 20L21 16M17 20L13 16"/>
               </svg>
               Swap
             </button>
-            <button class="btn btn-secondary" data-action="clear">Clear</button>
+            <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="clear">Clear</button>
           </div>
         </div>
         
-        <div class="diff-stats" id="diff-stats">
-          <span class="stat-item">
-            <span class="stat-label">Changes:</span>
-            <span class="stat-value" id="stat-changes">0</span>
-          </span>
-          <span class="stat-item added">
-            <span class="stat-label">Added:</span>
-            <span class="stat-value" id="stat-added">0</span>
-          </span>
-          <span class="stat-item removed">
-            <span class="stat-label">Removed:</span>
-            <span class="stat-value" id="stat-removed">0</span>
-          </span>
+        <div class="flex gap-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg mb-6" id="diff-stats">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Changes:</span>
+            <span class="text-sm font-bold text-gray-900 dark:text-white" id="stat-changes">0</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Added:</span>
+            <span class="text-sm font-bold text-green-600 dark:text-green-400" id="stat-added">0</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Removed:</span>
+            <span class="text-sm font-bold text-red-600 dark:text-red-400" id="stat-removed">0</span>
+          </div>
         </div>
         
         <div class="diff-inputs">
-          <div class="input-section">
-            <label for="left-input">Original Text</label>
+          <div class="flex-1">
+            <label for="left-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Original Text</label>
             <textarea 
               id="left-input" 
-              class="code-input" 
+              class="w-full h-96 p-4 font-mono text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
               placeholder="Paste or type original text here..."
               spellcheck="false"
             >function calculateTotal(items) {
@@ -81,11 +81,11 @@ export class DiffTool {
 }</textarea>
           </div>
           
-          <div class="input-section">
-            <label for="right-input">Modified Text</label>
+          <div class="flex-1">
+            <label for="right-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Modified Text</label>
             <textarea 
               id="right-input" 
-              class="code-input" 
+              class="w-full h-96 p-4 font-mono text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
               placeholder="Paste or type modified text here..."
               spellcheck="false"
             >function calculateTotal(items, taxRate = 0) {
@@ -99,9 +99,9 @@ export class DiffTool {
           </div>
         </div>
         
-        <div class="diff-output">
-          <h3>Diff Output</h3>
-          <div id="diff-result" class="diff-result unified"></div>
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Diff Output</h3>
+          <div id="diff-result" class="p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg font-mono text-sm overflow-auto max-h-96"></div>
         </div>
       </div>
     `;
@@ -139,11 +139,13 @@ export class DiffTool {
     // Update button states
     this.container.querySelectorAll('[data-view]').forEach(btn => {
       if (btn.dataset.view === mode) {
-        btn.classList.add('btn-primary');
-        btn.classList.remove('btn-secondary');
+        btn.className = 'px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+        if (btn.dataset.view === 'unified') btn.className += ' rounded-l-lg';
+        else if (btn.dataset.view === 'inline') btn.className += ' rounded-r-lg';
       } else {
-        btn.classList.remove('btn-primary');
-        btn.classList.add('btn-secondary');
+        btn.className = 'px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500';
+        if (btn.dataset.view === 'unified') btn.className += ' rounded-l-lg';
+        else if (btn.dataset.view === 'inline') btn.className += ' rounded-r-lg';
       }
     });
     
@@ -241,26 +243,31 @@ export class DiffTool {
     let html = '';
     
     diff.hunks.forEach(hunk => {
-      html += `<div class="diff-hunk">`;
-      html += `<div class="diff-hunk-header">@@ -${hunk.oldStart} +${hunk.newStart} @@</div>`;
+      html += `<div class="mb-4">`;
+      html += `<div class="text-xs text-gray-500 dark:text-gray-400 font-mono mb-2">@@ -${hunk.oldStart} +${hunk.newStart} @@</div>`;
       
       hunk.lines.forEach(line => {
         const escaped = this.escapeHtml(line.line);
-        const className = line.type === 'delete' ? 'diff-remove' : 
-                         line.type === 'insert' ? 'diff-add' : 'diff-equal';
-        const marker = line.type === 'delete' ? '-' : 
-                      line.type === 'insert' ? '+' : ' ';
+        const isDelete = line.type === 'delete';
+        const isInsert = line.type === 'insert';
+        const marker = isDelete ? '-' : isInsert ? '+' : ' ';
         
-        html += `<div class="diff-line ${className}">
-          <span class="line-marker">${marker}</span>
-          <span class="line-content">${escaped}</span>
+        const bgClass = isDelete ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300' : 
+                       isInsert ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300' : 
+                       'text-gray-600 dark:text-gray-400';
+        const borderClass = isDelete ? 'border-l-4 border-red-500' : 
+                           isInsert ? 'border-l-4 border-green-500' : '';
+        
+        html += `<div class="font-mono text-sm ${bgClass} ${borderClass} px-2 py-1">
+          <span class="inline-block w-4 text-center">${marker}</span>
+          <span>${escaped}</span>
         </div>`;
       });
       
       html += '</div>';
     });
     
-    this.outputArea.innerHTML = html || '<div class="no-diff">No differences found</div>';
+    this.outputArea.innerHTML = html || '<div class="text-gray-500 dark:text-gray-400 text-center py-8">No differences found</div>';
   }
   
   renderSplitDiffFromWorker(diff) {

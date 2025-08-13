@@ -15,11 +15,242 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
-  <link rel="stylesheet" href="css/base.css">
-  <link rel="stylesheet" href="css/tools.css">
-  <link rel="stylesheet" href="css/ui-improvements.css">
-  <link rel="stylesheet" href="css/password-generator-redesign.css">
-  <link rel="stylesheet" href="css/qr-generator-redesign.css">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#10b981',
+            danger: '#ef4444',
+            warning: '#f59e0b'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Minimal inline styles for critical tool layouts -->
+  <style>
+    /* Dark mode support */
+    [data-theme="dark"] {
+      color-scheme: dark;
+    }
+    
+    /* Fix checkbox styling */
+    input[type="checkbox"] {
+      background-color: white !important;
+      border: 1px solid #d1d5db !important;
+    }
+    
+    [data-theme="dark"] input[type="checkbox"] {
+      background-color: #1f2937 !important;
+      border-color: #4b5563 !important;
+    }
+    
+    input[type="checkbox"]:checked {
+      background-color: #3b82f6 !important;
+      border-color: #3b82f6 !important;
+    }
+    
+    input[type="checkbox"]:focus {
+      outline: 2px solid #3b82f6 !important;
+      outline-offset: 2px !important;
+    }
+    
+    /* Fix range slider styling */
+    input[type="range"] {
+      background: transparent !important;
+    }
+    
+    input[type="range"]::-webkit-slider-track {
+      background: #e5e7eb !important;
+      height: 0.5rem !important;
+      border-radius: 0.5rem !important;
+    }
+    
+    [data-theme="dark"] input[type="range"]::-webkit-slider-track {
+      background: #374151 !important;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none !important;
+      appearance: none !important;
+      width: 1.25rem !important;
+      height: 1.25rem !important;
+      border-radius: 50% !important;
+      background: #3b82f6 !important;
+      cursor: pointer !important;
+      border: 2px solid white !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    [data-theme="dark"] input[type="range"]::-webkit-slider-thumb {
+      border-color: #1f2937 !important;
+    }
+    
+    input[type="range"]::-moz-range-track {
+      background: #e5e7eb !important;
+      height: 0.5rem !important;
+      border-radius: 0.5rem !important;
+    }
+    
+    [data-theme="dark"] input[type="range"]::-moz-range-track {
+      background: #374151 !important;
+    }
+    
+    input[type="range"]::-moz-range-thumb {
+      width: 1.25rem !important;
+      height: 1.25rem !important;
+      border-radius: 50% !important;
+      background: #3b82f6 !important;
+      cursor: pointer !important;
+      border: 2px solid white !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    [data-theme="dark"] input[type="range"]::-moz-range-thumb {
+      border-color: #1f2937 !important;
+    }
+    
+    /* Tool-specific layouts that must be enforced */
+    .diff-inputs {
+      display: flex !important;
+      gap: 1rem !important;
+    }
+    
+    .diff-inputs > div {
+      flex: 1 !important;
+    }
+    
+    .jwt-parts {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr 1fr !important;
+      gap: 1rem !important;
+    }
+    
+    /* Markdown preview styles */
+    #markdown-output h1 { font-size: 2em; font-weight: bold; margin: 0.67em 0; }
+    #markdown-output h2 { font-size: 1.5em; font-weight: bold; margin: 0.83em 0; }
+    #markdown-output h3 { font-size: 1.17em; font-weight: bold; margin: 1em 0; }
+    #markdown-output p { margin: 1em 0; }
+    #markdown-output ul, #markdown-output ol { margin: 1em 0; padding-left: 2em; }
+    #markdown-output li { margin: 0.5em 0; }
+    #markdown-output blockquote { 
+      border-left: 4px solid #e5e7eb; 
+      padding-left: 1em; 
+      margin: 1em 0; 
+      color: #6b7280; 
+    }
+    [data-theme="dark"] #markdown-output blockquote { 
+      border-color: #4b5563; 
+      color: #9ca3af; 
+    }
+    #markdown-output code { 
+      background: #f3f4f6; 
+      padding: 0.2em 0.4em; 
+      border-radius: 0.25rem; 
+      font-family: monospace; 
+      font-size: 0.875em;
+    }
+    [data-theme="dark"] #markdown-output code { 
+      background: #1f2937; 
+    }
+    #markdown-output pre { 
+      background: #f3f4f6; 
+      padding: 1em; 
+      border-radius: 0.5rem; 
+      overflow-x: auto; 
+      margin: 1em 0;
+    }
+    [data-theme="dark"] #markdown-output pre { 
+      background: #1f2937; 
+    }
+    #markdown-output pre code { 
+      background: transparent; 
+      padding: 0; 
+    }
+    #markdown-output table { 
+      border-collapse: collapse; 
+      width: 100%; 
+      margin: 1em 0; 
+    }
+    #markdown-output th, #markdown-output td { 
+      border: 1px solid #e5e7eb; 
+      padding: 0.5em; 
+      text-align: left; 
+    }
+    [data-theme="dark"] #markdown-output th, 
+    [data-theme="dark"] #markdown-output td { 
+      border-color: #4b5563; 
+    }
+    #markdown-output th { 
+      background: #f9fafb; 
+      font-weight: bold; 
+    }
+    [data-theme="dark"] #markdown-output th { 
+      background: #1f2937; 
+    }
+    #markdown-output hr { 
+      border: none; 
+      border-top: 1px solid #e5e7eb; 
+      margin: 2em 0; 
+    }
+    [data-theme="dark"] #markdown-output hr { 
+      border-color: #4b5563; 
+    }
+    #markdown-output a { 
+      color: #3b82f6; 
+      text-decoration: underline; 
+    }
+    #markdown-output a:hover { 
+      color: #2563eb; 
+    }
+    #markdown-output img { 
+      max-width: 100%; 
+      height: auto; 
+    }
+    
+    /* Code highlighting */
+    #markdown-output .keyword { color: #7c3aed; }
+    #markdown-output .string { color: #059669; }
+    #markdown-output .number { color: #dc2626; }
+    #markdown-output .comment { color: #6b7280; font-style: italic; }
+    #markdown-output .selector { color: #7c3aed; }
+    #markdown-output .property { color: #2563eb; }
+    #markdown-output .value { color: #059669; }
+    #markdown-output .tag { color: #dc2626; }
+    #markdown-output .attribute { color: #2563eb; }
+    
+    [data-theme="dark"] #markdown-output .keyword { color: #a78bfa; }
+    [data-theme="dark"] #markdown-output .string { color: #34d399; }
+    [data-theme="dark"] #markdown-output .number { color: #f87171; }
+    [data-theme="dark"] #markdown-output .comment { color: #9ca3af; }
+    [data-theme="dark"] #markdown-output .selector { color: #a78bfa; }
+    [data-theme="dark"] #markdown-output .property { color: #60a5fa; }
+    [data-theme="dark"] #markdown-output .value { color: #34d399; }
+    [data-theme="dark"] #markdown-output .tag { color: #f87171; }
+    [data-theme="dark"] #markdown-output .attribute { color: #60a5fa; }
+    
+    /* Mobile responsiveness for tools */
+    @media (max-width: 768px) {
+      #sidebar.open {
+        transform: translateX(0) !important;
+      }
+      
+      .diff-inputs {
+        flex-direction: column !important;
+      }
+      
+      .jwt-parts {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,151 +274,171 @@
     }
   </script>
 </head>
-<body>
-  <a href="#main" class="skip-link">Skip to main content</a>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col">
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded">Skip to main content</a>
   
-  <div class="app-container">
-    <header role="banner" class="header">
-      <button 
-        class="menu-toggle"
-        data-menu-toggle
-        aria-label="Toggle menu"
-        aria-expanded="false"
-        aria-controls="sidebar"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-      </button>
+  <!-- Header -->
+  <header role="banner" class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+    <!-- Mobile menu button -->
+    <button 
+      class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      data-menu-toggle
+      aria-label="Toggle menu"
+      aria-expanded="false"
+      aria-controls="sidebar"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    
+    <!-- Logo -->
+    <div class="flex items-center space-x-2 text-xl font-bold">
+      <span class="text-2xl">⚡</span>
+      <span class="hidden sm:inline">DevToolbox</span>
+    </div>
       
-      <div class="logo">
-        <span class="logo-icon">⚡</span>
-        DevToolbox
-      </div>
-      
-      <div class="search-container">
+    <!-- Search bar -->
+    <div class="flex-1 max-w-2xl mx-4">
+      <div class="relative">
         <input 
           type="search" 
-          class="search-input"
+          class="w-full px-4 py-2 pl-10 pr-4 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           placeholder="Search tools (press /)"
           aria-label="Search tools"
           autocomplete="off"
           spellcheck="false"
         >
-        <button class="search-clear" aria-label="Clear search" hidden>
+        <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <button class="absolute right-2 top-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 hidden" aria-label="Clear search">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
-        <div class="search-filters">
-          <select class="category-filter" aria-label="Filter by category">
-            <option value="">All Categories</option>
-            <option value="Text & Data">Text & Data</option>
-            <option value="Generators">Generators</option>
-            <option value="Converters">Converters</option>
-            <option value="Developer Tools">Developer Tools</option>
-          </select>
-        </div>
-        <div class="search-results" hidden></div>
       </div>
+      <div class="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 hidden" id="search-results"></div>
+    </div>
       
-      <button 
-        class="theme-toggle"
-        data-theme-toggle
-        aria-label="Toggle theme"
-        title="Toggle theme (T)"
-      >
-        <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
-    </header>
-    
-    <aside id="sidebar" class="sidebar" aria-label="Tools sidebar">
-      <nav role="navigation" aria-label="Main navigation">
-        <div class="nav-section">
-          <h2 class="nav-section-title">Text & Data</h2>
-          <ul class="nav-list">
-            <li><a href="#json-formatter" class="nav-link">JSON Formatter</a></li>
-            <li><a href="#jwt-decoder" class="nav-link">JWT Decoder</a></li>
-            <li><a href="#base64" class="nav-link">Base64 Encode/Decode</a></li>
-            <li><a href="#url-encode" class="nav-link">URL Encode/Decode</a></li>
-            <li><a href="#diff" class="nav-link">Diff Tool</a></li>
-            <li><a href="#markdown" class="nav-link">Markdown Preview</a></li>
+    <!-- Theme toggle -->
+    <button 
+      class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      data-theme-toggle
+      aria-label="Toggle theme"
+      title="Toggle theme (T)"
+    >
+      <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+      </svg>
+      <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+      </svg>
+    </button>
+  </header>
+  
+  <!-- Main layout container -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 fixed lg:relative h-full z-40" aria-label="Tools sidebar">
+      <nav role="navigation" aria-label="Main navigation" class="p-4">
+        <div class="mb-6">
+          <h2 class="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Text & Data</h2>
+          <ul class="space-y-1">
+            <li><a href="#json-formatter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">JSON Formatter</a></li>
+            <li><a href="#jwt-decoder" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">JWT Decoder</a></li>
+            <li><a href="#base64" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Base64 Encode/Decode</a></li>
+            <li><a href="#url-encode" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">URL Encode/Decode</a></li>
+            <li><a href="#diff" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Diff Tool</a></li>
+            <li><a href="#markdown" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Markdown Preview</a></li>
           </ul>
         </div>
         
-        <div class="nav-section">
-          <h2 class="nav-section-title">Generators</h2>
-          <ul class="nav-list">
-            <li><a href="#uuid" class="nav-link">UUID Generator</a></li>
-            <li><a href="#hash" class="nav-link">Hash Generator</a></li>
-            <li><a href="#fake-data" class="nav-link">Fake Data Generator</a></li>
-            <li><a href="#password-generator" class="nav-link">Password Generator</a></li>
-            <li><a href="#qr-generator" class="nav-link">QR Code Generator</a></li>
-            <li><a href="#ascii-art" class="nav-link">ASCII Art Generator</a></li>
+        <div class="mb-6">
+          <h2 class="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Generators</h2>
+          <ul class="space-y-1">
+            <li><a href="#uuid" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">UUID Generator</a></li>
+            <li><a href="#hash" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Hash Generator</a></li>
+            <li><a href="#fake-data" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Fake Data Generator</a></li>
+            <li><a href="#password-generator" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Password Generator</a></li>
+            <li><a href="#qr-generator" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">QR Code Generator</a></li>
+            <li><a href="#ascii-art" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">ASCII Art Generator</a></li>
           </ul>
         </div>
         
-        <div class="nav-section">
-          <h2 class="nav-section-title">Converters</h2>
-          <ul class="nav-list">
-            <li><a href="#unix-time" class="nav-link">Unix Time Converter</a></li>
-            <li><a href="#csv-json" class="nav-link">CSV ↔ JSON</a></li>
-            <li><a href="#yaml-json" class="nav-link">YAML ↔ JSON</a></li>
-            <li><a href="#binary-converter" class="nav-link">Binary Converter</a></li>
-            <li><a href="#image-converter" class="nav-link">Image Converter</a></li>
+        <div class="mb-6">
+          <h2 class="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Converters</h2>
+          <ul class="space-y-1">
+            <li><a href="#unix-time" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Unix Time Converter</a></li>
+            <li><a href="#csv-json" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">CSV ↔ JSON</a></li>
+            <li><a href="#yaml-json" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">YAML ↔ JSON</a></li>
+            <li><a href="#binary-converter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Binary Converter</a></li>
+            <li><a href="#image-converter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Image Converter</a></li>
           </ul>
         </div>
         
-        <div class="nav-section">
-          <h2 class="nav-section-title">Developer Tools</h2>
-          <ul class="nav-list">
-            <li><a href="#regex-tester" class="nav-link">Regex Tester</a></li>
-            <li><a href="#cron" class="nav-link">Cron Parser</a></li>
-            <li><a href="#curl" class="nav-link">cURL Generator</a></li>
-            <li><a href="#api-mock" class="nav-link">API Mock Generator</a></li>
-            <li><a href="#dns-lookup" class="nav-link">DNS Lookup</a></li>
-            <li><a href="#graphql" class="nav-link">GraphQL Tester</a></li>
-            <li><a href="#sql-formatter" class="nav-link">SQL Formatter</a></li>
-            <li><a href="#xml-formatter" class="nav-link">XML Formatter</a></li>
-            <li><a href="#webhook-tester" class="nav-link">Webhook Tester</a></li>
+        <div class="mb-6">
+          <h2 class="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Developer Tools</h2>
+          <ul class="space-y-1">
+            <li><a href="#regex-tester" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Regex Tester</a></li>
+            <li><a href="#cron" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Cron Parser</a></li>
+            <li><a href="#curl" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">cURL Generator</a></li>
+            <li><a href="#api-mock" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">API Mock Generator</a></li>
+            <li><a href="#graphql" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">GraphQL Tester</a></li>
+            <li><a href="#sql-formatter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">SQL Formatter</a></li>
+            <li><a href="#xml-formatter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">XML Formatter</a></li>
+            <li><a href="#webhook-tester" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Webhook Tester</a></li>
+          </ul>
+        </div>
+        
+        <div class="mb-6">
+          <h2 class="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Networking & Cloud</h2>
+          <ul class="space-y-1">
+            <li><a href="#ip-lookup" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">IP Address Lookup</a></li>
+            <li><a href="#cidr-calculator" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">CIDR Calculator</a></li>
+            <li><a href="#dns-lookup" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">DNS Lookup</a></li>
+            <li><a href="#whois-lookup" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">WHOIS Lookup</a></li>
+            <li><a href="#s3-presigned-url" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">S3 Pre-signed URL</a></li>
+            <li><a href="#iam-policy-visualizer" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">IAM Policy Visualizer</a></li>
           </ul>
         </div>
       </nav>
     </aside>
     
-    <main id="main" role="main" class="main">
-      <div class="welcome-message">
-        <h1>Welcome to DevToolbox</h1>
-        <p>Select a tool from the sidebar or use search to get started.</p>
-        <div class="shortcuts-hint">
-          <p>Keyboard shortcuts:</p>
-          <ul>
-            <li><kbd>/</kbd> Focus search</li>
-            <li><kbd>Esc</kbd> Clear search</li>
-            <li><kbd>T</kbd> Toggle theme</li>
-          </ul>
+    <!-- Main content -->
+    <main id="main" role="main" class="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
+      <div class="max-w-4xl mx-auto px-6 py-12">
+        <div class="text-center">
+          <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Welcome to DevToolbox</h1>
+          <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">Select a tool from the sidebar or use search to get started.</p>
+          
+          <div class="inline-block text-left bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+            <p class="font-semibold text-gray-900 dark:text-white mb-3">Keyboard shortcuts:</p>
+            <ul class="space-y-2 text-sm">
+              <li class="flex items-center space-x-2">
+                <kbd class="px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">/</kbd>
+                <span class="text-gray-600 dark:text-gray-400">Focus search</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <kbd class="px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">Esc</kbd>
+                <span class="text-gray-600 dark:text-gray-400">Clear search</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <kbd class="px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">T</kbd>
+                <span class="text-gray-600 dark:text-gray-400">Toggle theme</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </main>
   </div>
   
-  <div class="sidebar-overlay" data-sidebar-overlay></div>
+  <!-- Mobile sidebar overlay -->
+  <div class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden" data-sidebar-overlay></div>
   
   <script src="js/app.js" type="module"></script>
 </body>

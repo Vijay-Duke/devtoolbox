@@ -24,204 +24,186 @@ export class HashGenerator {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>Hash Generator</h1>
-          <p class="tool-description">Generate cryptographic hashes using various algorithms</p>
+      <div class="max-w-7xl mx-auto p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Hash Generator</h1>
+          <p class="text-gray-600 dark:text-gray-400">Generate cryptographic hashes using various algorithms</p>
         </div>
         
-        <div class="tool-controls">
-          <button class="btn btn-primary" data-action="hash">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="flex flex-wrap gap-4 mb-6">
+          <button class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="hash">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
               <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
               <line x1="12" y1="22.08" x2="12" y2="12"/>
             </svg>
             Generate Hashes
           </button>
-          <button class="btn btn-secondary" data-action="copy-all">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy-all">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
               <rect x="9" y="9" width="13" height="13" rx="2"/>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
             Copy All
           </button>
-          <button class="btn btn-secondary" data-action="clear">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-            Clear
-          </button>
+          <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="clear">Clear</button>
         </div>
         
-        <div class="hash-options">
-          <div class="input-type-selector">
-            <label>Input Type:</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="input-type" value="text" checked />
-                <span>Text</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="input-type" value="hex" />
-                <span>Hex</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="input-type" value="base64" />
-                <span>Base64</span>
-              </label>
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Input Type:</label>
+              <div class="flex flex-wrap gap-4">
+                <label class="flex items-center space-x-2">
+                  <input type="radio" name="input-type" value="text" checked class="text-blue-600 focus:ring-blue-500" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Text</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="radio" name="input-type" value="hex" class="text-blue-600 focus:ring-blue-500" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Hex</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="radio" name="input-type" value="base64" class="text-blue-600 focus:ring-blue-500" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Base64</span>
+                </label>
+              </div>
             </div>
           </div>
-          <div class="output-format-selector">
-            <label>Output Format:</label>
-            <div class="radio-group">
-              <label class="radio-label">
-                <input type="radio" name="output-format" value="hex" checked />
-                <span>Hexadecimal</span>
-              </label>
-              <label class="radio-label">
-                <input type="radio" name="output-format" value="base64" />
-                <span>Base64</span>
-              </label>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Output Format:</label>
+              <div class="flex flex-wrap gap-4">
+                <label class="flex items-center space-x-2">
+                  <input type="radio" name="output-format" value="hex" checked class="text-blue-600 focus:ring-blue-500" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Hexadecimal</span>
+                </label>
+                <label class="flex items-center space-x-2">
+                  <input type="radio" name="output-format" value="base64" class="text-blue-600 focus:ring-blue-500" />
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Base64</span>
+                </label>
+              </div>
             </div>
           </div>
         </div>
         
-        <div class="error-display" data-error hidden></div>
+        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6 hidden" data-error>
+          <p class="text-red-800 dark:text-red-300 text-sm"></p>
+        </div>
         
-        <div class="input-section">
-          <label for="hash-input">Input Text</label>
+        <div class="mb-6">
+          <label for="hash-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Input Text</label>
           <textarea 
             id="hash-input" 
-            class="code-input" 
+            class="w-full h-32 p-4 font-mono text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
             placeholder="Enter text to hash..."
             spellcheck="false"
           >Hello, World!</textarea>
-          <div class="input-stats">
+          <div class="flex gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
             <span data-stat="chars">0 characters</span>
             <span data-stat="bytes">0 bytes</span>
           </div>
         </div>
         
-        <div class="hash-results">
-          <div class="hash-result-card">
-            <div class="hash-header">
-              <h3>MD5</h3>
-              <span class="hash-bits">128-bit</span>
-              <span class="hash-warning" title="MD5 is cryptographically broken and should not be used for security">⚠️ Not Secure</span>
+        <div class="space-y-4 mb-6">
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">MD5</h3>
+                <span class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 rounded">128-bit</span>
+                <span class="px-2 py-1 text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 rounded" title="MD5 is cryptographically broken and should not be used for security">⚠️ Not Secure</span>
+              </div>
             </div>
-            <div class="hash-output-wrapper">
-              <input type="text" class="hash-output" data-algo="md5" readonly placeholder="Hash will appear here..." />
-              <button class="btn-icon" data-copy="md5" title="Copy MD5 hash">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-              </button>
+            <div class="flex gap-2">
+              <input type="text" class="flex-1 p-2 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded" data-algo="md5" readonly placeholder="Hash will appear here..." />
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-copy="md5" title="Copy MD5 hash">Copy</button>
             </div>
           </div>
           
-          <div class="hash-result-card">
-            <div class="hash-header">
-              <h3>SHA-1</h3>
-              <span class="hash-bits">160-bit</span>
-              <span class="hash-warning" title="SHA-1 is deprecated for cryptographic use">⚠️ Deprecated</span>
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">SHA-1</h3>
+                <span class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 rounded">160-bit</span>
+                <span class="px-2 py-1 text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 rounded" title="SHA-1 is deprecated for cryptographic use">⚠️ Deprecated</span>
+              </div>
             </div>
-            <div class="hash-output-wrapper">
-              <input type="text" class="hash-output" data-algo="sha1" readonly placeholder="Hash will appear here..." />
-              <button class="btn-icon" data-copy="sha1" title="Copy SHA-1 hash">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-              </button>
+            <div class="flex gap-2">
+              <input type="text" class="flex-1 p-2 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded" data-algo="sha1" readonly placeholder="Hash will appear here..." />
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-copy="sha1" title="Copy SHA-1 hash">Copy</button>
             </div>
           </div>
           
-          <div class="hash-result-card">
-            <div class="hash-header">
-              <h3>SHA-256</h3>
-              <span class="hash-bits">256-bit</span>
-              <span class="hash-secure" title="SHA-256 is cryptographically secure">✓ Secure</span>
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">SHA-256</h3>
+                <span class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 rounded">256-bit</span>
+                <span class="px-2 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded" title="SHA-256 is cryptographically secure">✓ Secure</span>
+              </div>
             </div>
-            <div class="hash-output-wrapper">
-              <input type="text" class="hash-output" data-algo="sha256" readonly placeholder="Hash will appear here..." />
-              <button class="btn-icon" data-copy="sha256" title="Copy SHA-256 hash">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-              </button>
+            <div class="flex gap-2">
+              <input type="text" class="flex-1 p-2 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded" data-algo="sha256" readonly placeholder="Hash will appear here..." />
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-copy="sha256" title="Copy SHA-256 hash">Copy</button>
             </div>
           </div>
           
-          <div class="hash-result-card">
-            <div class="hash-header">
-              <h3>SHA-384</h3>
-              <span class="hash-bits">384-bit</span>
-              <span class="hash-secure" title="SHA-384 is cryptographically secure">✓ Secure</span>
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">SHA-384</h3>
+                <span class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 rounded">384-bit</span>
+                <span class="px-2 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded" title="SHA-384 is cryptographically secure">✓ Secure</span>
+              </div>
             </div>
-            <div class="hash-output-wrapper">
-              <input type="text" class="hash-output" data-algo="sha384" readonly placeholder="Hash will appear here..." />
-              <button class="btn-icon" data-copy="sha384" title="Copy SHA-384 hash">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-              </button>
+            <div class="flex gap-2">
+              <input type="text" class="flex-1 p-2 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded" data-algo="sha384" readonly placeholder="Hash will appear here..." />
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-copy="sha384" title="Copy SHA-384 hash">Copy</button>
             </div>
           </div>
           
-          <div class="hash-result-card">
-            <div class="hash-header">
-              <h3>SHA-512</h3>
-              <span class="hash-bits">512-bit</span>
-              <span class="hash-secure" title="SHA-512 is cryptographically secure">✓ Secure</span>
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">SHA-512</h3>
+                <span class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 rounded">512-bit</span>
+                <span class="px-2 py-1 text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded" title="SHA-512 is cryptographically secure">✓ Secure</span>
+              </div>
             </div>
-            <div class="hash-output-wrapper">
-              <input type="text" class="hash-output" data-algo="sha512" readonly placeholder="Hash will appear here..." />
-              <button class="btn-icon" data-copy="sha512" title="Copy SHA-512 hash">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-              </button>
+            <div class="flex gap-2">
+              <input type="text" class="flex-1 p-2 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded" data-algo="sha512" readonly placeholder="Hash will appear here..." />
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-copy="sha512" title="Copy SHA-512 hash">Copy</button>
             </div>
           </div>
           
-          <div class="hash-result-card">
-            <div class="hash-header">
-              <h3>RIPEMD-160</h3>
-              <span class="hash-bits">160-bit</span>
-              <span class="hash-info" title="RIPEMD-160 is commonly used in Bitcoin">ℹ️ Bitcoin</span>
+          <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-3">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">RIPEMD-160</h3>
+                <span class="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-300 rounded">160-bit</span>
+                <span class="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded" title="RIPEMD-160 is commonly used in Bitcoin">ℹ️ Bitcoin</span>
+              </div>
             </div>
-            <div class="hash-output-wrapper">
-              <input type="text" class="hash-output" data-algo="ripemd160" readonly placeholder="Hash will appear here..." />
-              <button class="btn-icon" data-copy="ripemd160" title="Copy RIPEMD-160 hash">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2"/>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-              </button>
+            <div class="flex gap-2">
+              <input type="text" class="flex-1 p-2 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded" data-algo="ripemd160" readonly placeholder="Hash will appear here..." />
+              <button class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-copy="ripemd160" title="Copy RIPEMD-160 hash">Copy</button>
             </div>
           </div>
         </div>
         
-        <div class="hash-info-section">
-          <h3>About Hash Functions</h3>
-          <div class="info-grid">
-            <div class="info-card">
-              <h4>🔒 Secure Algorithms</h4>
-              <p>SHA-256, SHA-384, and SHA-512 are cryptographically secure and recommended for security applications.</p>
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">About Hash Functions</h3>
+          <div class="grid md:grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-gray-900 p-4 rounded-lg">
+              <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">🔒 Secure Algorithms</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400">SHA-256, SHA-384, and SHA-512 are cryptographically secure and recommended for security applications.</p>
             </div>
-            <div class="info-card">
-              <h4>⚠️ Legacy Algorithms</h4>
-              <p>MD5 and SHA-1 are broken and should only be used for checksums, not security.</p>
+            <div class="bg-white dark:bg-gray-900 p-4 rounded-lg">
+              <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">⚠️ Legacy Algorithms</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400">MD5 and SHA-1 are broken and should only be used for checksums, not security.</p>
             </div>
-            <div class="info-card">
-              <h4>🎯 Use Cases</h4>
-              <p>File integrity checks, password storage (with salt), digital signatures, and blockchain.</p>
+            <div class="bg-white dark:bg-gray-900 p-4 rounded-lg">
+              <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">🎯 Use Cases</h4>
+              <p class="text-sm text-gray-600 dark:text-gray-400">File integrity checks, password storage (with salt), digital signatures, and blockchain.</p>
             </div>
           </div>
         </div>
@@ -460,13 +442,13 @@ export class HashGenerator {
   }
   
   showError(message) {
-    this.errorDisplay.textContent = message;
-    this.errorDisplay.hidden = false;
+    this.errorDisplay.querySelector('p').textContent = message;
+    this.errorDisplay.classList.remove('hidden');
   }
   
   clearError() {
-    this.errorDisplay.textContent = '';
-    this.errorDisplay.hidden = true;
+    this.errorDisplay.querySelector('p').textContent = '';
+    this.errorDisplay.classList.add('hidden');
   }
   
   handleWorkerMessage(event) {

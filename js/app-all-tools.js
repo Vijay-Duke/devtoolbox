@@ -11,33 +11,17 @@ import { SearchAliases } from './search-aliases.js';
 const themeToggle = document.querySelector('[data-theme-toggle]');
 const html = document.documentElement;
 
-// Initialize theme on load
-const savedTheme = localStorage.getItem('theme') || 'light';
-if (savedTheme === 'dark') {
-  html.classList.add('dark');
-  html.setAttribute('data-theme', 'dark');
-} else {
-  html.classList.remove('dark');
-  html.setAttribute('data-theme', 'light');
-}
-
 themeToggle?.addEventListener('click', () => {
-  const isDark = html.classList.contains('dark');
+  const currentTheme = html.getAttribute('data-theme') || 'light';
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
   
-  if (isDark) {
-    html.classList.remove('dark');
-    html.setAttribute('data-theme', 'light');
-    localStorage.setItem('theme', 'light');
-  } else {
-    html.classList.add('dark');
-    html.setAttribute('data-theme', 'dark');
-    localStorage.setItem('theme', 'dark');
-  }
+  html.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
 });
 
 // Mobile Menu Toggle
 const menuToggle = document.querySelector('[data-menu-toggle]');
-const sidebar = document.querySelector('#sidebar');
+const sidebar = document.querySelector('.sidebar');
 const sidebarOverlay = document.querySelector('[data-sidebar-overlay]');
 
 menuToggle?.addEventListener('click', () => {
@@ -66,9 +50,9 @@ if ('ontouchstart' in window) {
 }
 
 // Search Functionality
-const searchInput = document.querySelector('input[type="search"]');
-const searchClear = document.querySelector('.search-clear') || document.querySelector('button[aria-label="Clear search"]');
-const searchResults = document.querySelector('#search-results');
+const searchInput = document.querySelector('.search-input');
+const searchClear = document.querySelector('.search-clear');
+const searchResults = document.querySelector('.search-results');
 const categoryFilter = document.querySelector('.category-filter');
 
 // Enhanced tools data with keywords for better fuzzy matching
@@ -88,7 +72,7 @@ const tools = [
   { name: 'Markdown Preview', href: '#markdown', category: 'Text & Data', keywords: ['markdown', 'md', 'preview', 'render', 'github', 'gfm'] },
   { name: 'cURL Generator', href: '#curl', category: 'Developer Tools', keywords: ['curl', 'http', 'api', 'request', 'rest', 'command'] },
   { name: 'API Mock Generator', href: '#api-mock', category: 'Developer Tools', keywords: ['api', 'mock', 'server', 'express', 'json-server', 'postman', 'openapi'] },
-  { name: 'DNS Lookup', href: '#dns-lookup', category: 'Networking & Cloud', keywords: ['dns', 'lookup', 'domain', 'nameserver', 'mx', 'txt', 'a', 'aaaa', 'cname'] },
+  { name: 'DNS Lookup', href: '#dns-lookup', category: 'Developer Tools', keywords: ['dns', 'lookup', 'domain', 'nameserver', 'mx', 'txt', 'a', 'aaaa', 'cname'] },
   { name: 'GraphQL Tester', href: '#graphql', category: 'Developer Tools', keywords: ['graphql', 'query', 'mutation', 'introspection', 'api', 'test'] },
   { name: 'Fake Data Generator', href: '#fake-data', category: 'Generators', keywords: ['fake', 'data', 'mock', 'test', 'generator', 'random', 'person', 'address'] },
   { name: 'SQL Formatter', href: '#sql-formatter', category: 'Developer Tools', keywords: ['sql', 'format', 'query', 'database', 'beautify', 'minify', 'mysql', 'postgresql'] },
@@ -99,12 +83,6 @@ const tools = [
   { name: 'ASCII Art Generator', href: '#ascii-art', category: 'Generators', keywords: ['ascii', 'art', 'text', 'banner', 'figlet', 'generator'] },
   { name: 'Image Converter', href: '#image-converter', category: 'Converters', keywords: ['image', 'convert', 'resize', 'compress', 'jpeg', 'png', 'webp', 'format'] },
   { name: 'Webhook Tester', href: '#webhook-tester', category: 'Developer Tools', keywords: ['webhook', 'test', 'debug', 'http', 'request', 'endpoint', 'api'] },
-  // Networking & Cloud Tools
-  { name: 'IP Address Lookup', href: '#ip-lookup', category: 'Networking & Cloud', keywords: ['ip', 'address', 'lookup', 'geolocation', 'geo', 'isp', 'location', 'ipv4', 'ipv6'] },
-  { name: 'CIDR Calculator', href: '#cidr-calculator', category: 'Networking & Cloud', keywords: ['cidr', 'subnet', 'calculator', 'network', 'ip', 'mask', 'range', 'ipv4'] },
-  { name: 'WHOIS Lookup', href: '#whois-lookup', category: 'Networking & Cloud', keywords: ['whois', 'domain', 'registration', 'owner', 'registrar', 'expiry'] },
-  { name: 'S3 Pre-signed URL Generator', href: '#s3-presigned-url', category: 'Networking & Cloud', keywords: ['s3', 'aws', 'presigned', 'url', 'upload', 'download', 'bucket', 'amazon'] },
-  { name: 'AWS IAM Policy Visualizer', href: '#iam-policy-visualizer', category: 'Networking & Cloud', keywords: ['iam', 'aws', 'policy', 'visualizer', 'permissions', 'security', 'access'] },
 ];
 
 let searchDebounceTimer;

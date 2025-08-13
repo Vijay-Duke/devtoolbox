@@ -22,24 +22,24 @@ export class XMLFormatter {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>XML Formatter & Validator</h1>
-          <p class="tool-description">Format, validate, and minify XML documents</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">XML Formatter & Validator</h1>
+          <p class="text-gray-600 dark:text-gray-300">Format, validate, and minify XML documents</p>
         </div>
         
-        <div class="tool-controls">
-          <div class="control-group">
-            <label for="indent-size">Indent Size:</label>
-            <select id="indent-size" class="select-input">
+        <div class="mb-6 flex flex-wrap gap-4">
+          <div>
+            <label for="indent-size" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Indent Size:</label>
+            <select id="indent-size" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               <option value="2" selected>2 spaces</option>
               <option value="4">4 spaces</option>
               <option value="\t">Tab</option>
             </select>
           </div>
           
-          <div class="action-buttons">
-            <button class="btn btn-primary" data-action="format">
+          <div class="flex gap-2 items-end">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="format">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="21" y1="10" x2="7" y2="10"></line>
                 <line x1="21" y1="6" x2="3" y2="6"></line>
@@ -48,43 +48,43 @@ export class XMLFormatter {
               </svg>
               Format XML
             </button>
-            <button class="btn btn-secondary" data-action="validate">
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="validate">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg>
               Validate
             </button>
-            <button class="btn btn-secondary" data-action="minify">Minify</button>
-            <button class="btn btn-secondary" data-action="clear">Clear</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="minify">Minify</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="clear">Clear</button>
           </div>
         </div>
         
-        <div class="format-options">
-          <label class="checkbox-label">
-            <input type="checkbox" id="preserve-comments" checked>
-            <span>Preserve Comments</span>
+        <div class="mb-6 flex flex-wrap gap-4">
+          <label class="flex items-center">
+            <input type="checkbox" id="preserve-comments" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+            <span class="text-sm text-gray-700 dark:text-gray-300">Preserve Comments</span>
           </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="expand-empty">
-            <span>Expand Empty Elements</span>
+          <label class="flex items-center">
+            <input type="checkbox" id="expand-empty" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+            <span class="text-sm text-gray-700 dark:text-gray-300">Expand Empty Elements</span>
           </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="sort-attributes">
-            <span>Sort Attributes</span>
+          <label class="flex items-center">
+            <input type="checkbox" id="sort-attributes" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+            <span class="text-sm text-gray-700 dark:text-gray-300">Sort Attributes</span>
           </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="highlight-syntax">
-            <span>Syntax Highlighting</span>
+          <label class="flex items-center">
+            <input type="checkbox" id="highlight-syntax" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2">
+            <span class="text-sm text-gray-700 dark:text-gray-300">Syntax Highlighting</span>
           </label>
         </div>
         
-        <div class="validation-result" id="validation-result" hidden></div>
+        <div class="mb-4 p-4 rounded-lg" id="validation-result" hidden></div>
         
-        <div class="input-output-container">
-          <div class="input-section">
-            <div class="section-header">
-              <label for="xml-input">Input XML</label>
-              <button class="btn-icon" data-action="paste" title="Paste from clipboard">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label for="xml-input" class="text-sm font-medium text-gray-700 dark:text-gray-300">Input XML</label>
+              <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" data-action="paste" title="Paste from clipboard">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -93,48 +93,55 @@ export class XMLFormatter {
             </div>
             <textarea 
               id="xml-input" 
-              class="code-input" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" 
               placeholder="Paste or type your XML here..."
               spellcheck="false"
+              rows="10"
             ><?xml version="1.0" encoding="UTF-8"?><catalog><book id="bk101"><author>Gambardella, Matthew</author><title>XML Developer's Guide</title><genre>Computer</genre><price>44.95</price><publish_date>2000-10-01</publish_date><description>An in-depth look at creating applications with XML.</description></book><book id="bk102"><author>Ralls, Kim</author><title>Midnight Rain</title><genre>Fantasy</genre><price>5.95</price><publish_date>2000-12-16</publish_date><description>A former architect battles corporate zombies.</description></book></catalog></textarea>
-            <div class="input-stats">
+            <div class="mt-2 text-sm text-gray-600 dark:text-gray-400 flex gap-4">
               <span data-stat="elements">0 elements</span>
               <span data-stat="attributes">0 attributes</span>
               <span data-stat="size">0 bytes</span>
             </div>
           </div>
           
-          <div class="output-section">
-            <div class="section-header">
-              <label for="xml-output">Formatted XML</label>
-              <button class="btn-icon" data-action="copy" title="Copy to clipboard">
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label for="xml-output" class="text-sm font-medium text-gray-700 dark:text-gray-300">Formatted XML</label>
+              <button class="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white" data-action="copy" title="Copy to clipboard">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                 </svg>
               </button>
             </div>
-            <div id="xml-output" class="code-output xml-syntax"></div>
-            <div class="output-actions">
-              <button class="btn btn-sm" data-action="download">Download XML</button>
-              <button class="btn btn-sm" data-action="tree">Tree View</button>
-              <button class="btn btn-sm" data-action="xpath">XPath Tester</button>
+            <textarea 
+              id="xml-output" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" 
+              readonly
+              spellcheck="false"
+              rows="10"
+            ></textarea>
+            <div class="mt-2 flex gap-2">
+              <button class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="download">Download XML</button>
+              <button class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="tree">Tree View</button>
+              <button class="px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="xpath">XPath Tester</button>
             </div>
           </div>
         </div>
         
-        <div class="xml-tree" id="xml-tree" hidden>
-          <h3>Tree View</h3>
-          <div class="tree-content"></div>
+        <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg" id="xml-tree" hidden>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Tree View</h3>
+          <div class="tree-content text-sm text-gray-700 dark:text-gray-300 font-mono"></div>
         </div>
         
-        <div class="xpath-tester" id="xpath-tester" hidden>
-          <h3>XPath Tester</h3>
-          <div class="xpath-controls">
-            <input type="text" id="xpath-input" class="input-field" placeholder="Enter XPath expression (e.g., //book[@id='bk101']/title)">
-            <button class="btn btn-sm" data-action="test-xpath">Test XPath</button>
+        <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg" id="xpath-tester" hidden>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">XPath Tester</h3>
+          <div class="flex gap-2 mb-4">
+            <input type="text" id="xpath-input" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Enter XPath expression (e.g., //book[@id='bk101']/title)">
+            <button class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="test-xpath">Test XPath</button>
           </div>
-          <div class="xpath-results" id="xpath-results"></div>
+          <div class="xpath-results text-sm text-gray-700 dark:text-gray-300" id="xpath-results"></div>
         </div>
       </div>
     `;
@@ -184,7 +191,7 @@ export class XMLFormatter {
   formatXML() {
     const xml = this.inputArea.value.trim();
     if (!xml) {
-      this.outputArea.textContent = '';
+      this.outputArea.value = '';
       return;
     }
     
@@ -224,15 +231,10 @@ export class XMLFormatter {
         }
       }
       
-      // Display with or without syntax highlighting
-      if (syntaxHighlight) {
-        this.outputArea.innerHTML = this.highlightXML(result);
-      } else {
-        this.outputArea.textContent = result;
-      }
+      // Display the formatted XML (textareas don't support HTML highlighting)
+      this.outputArea.value = result;
     } catch (error) {
-      this.outputArea.textContent = `Error: ${error.message}`;
-      this.outputArea.classList.add('error');
+      this.outputArea.value = `Error: ${error.message}`;
     }
   }
   
@@ -414,7 +416,7 @@ export class XMLFormatter {
   minifyXML() {
     const xml = this.inputArea.value.trim();
     if (!xml) {
-      this.outputArea.textContent = '';
+      this.outputArea.value = '';
       return;
     }
     
@@ -426,7 +428,7 @@ export class XMLFormatter {
         .replace(/\s+/g, ' ')
         .trim();
       
-      this.outputArea.textContent = minified;
+      this.outputArea.value = minified;
     } catch (error) {
       this.outputArea.textContent = `Error: ${error.message}`;
     }
@@ -588,7 +590,7 @@ export class XMLFormatter {
   }
   
   async copyOutput() {
-    const text = this.outputArea.textContent;
+    const text = this.outputArea.value;
     if (!text) return;
     
     try {
@@ -634,7 +636,7 @@ export class XMLFormatter {
   
   clear() {
     this.inputArea.value = '';
-    this.outputArea.textContent = '';
+    this.outputArea.value = '';
     this.validationResult.hidden = true;
     this.container.querySelector('#xml-tree').hidden = true;
     this.container.querySelector('#xpath-tester').hidden = true;

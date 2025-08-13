@@ -16,21 +16,19 @@ export class BinaryConverter {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>Binary Converter</h1>
-          <p class="tool-description">Convert between binary, decimal, hexadecimal, octal, and ASCII</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Binary Converter</h1>
+          <p class="text-gray-600 dark:text-gray-300">Convert between binary, decimal, hexadecimal, octal, and ASCII</p>
         </div>
         
-        <div class="tool-controls">
-          <div class="control-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="auto-convert" checked>
-              <span>Auto-convert on input</span>
-            </label>
-          </div>
-          <div class="action-buttons">
-            <button class="btn btn-primary" data-action="convert">
+        <div class="flex items-center justify-between mb-6">
+          <label class="flex items-center">
+            <input type="checkbox" id="auto-convert" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+            <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Auto-convert on input</span>
+          </label>
+          <div class="flex gap-2">
+            <button class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="convert">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="16 3 21 3 21 8"></polyline>
                 <line x1="4" y1="20" x2="21" y2="3"></line>
@@ -40,15 +38,15 @@ export class BinaryConverter {
               </svg>
               Convert All
             </button>
-            <button class="btn btn-secondary" data-action="clear">Clear All</button>
+            <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="clear">Clear All</button>
           </div>
         </div>
         
-        <div class="converter-grid">
-          <div class="converter-box">
-            <div class="converter-header">
-              <h3>Binary (Base 2)</h3>
-              <button class="btn-icon" data-copy="binary" title="Copy">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Binary (Base 2)</h3>
+              <button class="p-2 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md" data-copy="binary" title="Copy">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -57,20 +55,21 @@ export class BinaryConverter {
             </div>
             <textarea 
               id="binary-input" 
-              class="converter-input" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white font-mono text-sm" 
               placeholder="Enter binary (e.g., 11111111)"
               spellcheck="false"
+              rows="3"
             >01001000 01100101 01101100 01101100 01101111</textarea>
-            <div class="input-info">
+            <div class="flex gap-4 mt-2 text-xs text-gray-600 dark:text-gray-400">
               <span data-info="binary-bits">0 bits</span>
               <span data-info="binary-bytes">0 bytes</span>
             </div>
           </div>
           
-          <div class="converter-box">
-            <div class="converter-header">
-              <h3>Decimal (Base 10)</h3>
-              <button class="btn-icon" data-copy="decimal" title="Copy">
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Decimal (Base 10)</h3>
+              <button class="p-2 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md" data-copy="decimal" title="Copy">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -79,19 +78,20 @@ export class BinaryConverter {
             </div>
             <textarea 
               id="decimal-input" 
-              class="converter-input" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white font-mono text-sm" 
               placeholder="Enter decimal (e.g., 255)"
               spellcheck="false"
+              rows="3"
             ></textarea>
-            <div class="input-info">
+            <div class="mt-2 text-xs text-gray-600 dark:text-gray-400">
               <span data-info="decimal-value">Value: 0</span>
             </div>
           </div>
           
-          <div class="converter-box">
-            <div class="converter-header">
-              <h3>Hexadecimal (Base 16)</h3>
-              <button class="btn-icon" data-copy="hex" title="Copy">
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Hexadecimal (Base 16)</h3>
+              <button class="p-2 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md" data-copy="hex" title="Copy">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -100,19 +100,20 @@ export class BinaryConverter {
             </div>
             <textarea 
               id="hex-input" 
-              class="converter-input" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white font-mono text-sm" 
               placeholder="Enter hexadecimal (e.g., FF)"
               spellcheck="false"
+              rows="3"
             ></textarea>
-            <div class="input-info">
+            <div class="mt-2 text-xs text-gray-600 dark:text-gray-400">
               <span data-info="hex-format">Format: 0x00</span>
             </div>
           </div>
           
-          <div class="converter-box">
-            <div class="converter-header">
-              <h3>Octal (Base 8)</h3>
-              <button class="btn-icon" data-copy="octal" title="Copy">
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Octal (Base 8)</h3>
+              <button class="p-2 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md" data-copy="octal" title="Copy">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -121,19 +122,20 @@ export class BinaryConverter {
             </div>
             <textarea 
               id="octal-input" 
-              class="converter-input" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white font-mono text-sm" 
               placeholder="Enter octal (e.g., 377)"
               spellcheck="false"
+              rows="3"
             ></textarea>
-            <div class="input-info">
+            <div class="mt-2 text-xs text-gray-600 dark:text-gray-400">
               <span data-info="octal-format">Format: 0o00</span>
             </div>
           </div>
           
-          <div class="converter-box">
-            <div class="converter-header">
-              <h3>ASCII Text</h3>
-              <button class="btn-icon" data-copy="ascii" title="Copy">
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">ASCII Text</h3>
+              <button class="p-2 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md" data-copy="ascii" title="Copy">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -142,19 +144,20 @@ export class BinaryConverter {
             </div>
             <textarea 
               id="ascii-input" 
-              class="converter-input" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white" 
               placeholder="Enter ASCII text"
               spellcheck="false"
+              rows="3"
             ></textarea>
-            <div class="input-info">
+            <div class="mt-2 text-xs text-gray-600 dark:text-gray-400">
               <span data-info="ascii-chars">0 characters</span>
             </div>
           </div>
           
-          <div class="converter-box">
-            <div class="converter-header">
-              <h3>Base64</h3>
-              <button class="btn-icon" data-copy="base64" title="Copy">
+          <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Base64</h3>
+              <button class="p-2 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-md" data-copy="base64" title="Copy">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="9" y="9" width="13" height="13" rx="2"/>
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -163,64 +166,65 @@ export class BinaryConverter {
             </div>
             <textarea 
               id="base64-input" 
-              class="converter-input" 
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white font-mono text-sm" 
               placeholder="Enter Base64"
               spellcheck="false"
+              rows="3"
             ></textarea>
-            <div class="input-info">
+            <div class="mt-2 text-xs text-gray-600 dark:text-gray-400">
               <span data-info="base64-size">0 bytes</span>
             </div>
           </div>
         </div>
         
-        <div class="conversion-options">
-          <h3>Conversion Options</h3>
-          <div class="options-grid">
-            <label class="checkbox-label">
-              <input type="checkbox" id="group-binary" checked>
-              <span>Group Binary by 8 bits</span>
+        <div class="mb-6 bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Conversion Options</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <label class="flex items-center">
+              <input type="checkbox" id="group-binary" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Group Binary by 8 bits</span>
             </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="prefix-hex" checked>
-              <span>Add 0x Prefix to Hex</span>
+            <label class="flex items-center">
+              <input type="checkbox" id="prefix-hex" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Add 0x Prefix to Hex</span>
             </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="prefix-octal" checked>
-              <span>Add 0o Prefix to Octal</span>
+            <label class="flex items-center">
+              <input type="checkbox" id="prefix-octal" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Add 0o Prefix to Octal</span>
             </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="uppercase-hex">
-              <span>Uppercase Hex</span>
+            <label class="flex items-center">
+              <input type="checkbox" id="uppercase-hex" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+              <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Uppercase Hex</span>
             </label>
           </div>
         </div>
         
-        <div class="conversion-tools">
-          <h3>Quick Tools</h3>
-          <div class="tools-grid">
-            <button class="btn btn-sm" data-action="flip-bits">Flip Bits</button>
-            <button class="btn btn-sm" data-action="shift-left">Shift Left</button>
-            <button class="btn btn-sm" data-action="shift-right">Shift Right</button>
-            <button class="btn btn-sm" data-action="ones-complement">1's Complement</button>
-            <button class="btn btn-sm" data-action="twos-complement">2's Complement</button>
-            <button class="btn btn-sm" data-action="byte-swap">Byte Swap</button>
+        <div class="mb-6">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Quick Tools</h3>
+          <div class="flex flex-wrap gap-2">
+            <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="flip-bits">Flip Bits</button>
+            <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="shift-left">Shift Left</button>
+            <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="shift-right">Shift Right</button>
+            <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="ones-complement">1's Complement</button>
+            <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="twos-complement">2's Complement</button>
+            <button class="px-3 py-2 text-sm bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="byte-swap">Byte Swap</button>
           </div>
         </div>
         
-        <div class="conversion-table" id="conversion-table">
-          <h3>ASCII Character Table</h3>
-          <div class="table-container">
-            <table class="ascii-table">
-              <thead>
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4" id="conversion-table">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">ASCII Character Table</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-gray-700 dark:text-gray-300">
+              <thead class="bg-gray-100 dark:bg-gray-800">
                 <tr>
-                  <th>Char</th>
-                  <th>Dec</th>
-                  <th>Hex</th>
-                  <th>Oct</th>
-                  <th>Binary</th>
+                  <th class="px-3 py-2 text-left font-medium text-gray-900 dark:text-white">Char</th>
+                  <th class="px-3 py-2 text-left font-medium text-gray-900 dark:text-white">Dec</th>
+                  <th class="px-3 py-2 text-left font-medium text-gray-900 dark:text-white">Hex</th>
+                  <th class="px-3 py-2 text-left font-medium text-gray-900 dark:text-white">Oct</th>
+                  <th class="px-3 py-2 text-left font-medium text-gray-900 dark:text-white">Binary</th>
                 </tr>
               </thead>
-              <tbody id="ascii-table-body"></tbody>
+              <tbody id="ascii-table-body" class="divide-y divide-gray-200 dark:divide-gray-600"></tbody>
             </table>
           </div>
         </div>
@@ -269,7 +273,7 @@ export class BinaryConverter {
     });
     
     // Options change
-    this.container.querySelectorAll('.conversion-options input').forEach(cb => {
+    this.container.querySelectorAll('#group-binary, #prefix-hex, #prefix-octal, #uppercase-hex').forEach(cb => {
       cb.addEventListener('change', () => {
         if (this.autoConvert) {
           // Re-convert with new options
@@ -616,12 +620,12 @@ export class BinaryConverter {
       const bin = i.toString(2).padStart(8, '0');
       
       html += `
-        <tr>
-          <td>${char}</td>
-          <td>${i}</td>
-          <td>0x${hex}</td>
-          <td>0o${oct}</td>
-          <td>${bin}</td>
+        <tr class="hover:bg-gray-100 dark:hover:bg-gray-600">
+          <td class="px-3 py-2 font-mono">${char}</td>
+          <td class="px-3 py-2 font-mono">${i}</td>
+          <td class="px-3 py-2 font-mono">0x${hex}</td>
+          <td class="px-3 py-2 font-mono">0o${oct}</td>
+          <td class="px-3 py-2 font-mono">${bin}</td>
         </tr>
       `;
     }

@@ -16,65 +16,68 @@ export class UUIDGenerator {
   
   render() {
     this.container.innerHTML = `
-      <div class="tool-container">
-        <div class="tool-header">
-          <h1>UUID Generator</h1>
-          <p class="tool-description">Generate universally unique identifiers (UUIDs) in various formats</p>
+      <div class="max-w-7xl mx-auto p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">UUID Generator</h1>
+          <p class="text-gray-600 dark:text-gray-400">Generate universally unique identifiers (UUIDs) in various formats</p>
         </div>
         
-        <div class="tool-controls">
-          <button class="btn btn-primary" data-action="generate">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <div class="flex flex-wrap gap-4 mb-8">
+          <button class="inline-flex items-center px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="generate">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
               <path d="M23 4v6h-6"/>
               <path d="M1 20v-6h6"/>
               <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
             </svg>
             Generate New
           </button>
-          <button class="btn btn-secondary" data-action="generate-bulk">Generate Bulk</button>
-          <button class="btn btn-secondary" data-action="copy">Copy</button>
-          <button class="btn btn-secondary" data-action="copy-all">Copy All</button>
-          <button class="btn btn-secondary" data-action="clear">Clear</button>
+          <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="generate-bulk">Generate Bulk</button>
+          <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy">Copy</button>
+          <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy-all">Copy All</button>
+          <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="clear">Clear</button>
         </div>
         
-        <div class="uuid-display">
-          <div class="uuid-main" id="uuid-output"></div>
-          <div class="uuid-formats">
-            <div class="format-item">
-              <span class="format-label">Uppercase:</span>
-              <code id="uuid-upper"></code>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <div class="text-center mb-6">
+            <div class="text-2xl font-mono font-bold text-gray-900 dark:text-white cursor-pointer select-all p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600" id="uuid-output" title="Click to copy"></div>
+          </div>
+          
+          <div class="space-y-3">
+            <div class="flex items-center justify-between py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+              <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Uppercase:</span>
+              <code class="font-mono text-sm text-gray-900 dark:text-white cursor-pointer select-all" id="uuid-upper" title="Click to copy"></code>
             </div>
-            <div class="format-item">
-              <span class="format-label">Without dashes:</span>
-              <code id="uuid-nodash"></code>
+            <div class="flex items-center justify-between py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+              <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Without dashes:</span>
+              <code class="font-mono text-sm text-gray-900 dark:text-white cursor-pointer select-all" id="uuid-nodash" title="Click to copy"></code>
             </div>
-            <div class="format-item">
-              <span class="format-label">URN:</span>
-              <code id="uuid-urn"></code>
+            <div class="flex items-center justify-between py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+              <span class="text-sm font-medium text-gray-600 dark:text-gray-400">URN:</span>
+              <code class="font-mono text-sm text-gray-900 dark:text-white cursor-pointer select-all" id="uuid-urn" title="Click to copy"></code>
             </div>
           </div>
         </div>
         
-        <div class="uuid-options">
-          <label class="input-group">
-            <span>Quantity:</span>
-            <input type="number" id="uuid-count" min="1" max="1000" value="10" />
+        <div class="grid md:grid-cols-3 gap-6 mb-6">
+          <div class="flex items-center gap-2">
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Quantity:</label>
+            <input type="number" id="uuid-count" min="1" max="1000" value="10" class="w-20 px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="uuid-uppercase" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Uppercase</span>
           </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="uuid-uppercase" />
-            <span>Uppercase</span>
-          </label>
-          <label class="checkbox-label">
-            <input type="checkbox" id="uuid-hyphens" checked />
-            <span>Include hyphens</span>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="uuid-hyphens" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Include hyphens</span>
           </label>
         </div>
         
-        <div class="uuid-history">
-          <h3>Generated UUIDs</h3>
+        <div>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Generated UUIDs</h3>
           <textarea 
             id="uuid-history" 
-            class="code-input" 
+            class="w-full h-64 p-4 font-mono text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg" 
             placeholder="Generated UUIDs will appear here..."
             spellcheck="false"
             readonly
