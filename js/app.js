@@ -158,7 +158,26 @@ function performSearch(query) {
   
   // Apply search query
   if (query) {
+    // Smart abbreviation matching first
+    const smartMatch = findSmartMatch(query, filtered);
+    if (smartMatch) {
+      window.location.hash = smartMatch.href;
+      searchResults.hidden = true;
+      searchInput.value = '';
+      searchClear.hidden = true;
+      return;
+    }
+    
     filtered = searchTools(query, filtered);
+    
+    // Auto-navigate if exactly one match
+    if (filtered.length === 1) {
+      window.location.hash = filtered[0].href;
+      searchResults.hidden = true;
+      searchInput.value = '';
+      searchClear.hidden = true;
+      return;
+    }
   }
   
   if (filtered.length > 0) {
@@ -168,6 +187,65 @@ function performSearch(query) {
     searchResults.hidden = false;
   }
   selectedResultIndex = -1;
+}
+
+function findSmartMatch(query, toolsList) {
+  const q = query.toLowerCase().trim();
+  
+  // Abbreviation patterns for quick access
+  const abbreviations = {
+    'jd': 'JWT Decoder',
+    'json': 'JSON Formatter', 
+    'jwt': 'JWT Decoder',
+    'b64': 'Base64 Encode/Decode',
+    'base64': 'Base64 Encode/Decode',
+    'url': 'URL Encode/Decode',
+    'uuid': 'UUID Generator',
+    'unix': 'Unix Time Converter',
+    'regex': 'Regex Tester',
+    'cron': 'Cron Parser',
+    'diff': 'Diff Tool',
+    'csv': 'CSV ↔ JSON Converter',
+    'yaml': 'YAML ↔ JSON Converter',
+    'hash': 'Hash Generator',
+    'md': 'Markdown Preview',
+    'curl': 'cURL Generator',
+    'dns': 'DNS Lookup',
+    'graphql': 'GraphQL Tester',
+    'sql': 'SQL Formatter',
+    'xml': 'XML Formatter',
+    'pass': 'Password Generator',
+    'pw': 'Password Generator',
+    'binary': 'Binary Converter',
+    'qr': 'QR Code Generator',
+    'ascii': 'ASCII Art Generator',
+    'img': 'Image Converter',
+    'image': 'Image Converter',
+    'webhook': 'Webhook Tester',
+    'ip': 'IP Address Lookup',
+    'cidr': 'CIDR Calculator',
+    'whois': 'WHOIS Lookup',
+    's3': 'S3 Pre-signed URL Generator',
+    'iam': 'AWS IAM Policy Visualizer'
+  };
+  
+  // Check for exact abbreviation match
+  if (abbreviations[q]) {
+    return toolsList.find(tool => tool.name === abbreviations[q]);
+  }
+  
+  // Check for unique prefix match
+  const prefixMatches = toolsList.filter(tool => 
+    tool.name.toLowerCase().startsWith(q) ||
+    tool.keywords.some(keyword => keyword.toLowerCase().startsWith(q))
+  );
+  
+  // Return if exactly one prefix match
+  if (prefixMatches.length === 1) {
+    return prefixMatches[0];
+  }
+  
+  return null;
 }
 
 function displaySearchResults(results, query) {
