@@ -24,6 +24,30 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       
+      - name: Start development server
+        run: |
+          echo "=== Starting development server ==="
+          nohup npm run dev > server.log 2>&1 &
+          echo $! > server.pid
+          echo "Server PID: $(cat server.pid)"
+          
+          echo "=== Waiting for server to start ==="
+          for i in {1..30}; do
+            if curl -f http://localhost:8081 >/dev/null 2>&1; then
+              echo "Server is ready!"
+              break
+            fi
+            echo "Attempt $i: Server not ready, waiting..."
+            sleep 2
+          done
+          
+          if ! curl -f http://localhost:8081 >/dev/null 2>&1; then
+            echo "=== Server failed to start ==="
+            echo "Server log:"
+            cat server.log
+            exit 1
+          fi
+      
       - name: Run Playwright tests
         run: npm run test:e2e
       
@@ -31,5 +55,7 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: playwright-report/
+          path: |
+            playwright-report/
+            server.log
           retention-days: 30
