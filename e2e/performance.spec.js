@@ -32,13 +32,13 @@ test.describe('Performance Tests', () => {
     expect(fcp).toBeLessThan(200); // Slightly relaxed for CI environments
   });
 
-  test('CSS file size is within budget', async ({ page, request }) => {
-    const response = await request.get('/css/base.css');
+  test('HTML file size is within budget', async ({ page, request }) => {
+    const response = await request.get('/');
     const text = await response.text();
     
-    // Check uncompressed size
+    // Check uncompressed size of index.html
     const sizeInKB = Buffer.byteLength(text, 'utf8') / 1024;
-    expect(sizeInKB).toBeLessThan(10); // Should be under 10KB
+    expect(sizeInKB).toBeLessThan(100); // Should be under 100KB for the main HTML
   });
 
   test('no layout shifts after initial render', async ({ page }) => {

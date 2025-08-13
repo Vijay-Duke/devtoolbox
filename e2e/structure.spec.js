@@ -29,7 +29,7 @@ test.describe('HTML Structure and Accessibility', () => {
 
   test('has skip link for accessibility', async ({ page }) => {
     const skipLink = page.locator('a[href="#main"]');
-    await expect(skipLink).toHaveClass(/skip-link/);
+    await expect(skipLink).toHaveClass(/sr-only/);
     
     // Focus the skip link and verify it becomes visible
     await skipLink.focus();
@@ -47,10 +47,15 @@ test.describe('HTML Structure and Accessibility', () => {
     await expect(menuToggle).toHaveAttribute('aria-label', 'Toggle menu');
   });
 
-  test('has keyboard shortcuts hint', async ({ page }) => {
-    await expect(page.locator('.shortcuts-hint')).toBeVisible();
-    await expect(page.locator('text=/Focus search/')).toBeVisible();
-    await expect(page.locator('text=Esc')).toBeVisible();
-    await expect(page.locator('text=Toggle theme')).toBeVisible();
+  test('keyboard shortcuts work', async ({ page }) => {
+    // Test / key focuses search
+    await page.keyboard.press('/');
+    const searchInput = page.locator('input[type="search"]');
+    await expect(searchInput).toBeFocused();
+    
+    // Test Escape key clears search
+    await searchInput.fill('test');
+    await page.keyboard.press('Escape');
+    await expect(searchInput).toHaveValue('');
   });
 });

@@ -42,7 +42,7 @@ test.describe('Search Functionality', () => {
 
   test('search results appear on input', async ({ page }) => {
     const searchInput = page.locator('input[type="search"]');
-    const searchResults = page.locator('.search-results');
+    const searchResults = page.locator('#search-results');
     
     // Initially hidden
     await expect(searchResults).toBeHidden();
@@ -60,7 +60,7 @@ test.describe('Search Functionality', () => {
 
   test('clear button appears and works', async ({ page }) => {
     const searchInput = page.locator('input[type="search"]');
-    const clearButton = page.locator('.search-clear');
+    const clearButton = page.locator('button[aria-label="Clear search"]');
     
     // Initially hidden
     await expect(clearButton).toBeHidden();
@@ -81,7 +81,7 @@ test.describe('Search Functionality', () => {
 
   test('no results message appears for non-matching query', async ({ page }) => {
     const searchInput = page.locator('input[type="search"]');
-    const searchResults = page.locator('.search-results');
+    const searchResults = page.locator('#search-results');
     
     // Type non-matching query
     await searchInput.fill('xyz123notfound');
