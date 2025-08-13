@@ -12,9 +12,10 @@ const connections = new Map()
 
 // CORS configuration
 app.use('*', cors({
-  origin: ['http://localhost:8081', 'http://127.0.0.1:8081'],
-  allowMethods: ['GET', 'POST', 'DELETE'],
-  allowHeaders: ['Content-Type', 'Accept']
+  origin: ['http://localhost:8081', 'http://127.0.0.1:8081', 'http://localhost:52474', 'http://127.0.0.1:52474'],
+  allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
+  allowHeaders: ['Content-Type', 'Accept', 'Cache-Control', 'X-Requested-With', 'Authorization'],
+  credentials: false
 }))
 
 // Utility functions
@@ -105,6 +106,16 @@ app.get('/api/inbox/generate', (c) => {
   })
 })
 
+// OPTIONS handler for SSE endpoint (preflight support)
+app.options('/api/emails/:inboxId/stream', (c) => {
+  // Explicit CORS headers for EventSource preflight
+  c.header('Access-Control-Allow-Origin', c.req.header('Origin') || '*')
+  c.header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+  c.header('Access-Control-Allow-Headers', 'Content-Type, Accept, Cache-Control, X-Requested-With')
+  c.header('Access-Control-Max-Age', '86400')
+  return c.text('', 200)
+})
+
 // SSE endpoint for real-time email streaming
 app.get('/api/emails/:inboxId/stream', (c) => {
   const inboxId = c.req.param('inboxId')
@@ -112,6 +123,13 @@ app.get('/api/emails/:inboxId/stream', (c) => {
   if (!inboxes.has(inboxId)) {
     return c.json({ error: 'Inbox not found' }, 404)
   }
+
+  // Set explicit headers for EventSource
+  c.header('Content-Type', 'text/event-stream')
+  c.header('Cache-Control', 'no-cache')
+  c.header('Connection', 'keep-alive')
+  c.header('Access-Control-Allow-Origin', c.req.header('Origin') || 'http://localhost:52474')
+  c.header('Access-Control-Allow-Credentials', 'false')
   
   return streamSSE(c, async (stream) => {
     // Store this connection
@@ -287,7 +305,7 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000)
 
-const port = process.env.PORT || 3001
+const port = process.env.PORT || 54322
 console.log(`🚀 Temporary Email Server starting on port ${port}`)
 
 serve({
