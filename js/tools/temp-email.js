@@ -17,8 +17,6 @@ export class TempEmailTool extends ToolTemplate {
       emails: [],
       filters: {
         search: '',
-        regex: '',
-        sender: '',
         showOTPOnly: false
       },
       serverUrl: 'http://localhost:54322'
@@ -104,33 +102,13 @@ export class TempEmailTool extends ToolTemplate {
 
         <!-- Filters Section -->
         <div id="filters-section" class="hidden mb-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search emails</label>
               <input 
                 type="text" 
                 id="search-filter"
-                placeholder="Search in subject/body..."
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sender Filter</label>
-              <input 
-                type="text" 
-                id="sender-filter"
-                placeholder="Filter by sender..."
-                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Regex Pattern</label>
-              <input 
-                type="text" 
-                id="regex-filter"
-                placeholder="Regex pattern..."
+                placeholder="Search in sender, subject, or body..."
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -175,9 +153,9 @@ export class TempEmailTool extends ToolTemplate {
             <div>
               <h4 class="font-medium text-red-800 dark:text-red-200">Server Connection Failed</h4>
               <p class="text-sm text-red-600 dark:text-red-300 mt-1">
-                Please make sure the email server is running on <code>http://localhost:3001</code>
+                Please make sure the email server is running on <code>http://localhost:54322</code>
                 <br>
-                Run: <code class="font-mono bg-red-100 dark:bg-red-800 px-1 rounded">cd server && npm run dev</code>
+                Run: <code class="font-mono bg-red-100 dark:bg-red-800 px-1 rounded">cd server && PORT=54322 npm run dev</code>
               </p>
             </div>
           </div>
@@ -205,15 +183,11 @@ export class TempEmailTool extends ToolTemplate {
 
     // Filter inputs
     const searchFilter = this.container.querySelector('#search-filter');
-    const senderFilter = this.container.querySelector('#sender-filter');
-    const regexFilter = this.container.querySelector('#regex-filter');
     const otpFilter = this.container.querySelector('#otp-only-filter');
 
     const updateFilters = this.debounce(() => this.updateFilters(), 300);
     
     searchFilter.addEventListener('input', updateFilters);
-    senderFilter.addEventListener('input', updateFilters);
-    regexFilter.addEventListener('input', updateFilters);
     otpFilter.addEventListener('change', updateFilters);
   }
 
@@ -306,6 +280,12 @@ export class TempEmailTool extends ToolTemplate {
       }
     });
     
+    this.eventSource.addEventListener('connected', (event) => {
+      const data = JSON.parse(event.data);
+      console.log('SSE connection confirmed:', data.timestamp);
+      this.updateConnectionStatus('Connected', 'bg-green-500');
+    });
+    
     this.eventSource.addEventListener('ping', () => {
       // Keepalive ping - just update last activity
       console.log('Received keepalive ping');
@@ -363,8 +343,6 @@ export class TempEmailTool extends ToolTemplate {
 
   updateFilters() {
     this.state.filters.search = this.container.querySelector('#search-filter').value.toLowerCase();
-    this.state.filters.sender = this.container.querySelector('#sender-filter').value.toLowerCase();
-    this.state.filters.regex = this.container.querySelector('#regex-filter').value;
     this.state.filters.showOTPOnly = this.container.querySelector('#otp-only-filter').checked;
     
     this.renderEmails();
@@ -373,31 +351,21 @@ export class TempEmailTool extends ToolTemplate {
 
   getFilteredEmails() {
     return this.state.emails.filter(email => {
-      // Search filter
+      // Fuzzy search across all fields
       if (this.state.filters.search) {
-        const searchText = `${email.subject} ${email.body}`.toLowerCase();
-        if (!searchText.includes(this.state.filters.search)) {
+        const searchTerm = this.state.filters.search;
+        const searchableText = `${email.from} ${email.subject} ${email.body}`.toLowerCase();
+        
+        // Split search term into words for better fuzzy matching
+        const searchWords = searchTerm.split(/\s+/).filter(word => word.length > 0);
+        
+        // Check if all search words are found in the email text
+        const allWordsFound = searchWords.every(word => 
+          searchableText.includes(word)
+        );
+        
+        if (!allWordsFound) {
           return false;
-        }
-      }
-      
-      // Sender filter
-      if (this.state.filters.sender) {
-        if (!email.from.toLowerCase().includes(this.state.filters.sender)) {
-          return false;
-        }
-      }
-      
-      // Regex filter
-      if (this.state.filters.regex) {
-        try {
-          const regex = new RegExp(this.state.filters.regex, 'i');
-          const testText = `${email.subject} ${email.body}`;
-          if (!regex.test(testText)) {
-            return false;
-          }
-        } catch (e) {
-          // Invalid regex, skip this filter
         }
       }
       
@@ -569,8 +537,6 @@ export class TempEmailTool extends ToolTemplate {
           
           // Restore filter values
           this.container.querySelector('#search-filter').value = this.state.filters.search || '';
-          this.container.querySelector('#sender-filter').value = this.state.filters.sender || '';
-          this.container.querySelector('#regex-filter').value = this.state.filters.regex || '';
           this.container.querySelector('#otp-only-filter').checked = this.state.filters.showOTPOnly || false;
           
           this.hideServerError();

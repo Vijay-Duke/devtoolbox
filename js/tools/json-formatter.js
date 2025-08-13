@@ -1,3 +1,6 @@
+import { feedback } from '../utils/feedback.js';
+import { formatBytes } from '../utils/common.js';
+
 export class JSONFormatter {
   constructor() {
     this.container = null;
@@ -85,7 +88,7 @@ export class JSONFormatter {
           
           <div>
             <label for="json-output" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Formatted Output</label>
-            <pre id="json-output" class="w-full h-96 p-4 font-mono text-sm bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-auto"></pre>
+            <pre id="json-output" class="w-full h-96 p-4 font-mono text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg overflow-auto"></pre>
           </div>
         </div>
         
@@ -199,7 +202,7 @@ export class JSONFormatter {
   format() {
     const input = this.inputArea.value.trim();
     if (!input) {
-      this.showError('Please enter some JSON data');
+      feedback.showToast('Please enter some JSON data', 'warning');
       return;
     }
     
@@ -211,17 +214,19 @@ export class JSONFormatter {
       this.inputArea.value = formatted;
       this.clearError();
       this.updateStats();
+      feedback.showToast('JSON formatted successfully', 'success');
     } catch (error) {
       const errorLocation = this.getErrorLocation(error.message, input);
       this.showInlineError(errorLocation, input);
       this.outputArea.textContent = '';
+      feedback.showToast(`JSON formatting failed: ${error.message}`, 'error');
     }
   }
   
   minify() {
     const input = this.inputArea.value.trim();
     if (!input) {
-      this.showError('Please enter some JSON data');
+      feedback.showToast('Please enter some JSON data', 'warning');
       return;
     }
     
@@ -232,8 +237,9 @@ export class JSONFormatter {
       this.inputArea.value = minified;
       this.clearError();
       this.updateStats();
+      feedback.showToast('JSON minified successfully', 'success');
     } catch (error) {
-      this.showError(`Invalid JSON: ${error.message}`);
+      feedback.showToast(`Invalid JSON: ${error.message}`, 'error');
       this.outputArea.textContent = '';
     }
   }
@@ -241,22 +247,11 @@ export class JSONFormatter {
   copy() {
     const output = this.outputArea.textContent || this.inputArea.value;
     if (!output) {
-      this.showError('Nothing to copy');
+      feedback.showToast('Nothing to copy', 'warning');
       return;
     }
     
-    navigator.clipboard.writeText(output).then(() => {
-      const originalText = this.copyBtn.textContent;
-      this.copyBtn.textContent = 'Copied!';
-      this.copyBtn.classList.add('btn-success');
-      
-      setTimeout(() => {
-        this.copyBtn.textContent = originalText;
-        this.copyBtn.classList.remove('btn-success');
-      }, 2000);
-    }).catch(() => {
-      this.showError('Failed to copy to clipboard');
-    });
+    feedback.copyToClipboard(output, 'JSON copied to clipboard');
   }
   
   clear() {
@@ -308,15 +303,7 @@ export class JSONFormatter {
     
     this.container.querySelector('[data-stat="chars"]').textContent = `${chars.toLocaleString()} characters`;
     this.container.querySelector('[data-stat="lines"]').textContent = `${lines.toLocaleString()} lines`;
-    this.container.querySelector('[data-stat="size"]').textContent = this.formatBytes(bytes);
-  }
-  
-  formatBytes(bytes) {
-    if (bytes === 0) return '0 bytes';
-    const k = 1024;
-    const sizes = ['bytes', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+    this.container.querySelector('[data-stat="size"]').textContent = formatBytes(bytes);
   }
   
   getErrorLocation(errorMessage, jsonString) {

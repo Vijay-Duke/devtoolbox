@@ -123,47 +123,74 @@ app.get('/api/emails/:inboxId/stream', (c) => {
   if (!inboxes.has(inboxId)) {
     return c.json({ error: 'Inbox not found' }, 404)
   }
-
-  // Set explicit headers for EventSource
-  c.header('Content-Type', 'text/event-stream')
-  c.header('Cache-Control', 'no-cache')
-  c.header('Connection', 'keep-alive')
-  c.header('Access-Control-Allow-Origin', c.req.header('Origin') || 'http://localhost:52474')
-  c.header('Access-Control-Allow-Credentials', 'false')
   
   return streamSSE(c, async (stream) => {
     // Store this connection
     const connectionId = uuidv4()
     connections.set(connectionId, { stream, inboxId })
+    console.log(`New SSE connection established: ${connectionId} for inbox ${inboxId}`)
     
-    // Send existing emails immediately
-    const inbox = inboxes.get(inboxId)
-    for (const email of inbox.emails) {
-      await stream.writeSSE({
-        data: JSON.stringify({ type: 'email', data: email }),
-        event: 'email'
-      })
-    }
-    
-    // Send keepalive ping
-    const pingInterval = setInterval(async () => {
-      try {
-        await stream.writeSSE({
-          data: JSON.stringify({ type: 'ping', timestamp: new Date().toISOString() }),
-          event: 'ping'
-        })
-      } catch (error) {
-        console.log('Connection closed, cleaning up ping interval')
-        clearInterval(pingInterval)
-        connections.delete(connectionId)
-      }
-    }, 30000)
+    let pingInterval
     
     // Clean up on connection close
     stream.onAbort(() => {
-      console.log('SSE connection aborted')
-      clearInterval(pingInterval)
+      console.log(`SSE connection aborted: ${connectionId} for inbox ${inboxId}`)
+      if (pingInterval) clearInterval(pingInterval)
       connections.delete(connectionId)
+    })
+    
+    try {
+      // Send existing emails immediately
+      const inbox = inboxes.get(inboxId)
+      console.log(`Sending ${inbox.emails.length} existing emails to new connection`)
+      for (const email of inbox.emails) {
+        try {
+          await stream.writeSSE({
+            data: JSON.stringify({ type: 'email', data: email }),
+            event: 'email'
+          })
+        } catch (writeError) {
+          console.log('Error writing existing email to stream:', writeError.message)
+          connections.delete(connectionId)
+          throw writeError
+        }
+      }
+      
+      // Send initial connection confirmation
+      await stream.writeSSE({
+        data: JSON.stringify({ type: 'connected', timestamp: new Date().toISOString() }),
+        event: 'connected'
+      })
+      console.log(`Connection confirmation sent to ${connectionId}`)
+      
+    } catch (error) {
+      console.log('Error setting up SSE stream:', error.message)
+      connections.delete(connectionId)
+      throw error
+    }
+    
+    // Send keepalive ping
+    pingInterval = setInterval(async () => {
+      if (connections.has(connectionId)) {
+        try {
+          await stream.writeSSE({
+            data: JSON.stringify({ type: 'ping', timestamp: new Date().toISOString() }),
+            event: 'ping'
+          })
+        } catch (error) {
+          console.log('Ping failed, connection closed:', error.message)
+          clearInterval(pingInterval)
+          connections.delete(connectionId)
+        }
+      } else {
+        clearInterval(pingInterval)
+      }
+    }, 30000)
+    
+    // Keep the stream alive - this is important for SSE
+    await new Promise((resolve) => {
+      // The stream will stay open until the client disconnects or an error occurs
+      // This promise will never resolve, keeping the function alive
     })
   })
 })
@@ -310,5 +337,5 @@ console.log(`🚀 Temporary Email Server starting on port ${port}`)
 
 serve({
   fetch: app.fetch,
-  port: port
+  port: parseInt(port)
 })

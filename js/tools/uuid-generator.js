@@ -1,3 +1,6 @@
+import { feedback } from '../utils/feedback.js';
+import { generateUUID } from '../utils/common.js';
+
 export class UUIDGenerator {
   constructor() {
     this.container = null;
@@ -32,26 +35,25 @@ export class UUIDGenerator {
             Generate New
           </button>
           <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="generate-bulk">Generate Bulk</button>
-          <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy">Copy</button>
-          <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy-all">Copy All</button>
+          <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy-all">Copy All History</button>
           <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="clear">Clear</button>
         </div>
         
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
           <div class="text-center mb-6">
-            <div class="text-2xl font-mono font-bold text-gray-900 dark:text-white cursor-pointer select-all p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600" id="uuid-output" title="Click to copy"></div>
+            <div class="text-2xl font-mono font-bold text-gray-900 dark:text-white cursor-pointer select-all p-4 bg-white dark:bg-gray-900 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600" id="uuid-output" title="Click to copy"></div>
           </div>
           
           <div class="space-y-3">
-            <div class="flex items-center justify-between py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+            <div class="flex items-center justify-between py-2 px-4 bg-white dark:bg-gray-900 rounded">
               <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Uppercase:</span>
               <code class="font-mono text-sm text-gray-900 dark:text-white cursor-pointer select-all" id="uuid-upper" title="Click to copy"></code>
             </div>
-            <div class="flex items-center justify-between py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+            <div class="flex items-center justify-between py-2 px-4 bg-white dark:bg-gray-900 rounded">
               <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Without dashes:</span>
               <code class="font-mono text-sm text-gray-900 dark:text-white cursor-pointer select-all" id="uuid-nodash" title="Click to copy"></code>
             </div>
-            <div class="flex items-center justify-between py-2 px-4 bg-gray-50 dark:bg-gray-900 rounded">
+            <div class="flex items-center justify-between py-2 px-4 bg-white dark:bg-gray-900 rounded">
               <span class="text-sm font-medium text-gray-600 dark:text-gray-400">URN:</span>
               <code class="font-mono text-sm text-gray-900 dark:text-white cursor-pointer select-all" id="uuid-urn" title="Click to copy"></code>
             </div>
@@ -61,14 +63,14 @@ export class UUIDGenerator {
         <div class="grid md:grid-cols-3 gap-6 mb-6">
           <div class="flex items-center gap-2">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Quantity:</label>
-            <input type="number" id="uuid-count" min="1" max="1000" value="10" class="w-20 px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+            <input type="number" id="uuid-count" min="1" max="1000" value="10" class="w-20 px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white" />
           </div>
           <label class="flex items-center space-x-2">
-            <input type="checkbox" id="uuid-uppercase" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+            <input type="checkbox" id="uuid-uppercase" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2" />
             <span class="text-sm text-gray-700 dark:text-gray-300">Uppercase</span>
           </label>
           <label class="flex items-center space-x-2">
-            <input type="checkbox" id="uuid-hyphens" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+            <input type="checkbox" id="uuid-hyphens" checked class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2" />
             <span class="text-sm text-gray-700 dark:text-gray-300">Include hyphens</span>
           </label>
         </div>
@@ -77,7 +79,7 @@ export class UUIDGenerator {
           <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Generated UUIDs</h3>
           <textarea 
             id="uuid-history" 
-            class="w-full h-64 p-4 font-mono text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg" 
+            class="w-full h-64 p-4 font-mono text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg" 
             placeholder="Generated UUIDs will appear here..."
             spellcheck="false"
             readonly
@@ -92,47 +94,35 @@ export class UUIDGenerator {
   attachEventListeners() {
     this.container.querySelector('[data-action="generate"]').addEventListener('click', () => this.generate());
     this.container.querySelector('[data-action="generate-bulk"]').addEventListener('click', () => this.generateBulk());
-    this.container.querySelector('[data-action="copy"]').addEventListener('click', () => this.copy());
     this.container.querySelector('[data-action="copy-all"]').addEventListener('click', () => this.copyAll());
     this.container.querySelector('[data-action="clear"]').addEventListener('click', () => this.clear());
     
-    // Copy individual format on click
-    this.container.querySelectorAll('.uuid-formats code').forEach(elem => {
-      elem.style.cursor = 'pointer';
-      elem.addEventListener('click', () => {
-        navigator.clipboard.writeText(elem.textContent).then(() => {
-          elem.style.backgroundColor = 'var(--color-success)';
-          elem.style.color = 'white';
-          setTimeout(() => {
-            elem.style.backgroundColor = '';
-            elem.style.color = '';
-          }, 500);
-        });
+    // Copy individual format variations on click
+    ['#uuid-upper', '#uuid-nodash', '#uuid-urn'].forEach(selector => {
+      this.container.querySelector(selector).addEventListener('click', () => {
+        const element = this.container.querySelector(selector);
+        const text = element.textContent;
+        if (text) {
+          feedback.copyToClipboard(text, 'UUID format copied');
+          feedback.highlightElement(element);
+        }
       });
     });
     
     // Main UUID click to copy
     this.container.querySelector('#uuid-output').addEventListener('click', () => {
-      const uuid = this.container.querySelector('#uuid-output').textContent;
-      navigator.clipboard.writeText(uuid).then(() => {
-        const elem = this.container.querySelector('#uuid-output');
-        elem.style.backgroundColor = 'var(--color-success)';
-        elem.style.color = 'white';
-        setTimeout(() => {
-          elem.style.backgroundColor = '';
-          elem.style.color = '';
-        }, 500);
-      });
+      const element = this.container.querySelector('#uuid-output');
+      const uuid = element.textContent;
+      if (uuid) {
+        feedback.copyToClipboard(uuid, 'UUID copied');
+        feedback.highlightElement(element);
+      }
     });
   }
   
   generateUUID() {
-    // Generate RFC4122 version 4 UUID
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
+    // Use the common utility for consistent UUID generation
+    return generateUUID();
   }
   
   generate() {
@@ -186,37 +176,17 @@ export class UUIDGenerator {
     this.outputArea.value = this.history.join('\n');
   }
   
-  copy() {
-    const uuid = this.container.querySelector('#uuid-output').textContent;
-    if (!uuid) return;
-    
-    navigator.clipboard.writeText(uuid).then(() => {
-      const btn = this.container.querySelector('[data-action="copy"]');
-      const originalText = btn.textContent;
-      btn.textContent = 'Copied!';
-      btn.classList.add('btn-success');
-      
-      setTimeout(() => {
-        btn.textContent = originalText;
-        btn.classList.remove('btn-success');
-      }, 2000);
-    });
-  }
   
   copyAll() {
-    if (this.history.length === 0) return;
+    if (this.history.length === 0) {
+      feedback.showToast('No UUIDs to copy', 'warning');
+      return;
+    }
     
-    navigator.clipboard.writeText(this.history.join('\n')).then(() => {
-      const btn = this.container.querySelector('[data-action="copy-all"]');
-      const originalText = btn.textContent;
-      btn.textContent = 'Copied!';
-      btn.classList.add('btn-success');
-      
-      setTimeout(() => {
-        btn.textContent = originalText;
-        btn.classList.remove('btn-success');
-      }, 2000);
-    });
+    feedback.copyToClipboard(
+      this.history.join('\n'), 
+      `All ${this.history.length} UUIDs copied`
+    );
   }
   
   clear() {

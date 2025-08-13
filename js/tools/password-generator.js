@@ -37,7 +37,7 @@ export class PasswordGenerator {
 
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
           <div class="flex gap-3 mb-4">
-            <input type="text" id="password-output" class="flex-1 p-3 font-mono text-lg bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" readonly aria-label="Generated password" />
+            <input type="text" id="password-output" class="flex-1 p-3 font-mono text-lg bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" readonly aria-label="Generated password" />
             <button class="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy" title="Copy password (Cmd/Ctrl+C)" aria-label="Copy password">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <rect x="9" y="9" width="13" height="13" rx="2"/>
@@ -47,7 +47,7 @@ export class PasswordGenerator {
           </div>
 
           <div aria-describedby="strength-label">
-            <div class="w-full bg-gray-200 dark:bg-gray-900 rounded-full h-2 mb-3">
+            <div class="w-full bg-gray-100 dark:bg-gray-900 rounded-full h-2 mb-3">
               <div class="h-2 rounded-full transition-all duration-300" id="strength-fill"></div>
             </div>
             <div class="flex items-center justify-between">
@@ -59,98 +59,119 @@ export class PasswordGenerator {
 
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
           <div class="mb-6">
-            <label for="password-length" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">Password Length</label>
+            <div class="flex items-center justify-between mb-4">
+              <label for="password-length" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password Length</label>
+              <button class="inline-flex items-center px-3 py-1 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300" data-toggle="advanced-options">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1">
+                  <path d="M12 20h9"/>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                </svg>
+                Advanced Options
+              </button>
+            </div>
             <div class="space-y-4">
               <div class="flex items-center gap-4">
                 <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 min-w-[3rem]" id="length-display">16</div>
-                <input type="range" id="password-length" min="4" max="128" value="16" class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-900" />
+                <input type="range" id="password-length" min="4" max="128" value="16" class="flex-1 h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer dark:bg-gray-900" />
               </div>
               <div class="flex gap-2" role="group" aria-label="Length presets">
-                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-600" data-length="8">8</button>
-                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-600" data-length="12">12</button>
+                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600" data-length="8">8</button>
+                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600" data-length="12">12</button>
                 <button class="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 active" data-length="16">16</button>
-                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-600" data-length="20">20</button>
-                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-600" data-length="32">32</button>
+                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600" data-length="20">20</button>
+                <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600" data-length="32">32</button>
               </div>
             </div>
           </div>
 
-          <div class="grid md:grid-cols-2 gap-8">
-            <div>
-              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Character Types</h3>
-              <div class="space-y-3">
-                <label class="flex items-center space-x-3">
-                  <input type="checkbox" id="use-uppercase" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                  <span class="text-sm text-gray-700 dark:text-gray-300">Uppercase Letters (A–Z)</span>
-                </label>
-                <label class="flex items-center space-x-3">
-                  <input type="checkbox" id="use-lowercase" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                  <span class="text-sm text-gray-700 dark:text-gray-300">Lowercase Letters (a–z)</span>
-                </label>
-                <label class="flex items-center space-x-3">
-                  <input type="checkbox" id="use-numbers" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                  <span class="text-sm text-gray-700 dark:text-gray-300">Numbers (0–9)</span>
-                </label>
-                <label class="flex items-center space-x-3">
-                  <input type="checkbox" id="use-symbols" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                  <span class="text-sm text-gray-700 dark:text-gray-300">Symbols (!@#$%...)</span>
-                </label>
-                <label class="flex items-center space-x-3" title="When off, confusable characters are excluded">
-                  <input type="checkbox" id="use-similar" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                  <span class="text-sm text-gray-700 dark:text-gray-300">Include Similar Characters (il1Lo0O)</span>
-                </label>
-              </div>
+          <!-- Basic Character Types -->
+          <div class="mb-6">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Character Types</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-center space-x-3">
+                <input type="checkbox" id="use-uppercase" checked class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Uppercase Letters (A–Z)</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="checkbox" id="use-lowercase" checked class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Lowercase Letters (a–z)</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="checkbox" id="use-numbers" checked class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Numbers (0–9)</span>
+              </label>
+              <label class="flex items-center space-x-3">
+                <input type="checkbox" id="use-symbols" checked class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                <span class="text-sm text-gray-700 dark:text-gray-300">Symbols (!@#$%...)</span>
+              </label>
             </div>
+          </div>
 
-            <div>
-              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Advanced Options</h3>
-              <div class="space-y-3">
-                <label class="flex items-center space-x-3">
-                  <input type="checkbox" id="begin-letter" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                  <span class="text-sm text-gray-700 dark:text-gray-300">Begin With a Letter</span>
-                </label>
-                <label class="flex items-center space-x-3">
-                  <input type="checkbox" id="no-sequential" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                  <span class="text-sm text-gray-700 dark:text-gray-300">No Sequential Characters</span>
-                </label>
-                <label class="flex items-center space-x-3">
-                  <input type="checkbox" id="no-duplicate" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                  <span class="text-sm text-gray-700 dark:text-gray-300">No Duplicate Characters</span>
-                </label>
-                <div class="space-y-2">
-                  <label for="custom-symbols" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Custom Symbol Set:</label>
-                  <input type="text" id="custom-symbols" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="!@#$%^&*" inputmode="text" />
+          <!-- Advanced Options (Hidden by default) -->
+          <div id="advanced-options" class="hidden">
+            <div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+              <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                  <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">Character Rules</h4>
+                  <div class="space-y-3">
+                    <label class="flex items-center space-x-3" title="When off, confusable characters are excluded">
+                      <input type="checkbox" id="use-similar" checked class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                      <span class="text-sm text-gray-700 dark:text-gray-300">Include Similar Characters (il1Lo0O)</span>
+                    </label>
+                    <label class="flex items-center space-x-3">
+                      <input type="checkbox" id="begin-letter" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                      <span class="text-sm text-gray-700 dark:text-gray-300">Begin With a Letter</span>
+                    </label>
+                    <label class="flex items-center space-x-3">
+                      <input type="checkbox" id="no-sequential" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                      <span class="text-sm text-gray-700 dark:text-gray-300">No Sequential Characters</span>
+                    </label>
+                    <label class="flex items-center space-x-3">
+                      <input type="checkbox" id="no-duplicate" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2">
+                      <span class="text-sm text-gray-700 dark:text-gray-300">No Duplicate Characters</span>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <h4 class="text-md font-medium text-gray-900 dark:text-white mb-4">Custom Options</h4>
+                  <div class="space-y-2">
+                    <label for="custom-symbols" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Custom Symbol Set:</label>
+                    <input type="text" id="custom-symbols" class="w-full px-3 py-2 text-sm bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="!@#$%^&*" inputmode="text" />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="flex flex-wrap gap-2 mb-6">
-          <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" data-action="generate-multiple" title="Generate 10 passwords">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="mr-2">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
-            </svg>
-            Generate Multiple
-          </button>
-          <button class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" data-action="show-passphrase">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="mr-2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            Passphrase Mode
-          </button>
-          <button class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" data-action="show-memorable">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="mr-2">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-            </svg>
-            Memorable
-          </button>
+        <!-- Advanced Mode Buttons (Hidden by default) -->
+        <div id="advanced-mode-buttons" class="hidden">
+          <div class="flex flex-wrap gap-2 mb-6">
+            <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" data-action="generate-multiple" title="Generate 10 passwords">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="mr-2">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/>
+              </svg>
+              Generate Multiple
+            </button>
+            <button class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" data-action="show-passphrase">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="mr-2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              </svg>
+              Passphrase Mode
+            </button>
+            <button class="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-medium border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors" data-action="show-memorable">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" class="mr-2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              Memorable
+            </button>
+          </div>
         </div>
 
         <section class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm mb-6" id="multiple-passwords" hidden>
           <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Generated Passwords</h3>
-            <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors" data-action="copy-all">Copy All</button>
+            <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" data-action="copy-all">Copy All</button>
           </div>
           <div class="p-4 space-y-2" id="password-list" role="list"></div>
         </section>
@@ -163,7 +184,7 @@ export class PasswordGenerator {
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label for="word-count" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Words:</label>
-                <input type="number" id="word-count" value="4" min="3" max="10" class="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <input type="number" id="word-count" value="4" min="3" max="10" class="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white">
               </div>
               <div>
                 <label for="word-separator" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Separator:</label>
@@ -172,11 +193,11 @@ export class PasswordGenerator {
             </div>
             <div class="space-y-2">
               <label class="flex items-center space-x-3">
-                <input type="checkbox" id="capitalize-words" checked class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <input type="checkbox" id="capitalize-words" checked class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2">
                 <span class="text-sm text-gray-700 dark:text-gray-300">Capitalize Words</span>
               </label>
               <label class="flex items-center space-x-3">
-                <input type="checkbox" id="include-number" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                <input type="checkbox" id="include-number" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2">
                 <span class="text-sm text-gray-700 dark:text-gray-300">Include Number</span>
               </label>
             </div>
@@ -204,6 +225,33 @@ export class PasswordGenerator {
           </div>
         </section>
 
+        <!-- Educational Content (Collapsible) -->
+        <div class="border-t border-gray-200 dark:border-gray-600 pt-6">
+          <button class="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white mb-4" data-toggle="password-educational-content">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform" id="password-educational-chevron">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            Learn about Password Security
+          </button>
+          <div id="password-educational-content" class="hidden bg-white dark:bg-gray-800 rounded-lg p-6">
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Password Security Best Practices</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div class="bg-white dark:bg-gray-900 p-4 rounded-lg">
+                <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">🔒 Strong Passwords</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Use at least 12 characters with a mix of uppercase, lowercase, numbers, and symbols for maximum security.</p>
+              </div>
+              <div class="bg-white dark:bg-gray-900 p-4 rounded-lg">
+                <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">🔑 Unique Passwords</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Never reuse passwords across accounts. Use a password manager to generate and store unique passwords.</p>
+              </div>
+              <div class="bg-white dark:bg-gray-900 p-4 rounded-lg">
+                <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-2">🛡️ Additional Security</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Enable two-factor authentication (2FA) whenever possible for an extra layer of protection.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="sr-only" aria-live="polite" id="announce"></div>
       </div>
     `;
@@ -215,7 +263,7 @@ export class PasswordGenerator {
   attachEventListeners() {
     const onDebouncedRegen = () => {
       clearTimeout(this._regenDebounce);
-      this._regenDebounce = setTimeout(() => this.generatePassword(), 80);
+      this._regenDebounce = setTimeout(() => this.generatePassword(), 150); // Increased debounce for better performance
     };
 
     // Main actions
@@ -262,6 +310,12 @@ export class PasswordGenerator {
 
     // Custom symbols
     this.container.querySelector('#custom-symbols').addEventListener('input', () => this.generatePassword());
+
+    // Advanced options toggle
+    this.container.querySelector('[data-toggle="advanced-options"]').addEventListener('click', () => this.toggleAdvancedOptions());
+    
+    // Educational content toggle
+    this.container.querySelector('[data-toggle="password-educational-content"]').addEventListener('click', () => this.togglePasswordEducationalContent());
 
     // Tool buttons
     this.container.querySelector('[data-action="generate-multiple"]').addEventListener('click', () => this.generateMultiple());
@@ -483,7 +537,7 @@ export class PasswordGenerator {
     }
 
     list.innerHTML = items.map((pwd, i) => `
-      <div class="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded" role="listitem">
+      <div class="flex items-center gap-2 p-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-600 rounded" role="listitem">
         <span class="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[2rem]">${i + 1}.</span>
         <input type="text" value="${pwd}" readonly class="flex-1 px-2 py-1 font-mono text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded" aria-label="Password ${i + 1}">
         <button class="px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700" data-copy="${pwd}" title="Copy password ${i + 1}">Copy</button>
@@ -533,7 +587,7 @@ export class PasswordGenerator {
     const output = this.container.querySelector('#passphrase-output');
     output.innerHTML = `
       <div class="flex gap-2">
-        <input type="text" value="${result}" readonly class="flex-1 px-3 py-2 font-mono bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg" aria-label="Generated passphrase">
+        <input type="text" value="${result}" readonly class="flex-1 px-3 py-2 font-mono bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg" aria-label="Generated passphrase">
         <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700" data-copy-passphrase="${result}" title="Copy passphrase">Copy</button>
       </div>
     `;
@@ -573,7 +627,7 @@ export class PasswordGenerator {
     const output = this.container.querySelector('#memorable-output');
     output.innerHTML = `
       <div class="flex gap-2">
-        <input type="text" value="${memorable}" readonly class="flex-1 px-3 py-2 font-mono bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg" aria-label="Memorable password">
+        <input type="text" value="${memorable}" readonly class="flex-1 px-3 py-2 font-mono bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg" aria-label="Memorable password">
         <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700" data-copy-memorable="${memorable}" title="Copy memorable">Copy</button>
       </div>
     `;
@@ -583,6 +637,50 @@ export class PasswordGenerator {
       e.target.textContent = '✓';
       setTimeout(() => e.target.textContent = 'Copy', 1400);
     });
+  }
+
+  toggleAdvancedOptions() {
+    const advancedPanel = this.container.querySelector('#advanced-options');
+    const advancedButtons = this.container.querySelector('#advanced-mode-buttons');
+    const toggleBtn = this.container.querySelector('[data-toggle="advanced-options"]');
+    
+    const isHidden = advancedPanel.classList.contains('hidden');
+    
+    if (isHidden) {
+      advancedPanel.classList.remove('hidden');
+      advancedButtons.classList.remove('hidden');
+      toggleBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1">
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+        Hide Advanced Options
+      `;
+    } else {
+      advancedPanel.classList.add('hidden');
+      advancedButtons.classList.add('hidden');
+      toggleBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1">
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        Advanced Options
+      `;
+    }
+  }
+
+  togglePasswordEducationalContent() {
+    const educationalContent = this.container.querySelector('#password-educational-content');
+    const chevron = this.container.querySelector('#password-educational-chevron');
+    
+    const isHidden = educationalContent.classList.contains('hidden');
+    
+    if (isHidden) {
+      educationalContent.classList.remove('hidden');
+      chevron.style.transform = 'rotate(90deg)';
+    } else {
+      educationalContent.classList.add('hidden');
+      chevron.style.transform = 'rotate(0deg)';
+    }
   }
 
   togglePassphraseMode() {
@@ -603,7 +701,7 @@ export class PasswordGenerator {
       if (isActive) {
         btn.className = 'px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700';
       } else {
-        btn.className = 'px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-600';
+        btn.className = 'px-3 py-1 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600';
       }
     });
   }

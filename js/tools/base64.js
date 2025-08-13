@@ -1,3 +1,6 @@
+import { feedback } from '../utils/feedback.js';
+import { formatBytes, sanitizeInput } from '../utils/common.js';
+
 export class Base64Tool {
   constructor() {
     this.container = null;
@@ -68,7 +71,7 @@ export class Base64Tool {
             <label for="base64-output" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Output</label>
             <textarea 
               id="base64-output" 
-              class="w-full h-64 p-4 font-mono text-sm bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg" 
+              class="w-full h-64 p-4 font-mono text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg" 
               placeholder="Result will appear here..."
               spellcheck="false"
               readonly
@@ -83,7 +86,7 @@ export class Base64Tool {
             <span class="text-gray-600 dark:text-gray-400" data-stat="ratio">Ratio: 0%</span>
           </div>
           <label class="flex items-center space-x-2 text-sm">
-            <input type="checkbox" id="url-safe" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+            <input type="checkbox" id="url-safe" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2" />
             <span class="text-gray-700 dark:text-gray-300">URL Safe (RFC 4648)</span>
           </label>
         </div>
@@ -155,13 +158,15 @@ export class Base64Tool {
   }
   
   process() {
-    const input = this.inputArea.value;
-    if (!input) {
+    const rawInput = this.inputArea.value;
+    if (!rawInput) {
       this.outputArea.value = '';
       this.clearError();
       return;
     }
     
+    // Sanitize input for security
+    const input = sanitizeInput(rawInput, { maxLength: 10000000 }); // 10MB limit
     const urlSafe = this.container.querySelector('#url-safe').checked;
     
     try {
@@ -178,6 +183,7 @@ export class Base64Tool {
       this.updateStats();
     } catch (error) {
       this.outputArea.value = '';
+      feedback.showToast(`Failed to ${this.mode}: ${error.message}`, 'error');
       this.showError(`Failed to ${this.mode}: ${error.message}`);
     }
   }
@@ -232,21 +238,11 @@ export class Base64Tool {
   copy() {
     const output = this.outputArea.value;
     if (!output) {
-      this.showError('Nothing to copy');
+      feedback.showToast('Nothing to copy', 'warning');
       return;
     }
     
-    navigator.clipboard.writeText(output).then(() => {
-      const btn = this.container.querySelector('[data-action="copy"]');
-      const originalText = btn.innerHTML;
-      btn.innerHTML = 'Copied!';
-      btn.classList.add('btn-success');
-      
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.classList.remove('btn-success');
-      }, 2000);
-    });
+    feedback.copyToClipboard(output, `${this.mode === 'encode' ? 'Encoded' : 'Decoded'} result copied`);
   }
   
   clear() {
@@ -260,8 +256,8 @@ export class Base64Tool {
     const inputBytes = new Blob([this.inputArea.value]).size;
     const outputBytes = new Blob([this.outputArea.value]).size;
     
-    this.container.querySelector('[data-stat="input-size"]').textContent = this.formatBytes(inputBytes);
-    this.container.querySelector('[data-stat="output-size"]').textContent = this.formatBytes(outputBytes);
+    this.container.querySelector('[data-stat="input-size"]').textContent = formatBytes(inputBytes);
+    this.container.querySelector('[data-stat="output-size"]').textContent = formatBytes(outputBytes);
     
     if (inputBytes > 0) {
       const ratio = Math.round((outputBytes / inputBytes) * 100);
@@ -269,14 +265,6 @@ export class Base64Tool {
     } else {
       this.container.querySelector('[data-stat="ratio"]').textContent = 'Ratio: 0%';
     }
-  }
-  
-  formatBytes(bytes) {
-    if (bytes === 0) return '0 bytes';
-    const k = 1024;
-    const sizes = ['bytes', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   }
   
   showError(message) {
