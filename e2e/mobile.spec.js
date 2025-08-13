@@ -98,12 +98,14 @@ test.describe('Mobile Responsiveness', () => {
     const width = await searchContainer.evaluate(el => el.offsetWidth);
     expect(width).toBeLessThan(400);
     
-    // Search should still function
+    // Search should auto-navigate for exact matches
     await searchInput.fill('json');
     
-    // Wait for search results to appear (more reliable than fixed timeout)
-    const searchResults = page.locator('#search-results');
-    await expect(searchResults).toBeVisible({ timeout: 10000 }); // Wait up to 10s
+    // Should auto-navigate to JSON Formatter (smart search behavior)
+    await expect(page).toHaveURL(/#json-formatter/, { timeout: 5000 });
+    
+    // Search input should be cleared after navigation
+    await expect(searchInput).toHaveValue('');
   });
 
   test('touch targets are adequate size', async ({ page }) => {

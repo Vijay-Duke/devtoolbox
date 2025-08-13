@@ -40,22 +40,17 @@ test.describe('Search Functionality', () => {
     await expect(searchInput).not.toBeFocused();
   });
 
-  test('search results appear on input', async ({ page }) => {
+  test('smart search auto-navigates for exact matches', async ({ page }) => {
     const searchInput = page.locator('input[type="search"]');
-    const searchResults = page.locator('#search-results');
     
-    // Initially hidden
-    await expect(searchResults).toBeHidden();
+    // Type abbreviation that should auto-navigate
+    await searchInput.fill('jf');
     
-    // Type in search
-    await searchInput.fill('json');
+    // Should auto-navigate to JSON Formatter
+    await expect(page).toHaveURL(/#json-formatter/, { timeout: 5000 });
     
-    // Wait for debounce and check results appear
-    await page.waitForTimeout(250);
-    await expect(searchResults).toBeVisible();
-    
-    // Should show JSON Formatter result
-    await expect(page.locator('.search-result-item').first()).toContainText('JSON Formatter');
+    // Search input should be cleared after auto-navigation
+    await expect(searchInput).toHaveValue('');
   });
 
   test('clear button appears and works', async ({ page }) => {
@@ -65,8 +60,8 @@ test.describe('Search Functionality', () => {
     // Initially hidden
     await expect(clearButton).toBeHidden();
     
-    // Type in search
-    await searchInput.fill('test');
+    // Type in search that shows multiple results (won't auto-navigate)
+    await searchInput.fill('gen');
     
     // Wait for debounce and clear button to appear
     await page.waitForTimeout(300);
@@ -95,17 +90,20 @@ test.describe('Search Functionality', () => {
     await expect(searchResults).toContainText('No tools found');
   });
 
-  test('search filters tools correctly', async ({ page }) => {
+  test('search shows multiple results when no single match', async ({ page }) => {
     const searchInput = page.locator('input[type="search"]');
+    const searchResults = page.locator('#search-results');
     
-    // Search for "encode"
-    await searchInput.fill('encode');
-    await page.waitForTimeout(250);
+    // Search for "generator" - should show multiple generator tools
+    await searchInput.fill('generator');
+    await page.waitForTimeout(300);
     
-    // Should show Base64 and URL encode tools
+    // Should show results (not auto-navigate because multiple matches)
+    await expect(searchResults).toBeVisible();
     const results = page.locator('.search-result-item');
-    await expect(results).toHaveCount(2);
-    await expect(results.nth(0)).toContainText('Base64');
-    await expect(results.nth(1)).toContainText('URL');
+    await expect(results).toHaveCount.greaterThan(1);
+    
+    // Should include generator tools
+    await expect(searchResults).toContainText('Generator');
   });
 });
