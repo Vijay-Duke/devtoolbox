@@ -44,16 +44,19 @@ jobs:
     - name: Install Playwright browsers
       run: npx playwright install --with-deps chromium
     
-    - name: Start dev server
+    - name: Start HTTP server in background
       run: |
+        echo "Starting server..."
         npm run dev &
-        sleep 5
-        curl -I http://localhost:8081 || exit 1
+        SERVER_PID=$!
+        echo "Server PID: $SERVER_PID"
+        sleep 10
+        echo "Testing server connection..."
+        curl -f http://localhost:8081 || (echo "Server failed to start" && exit 1)
+        echo "Server is running!"
     
-    - name: Run Playwright tests
-      run: npx playwright test --project=chromium --reporter=list
-      env:
-        CI: true
+    - name: Run Playwright tests  
+      run: npx playwright test --project=chromium --reporter=list --timeout=30000
     
     - uses: actions/upload-artifact@v3
       if: always()
