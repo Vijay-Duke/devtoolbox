@@ -21,7 +21,7 @@ export class TempEmailTool extends ToolTemplate {
         sender: '',
         showOTPOnly: false
       },
-      serverUrl: 'http://localhost:3001'
+      serverUrl: 'http://localhost:54322'
     };
     
     this.eventSource = null;
@@ -314,9 +314,23 @@ export class TempEmailTool extends ToolTemplate {
     this.eventSource.onerror = (error) => {
       console.error('SSE error:', error);
       this.isConnected = false;
+      
+      // Check if this is a 404 error (inbox not found)
+      if (this.eventSource.readyState === EventSource.CLOSED) {
+        // Likely a 404 or server restart - clear the old inbox
+        console.log('Inbox not found (likely server restart). Clearing old state.');
+        this.state.currentInbox = null;
+        this.state.emails = [];
+        this.hideInboxInfo();
+        this.updateConnectionStatus('Inbox Expired', 'bg-yellow-500');
+        this.showNotification('Inbox expired or server restarted. Please generate a new inbox.', 'error');
+        this.saveState();
+        return;
+      }
+      
       this.updateConnectionStatus('Connection Error', 'bg-red-500');
       
-      // Attempt to reconnect after a delay
+      // Attempt to reconnect after a delay for other errors
       setTimeout(() => {
         if (this.state.currentInbox && !this.isConnected) {
           console.log('Attempting to reconnect...');
@@ -505,6 +519,20 @@ export class TempEmailTool extends ToolTemplate {
     emailElement.textContent = this.state.currentInbox.email;
   }
 
+  hideInboxInfo() {
+    const inboxSection = this.container.querySelector('#current-inbox');
+    const filtersSection = this.container.querySelector('#filters-section');
+    const emailsContainer = this.container.querySelector('#emails-container');
+    
+    inboxSection.classList.add('hidden');
+    filtersSection.classList.add('hidden');
+    emailsContainer.classList.add('hidden');
+    
+    // Disable buttons
+    this.container.querySelector('#simulate-email-btn').disabled = true;
+    this.container.querySelector('#clear-emails-btn').disabled = true;
+  }
+
   enableButtons() {
     this.container.querySelector('#simulate-email-btn').disabled = false;
     this.container.querySelector('#clear-emails-btn').disabled = false;
@@ -526,18 +554,40 @@ export class TempEmailTool extends ToolTemplate {
     this.container.querySelector('#server-error').classList.add('hidden');
   }
 
-  applyState() {
+  async applyState() {
     if (this.state.currentInbox) {
-      this.showInboxInfo();
-      this.connectToSSE();
-      this.enableButtons();
-      this.renderEmails();
-      
-      // Restore filter values
-      this.container.querySelector('#search-filter').value = this.state.filters.search || '';
-      this.container.querySelector('#sender-filter').value = this.state.filters.sender || '';
-      this.container.querySelector('#regex-filter').value = this.state.filters.regex || '';
-      this.container.querySelector('#otp-only-filter').checked = this.state.filters.showOTPOnly || false;
+      // Validate that the inbox still exists on the server
+      try {
+        const response = await fetch(`${this.state.serverUrl}/api/emails/${this.state.currentInbox.id}`);
+        
+        if (response.ok) {
+          // Inbox still exists, restore the full state
+          this.showInboxInfo();
+          this.connectToSSE();
+          this.enableButtons();
+          this.renderEmails();
+          
+          // Restore filter values
+          this.container.querySelector('#search-filter').value = this.state.filters.search || '';
+          this.container.querySelector('#sender-filter').value = this.state.filters.sender || '';
+          this.container.querySelector('#regex-filter').value = this.state.filters.regex || '';
+          this.container.querySelector('#otp-only-filter').checked = this.state.filters.showOTPOnly || false;
+          
+          this.hideServerError();
+        } else {
+          // Inbox no longer exists (404), clear the state
+          console.log('Saved inbox no longer exists, clearing state');
+          this.state.currentInbox = null;
+          this.state.emails = [];
+          this.hideInboxInfo();
+          this.showNotification('Previous inbox expired. Please generate a new one.', 'error');
+          this.saveState();
+        }
+      } catch (error) {
+        console.error('Error validating saved inbox:', error);
+        // Server might be down, show error but keep the saved state
+        this.showServerError();
+      }
     }
   }
 
