@@ -41,22 +41,24 @@ const sidebar = document.querySelector('#sidebar');
 const sidebarOverlay = document.querySelector('[data-sidebar-overlay]');
 
 menuToggle?.addEventListener('click', () => {
-  const isOpen = sidebar.classList.contains('active');
+  const isOpen = !sidebar.classList.contains('-translate-x-full');
   
   if (isOpen) {
-    sidebar.classList.remove('active');
-    sidebarOverlay.classList.remove('active');
+    // Close sidebar
+    sidebar.classList.add('-translate-x-full');
+    sidebarOverlay.classList.add('hidden');
     menuToggle.setAttribute('aria-expanded', 'false');
   } else {
-    sidebar.classList.add('active');
-    sidebarOverlay.classList.add('active');
+    // Open sidebar
+    sidebar.classList.remove('-translate-x-full');
+    sidebarOverlay.classList.remove('hidden');
     menuToggle.setAttribute('aria-expanded', 'true');
   }
 });
 
 sidebarOverlay?.addEventListener('click', () => {
-  sidebar.classList.remove('active');
-  sidebarOverlay.classList.remove('active');
+  sidebar.classList.add('-translate-x-full');
+  sidebarOverlay.classList.add('hidden');
   menuToggle.setAttribute('aria-expanded', 'false');
 });
 
@@ -272,8 +274,8 @@ navLinks.forEach(link => {
     
     // Close mobile menu after selection
     if (window.innerWidth <= 768) {
-      sidebar.classList.remove('active');
-      sidebarOverlay.classList.remove('active');
+      sidebar.classList.add('-translate-x-full');
+      sidebarOverlay.classList.add('hidden');
       menuToggle.setAttribute('aria-expanded', 'false');
     }
   });
