@@ -46,6 +46,7 @@ export class Router {
       { path: 'ascii-art', name: 'ASCII Art Generator', module: './tools/ascii-art.js', className: 'ASCIIArtGenerator' },
       { path: 'image-converter', name: 'Image Converter', module: './tools/image-converter.js', className: 'ImageConverter' },
       { path: 'webhook-tester', name: 'Webhook Tester', module: './tools/webhook-tester.js', className: 'WebhookTester' },
+      { path: 'temp-email', name: 'Temporary Email', module: './tools/temp-email.js', className: 'TempEmailTool' },
       // Networking & Cloud Tools
       { path: 'ip-lookup', name: 'IP Address Lookup', module: './tools/ip-lookup.js', className: 'IPLookup' },
       { path: 'cidr-calculator', name: 'CIDR Calculator', module: './tools/cidr-calculator.js', className: 'CIDRCalculator' },

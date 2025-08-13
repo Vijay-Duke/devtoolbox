@@ -101,6 +101,7 @@ const tools = [
   { name: 'ASCII Art Generator', href: '#ascii-art', category: 'Generators', keywords: ['ascii', 'art', 'text', 'banner', 'figlet', 'generator'] },
   { name: 'Image Converter', href: '#image-converter', category: 'Converters', keywords: ['image', 'convert', 'resize', 'compress', 'jpeg', 'png', 'webp', 'format'] },
   { name: 'Webhook Tester', href: '#webhook-tester', category: 'Developer Tools', keywords: ['webhook', 'test', 'debug', 'http', 'request', 'endpoint', 'api'] },
+  { name: 'Temporary Email', href: '#temp-email', category: 'Developer Tools', keywords: ['email', 'temp', 'otp', 'disposable', 'inbox', 'testing', 'throwaway'] },
   // Networking & Cloud Tools
   { name: 'IP Address Lookup', href: '#ip-lookup', category: 'Networking & Cloud', keywords: ['ip', 'address', 'lookup', 'geolocation', 'geo', 'isp', 'location', 'ipv4', 'ipv6'] },
   { name: 'CIDR Calculator', href: '#cidr-calculator', category: 'Networking & Cloud', keywords: ['cidr', 'subnet', 'calculator', 'network', 'ip', 'mask', 'range', 'ipv4'] },
@@ -243,6 +244,10 @@ function findSmartMatch(query, toolsList) {
     'wh': 'Webhook Tester',
     'api': 'API Mock Generator',
     'mock': 'API Mock Generator',
+    'email': 'Temporary Email',
+    'temp': 'Temporary Email',
+    'otp': 'Temporary Email',
+    'inbox': 'Temporary Email',
     
     // Text & Data
     'md': 'Markdown Preview',
