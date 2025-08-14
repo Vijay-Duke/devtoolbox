@@ -1,27 +1,32 @@
-export class CurlGenerator {
+import { ToolTemplate } from './tool-template.js';
+
+export class CurlGenerator extends ToolTemplate {
   constructor() {
-    this.container = null;
+    super();
+    this.config = {
+      name: 'cURL Generator',
+      description: 'Build cURL commands visually with support for headers, authentication, and request bodies',
+      version: '1.0.0',
+      author: 'DevToolbox',
+      category: 'Developer Tools',
+      keywords: ['curl', 'http', 'api', 'request', 'command', 'header', 'auth']
+    };
+    
     this.method = 'GET';
     this.headers = [];
     this.queryParams = [];
     this.errorDisplay = null;
   }
   
-  init(containerId) {
-    this.container = document.getElementById(containerId);
-    if (!this.container) return;
-    
-    this.render();
-    this.attachEventListeners();
-  }
-  
   render() {
     this.container.innerHTML = `
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">cURL Command Generator</h1>
-          <p class="text-gray-600 dark:text-gray-400">Build cURL commands visually with support for headers, authentication, and request bodies</p>
+      <div class="tool-container">
+        <div class="tool-header">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">${this.config.name}</h1>
+          <p class="text-gray-600 dark:text-gray-400">${this.config.description}</p>
         </div>
+        
+        <div class="tool-body bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         
         <div class="mb-6 flex flex-wrap gap-2">
           <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="generate">
@@ -216,6 +221,7 @@ export class CurlGenerator {
             </button>
           </div>
         </div>
+      </div>
       </div>
     `;
     
@@ -691,23 +697,7 @@ export class CurlGenerator {
       return;
     }
     
-    navigator.clipboard.writeText(command).then(() => {
-      const btn = this.container.querySelector('[data-action="copy"]');
-      const originalHTML = btn.innerHTML;
-      const originalClasses = btn.className;
-      btn.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
-        Copied!
-      `;
-      btn.className = 'px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center gap-2';
-      
-      setTimeout(() => {
-        btn.innerHTML = originalHTML;
-        btn.className = originalClasses;
-      }, 2000);
-    });
+    this.copyToClipboard(command);
   }
   
   clear() {
@@ -754,12 +744,10 @@ export class CurlGenerator {
   }
   
   showError(message) {
-    this.errorDisplay.textContent = message;
-    this.errorDisplay.hidden = false;
+    this.showNotification(message, 'error');
   }
   
   clearError() {
-    this.errorDisplay.textContent = '';
-    this.errorDisplay.hidden = true;
+    // ToolTemplate handles notification cleanup automatically
   }
 }

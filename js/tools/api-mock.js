@@ -1,6 +1,17 @@
-export class APIMockGenerator {
+import { ToolTemplate } from './tool-template.js';
+
+export class APIMockGenerator extends ToolTemplate {
   constructor() {
-    this.container = null;
+    super();
+    this.config = {
+      name: 'API Mock Generator',
+      description: 'Create mock API endpoints with custom responses, status codes, and headers for testing',
+      version: '1.0.0',
+      author: 'DevToolbox',
+      category: 'Developer Tools',
+      keywords: ['api', 'mock', 'testing', 'endpoints', 'json', 'server', 'response']
+    };
+    
     this.mockData = {
       endpoints: [],
       globalHeaders: {},
@@ -9,22 +20,15 @@ export class APIMockGenerator {
     this.activeEndpointIndex = -1;
   }
   
-  init(containerId) {
-    this.container = document.getElementById(containerId);
-    if (!this.container) return;
-    
-    this.render();
-    this.attachEventListeners();
-    this.loadExampleAPI();
-  }
-  
   render() {
     this.container.innerHTML = `
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">API Mock Generator</h1>
-          <p class="text-gray-600 dark:text-gray-400">Create mock API endpoints with custom responses, status codes, and headers for testing</p>
+      <div class="tool-container">
+        <div class="tool-header">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">${this.config.name}</h1>
+          <p class="text-gray-600 dark:text-gray-400">${this.config.description}</p>
         </div>
+        
+        <div class="tool-body bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         
         <div class="mb-6 flex flex-wrap gap-2">
           <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="add-endpoint">
@@ -120,11 +124,14 @@ export class APIMockGenerator {
         </div>
         
         <input type="file" id="import-file" accept=".json" style="display: none;" />
+        </div>
+      </div>
       </div>
     `;
   }
   
   attachEventListeners() {
+    this.loadExampleAPI();
     // Add endpoint
     this.container.querySelector('[data-action="add-endpoint"]').addEventListener('click', () => {
       this.addEndpoint();

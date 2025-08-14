@@ -1,27 +1,31 @@
-export class GraphQLTester {
+import { ToolTemplate } from './tool-template.js';
+
+export class GraphQLTester extends ToolTemplate {
   constructor() {
-    this.container = null;
+    super();
+    this.config = {
+      name: 'GraphQL Tester',
+      description: 'Test GraphQL queries and mutations with variables, headers, and introspection',
+      version: '1.0.0',
+      author: 'DevToolbox',
+      category: 'Developer Tools',
+      keywords: ['graphql', 'query', 'mutation', 'api', 'testing', 'variables', 'introspection']
+    };
+    
     this.queryHistory = [];
     this.variables = {};
     this.headers = {};
   }
   
-  init(containerId) {
-    this.container = document.getElementById(containerId);
-    if (!this.container) return;
-    
-    this.render();
-    this.attachEventListeners();
-    this.loadExampleQuery();
-  }
-  
   render() {
     this.container.innerHTML = `
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">GraphQL Tester</h1>
-          <p class="text-gray-600 dark:text-gray-400">Test GraphQL queries and mutations with variables, headers, and introspection</p>
+      <div class="tool-container">
+        <div class="tool-header">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">${this.config.name}</h1>
+          <p class="text-gray-600 dark:text-gray-400">${this.config.description}</p>
         </div>
+        
+        <div class="tool-body bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         
         <div class="mb-6 flex flex-wrap gap-2">
           <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2" data-action="execute">
@@ -149,11 +153,15 @@ query {
             <button class="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600" data-example="mutation">Mutation Example</button>
           </div>
         </div>
+        </div>
+      </div>
       </div>
     `;
   }
   
   attachEventListeners() {
+    this.loadExampleQuery();
+    
     // Execute query
     this.container.querySelector('[data-action="execute"]').addEventListener('click', () => {
       this.executeQuery();
