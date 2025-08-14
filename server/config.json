@@ -13,7 +13,9 @@
   "broadcasting": {
     "maxRecipientsPerInbox": 20,
     "writeSchedulingBatchSize": 100,
-    "enableWriteScheduling": true
+    "enableWriteScheduling": true,
+    "enableBackpressure": true,
+    "dropFailedClients": true
   },
   "timeouts": {
     "pingIntervalMs": 30000,
@@ -21,10 +23,17 @@
     "globalCleanupIntervalMs": 120000,
     "connectionTimeoutMs": 120000
   },
+  "ttl": {
+    "inboxTtlHours": 2,
+    "subscriberTtlHours": 2,
+    "cleanupIntervalMinutes": 5,
+    "enableAutoExpiry": true
+  },
   "sse": {
     "retryMs": 3000,
     "enableEventIds": true,
-    "ringBufferSize": 100
+    "ringBufferSize": 50,
+    "emailSummaryFields": ["id", "from", "subject", "timestamp", "otpCodes"]
   },
   "inbox": {
     "maxAgeHours": 2,

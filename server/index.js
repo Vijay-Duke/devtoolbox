@@ -18,25 +18,54 @@ const inboxSubs = new Map() // Map<inboxId, Map<connectionId, stream>>
 const connMeta = new Map()  // Map<connectionId, inboxId>
 const connHeartbeats = new Map() // Map<connectionId, lastHeartbeat>
 
+// TTL tracking for automatic expiry
+const inboxTtl = new Map()    // Map<inboxId, createdTimestamp>
+const subscriberTtl = new Map() // Map<connectionId, createdTimestamp>
+
 // Event tracking for message replay
 const eventCounters = new Map() // Map<inboxId, currentEventId>
 const ringBuffers = new Map()   // Map<inboxId, CircularBuffer>
 
-// Circular buffer for message replay
+// Circular buffer for message replay with email summaries
 class CircularBuffer {
-  constructor(size) {
+  constructor(size, summaryFields = []) {
     this.size = size
     this.buffer = new Array(size)
     this.head = 0
     this.count = 0
+    this.summaryFields = summaryFields
   }
   
   add(item) {
-    this.buffer[this.head] = item
+    // Store only summary fields to reduce memory usage
+    const summary = this.createSummary(item)
+    this.buffer[this.head] = summary
     this.head = (this.head + 1) % this.size
     if (this.count < this.size) {
       this.count++
     }
+  }
+  
+  createSummary(item) {
+    if (!this.summaryFields.length || !item.data) {
+      return item // Store full item if no summary fields configured
+    }
+    
+    const summary = {
+      id: item.id,
+      type: item.type,
+      timestamp: item.timestamp,
+      data: {}
+    }
+    
+    // Extract only configured summary fields from email data
+    for (const field of this.summaryFields) {
+      if (item.data.hasOwnProperty(field)) {
+        summary.data[field] = item.data[field]
+      }
+    }
+    
+    return summary
   }
   
   getFromId(eventId) {
@@ -76,6 +105,8 @@ class CircularBuffer {
 
 // Helper functions for connection management
 function addConnection(connectionId, inboxId, stream) {
+  const now = Date.now()
+  
   // Add to reverse lookup
   connMeta.set(connectionId, inboxId)
   
@@ -86,12 +117,23 @@ function addConnection(connectionId, inboxId, stream) {
   inboxSubs.get(inboxId).set(connectionId, stream)
   
   // Initialize heartbeat tracking
-  connHeartbeats.set(connectionId, Date.now())
+  connHeartbeats.set(connectionId, now)
+  
+  // Initialize TTL tracking for subscriber
+  subscriberTtl.set(connectionId, now)
   
   // Initialize event tracking for this inbox
   if (!eventCounters.has(inboxId)) {
     eventCounters.set(inboxId, 0)
-    ringBuffers.set(inboxId, new CircularBuffer(config.sse.ringBufferSize))
+    ringBuffers.set(inboxId, new CircularBuffer(
+      config.sse.ringBufferSize, 
+      config.sse.emailSummaryFields
+    ))
+    
+    // Initialize inbox TTL if not already set
+    if (!inboxTtl.has(inboxId)) {
+      inboxTtl.set(inboxId, now)
+    }
   }
   
   console.log(`Connection added: ${connectionId} for inbox ${inboxId}`)
@@ -107,14 +149,20 @@ function removeConnection(connectionId) {
   // Remove heartbeat tracking
   connHeartbeats.delete(connectionId)
   
+  // Remove TTL tracking for subscriber
+  subscriberTtl.delete(connectionId)
+  
   // Remove from inbox subscribers
   const subscribers = inboxSubs.get(inboxId)
   if (subscribers) {
     subscribers.delete(connectionId)
     
-    // Clean up empty inbox subscription maps
+    // Clean up empty inbox subscription maps and check if inbox should be cleaned
     if (subscribers.size === 0) {
       inboxSubs.delete(inboxId)
+      
+      // If no subscribers and TTL enabled, the inbox may be cleaned up by TTL cleanup
+      console.log(`No remaining subscribers for inbox ${inboxId}`)
     }
   }
   
@@ -165,16 +213,23 @@ async function broadcastEmail(inboxId, email) {
   const failedConnections = []
   let writeCount = 0
   
-  // Broadcast to subscribers with write scheduling for responsiveness
-  for (const [connectionId, stream] of cappedSubscribers) {
-    try {
-      await stream.writeSSE({
+  // Broadcast with backpressure management
+  if (config.broadcasting.enableBackpressure) {
+    // Non-blocking writes: fire and catch errors, then prune failed clients
+    const writePromises = []
+    
+    for (const [connectionId, stream] of cappedSubscribers) {
+      const writePromise = stream.writeSSE({
         id: config.sse.enableEventIds ? eventId.toString() : undefined,
         data: serializedEmail,
         event: 'email',
         retry: config.sse.retryMs
+      }).catch(error => {
+        console.log(`Failed to send email to connection ${connectionId}, marking for removal:`, error.message)
+        return { failed: true, connectionId }
       })
       
+      writePromises.push(writePromise)
       writeCount++
       
       // Write scheduling: batch microtasks after configured batch size to keep event loop responsive
@@ -182,16 +237,51 @@ async function broadcastEmail(inboxId, email) {
           writeCount % config.broadcasting.writeSchedulingBatchSize === 0) {
         await new Promise(resolve => queueMicrotask(resolve))
       }
-      
-    } catch (error) {
-      console.log(`Failed to send email to connection ${connectionId}, marking for removal:`, error.message)
-      failedConnections.push(connectionId)
+    }
+    
+    // Wait for all writes to complete and collect failed connections
+    const results = await Promise.allSettled(writePromises)
+    
+    for (const result of results) {
+      if (result.status === 'fulfilled' && result.value?.failed) {
+        failedConnections.push(result.value.connectionId)
+      } else if (result.status === 'rejected') {
+        console.log('Write promise rejected:', result.reason)
+      }
+    }
+    
+  } else {
+    // Sequential writes (legacy behavior)
+    for (const [connectionId, stream] of cappedSubscribers) {
+      try {
+        await stream.writeSSE({
+          id: config.sse.enableEventIds ? eventId.toString() : undefined,
+          data: serializedEmail,
+          event: 'email',
+          retry: config.sse.retryMs
+        })
+        
+        writeCount++
+        
+        // Write scheduling: batch microtasks after configured batch size to keep event loop responsive
+        if (config.broadcasting.enableWriteScheduling && 
+            writeCount % config.broadcasting.writeSchedulingBatchSize === 0) {
+          await new Promise(resolve => queueMicrotask(resolve))
+        }
+        
+      } catch (error) {
+        console.log(`Failed to send email to connection ${connectionId}, marking for removal:`, error.message)
+        failedConnections.push(connectionId)
+      }
     }
   }
   
-  // Clean up failed connections
-  for (const connectionId of failedConnections) {
-    removeConnection(connectionId)
+  // Clean up failed connections if configured to drop them
+  if (config.broadcasting.dropFailedClients && failedConnections.length > 0) {
+    console.log(`Dropping ${failedConnections.length} failed clients due to backpressure`)
+    for (const connectionId of failedConnections) {
+      removeConnection(connectionId)
+    }
   }
 }
 
@@ -273,20 +363,25 @@ function generateMockEmail(toAddress) {
 app.get('/api/inbox/generate', (c) => {
   const email = generateRandomEmail()
   const inboxId = uuidv4()
+  const now = Date.now()
+  const isoString = new Date(now).toISOString()
   
   inboxes.set(inboxId, {
     id: inboxId,
     email,
     emails: [],
-    createdAt: new Date().toISOString()
+    createdAt: isoString
   })
+  
+  // Set TTL for inbox
+  inboxTtl.set(inboxId, now)
   
   return c.json({
     success: true,
     data: {
       id: inboxId,
       email,
-      createdAt: new Date().toISOString()
+      createdAt: isoString
     }
   })
 })
@@ -523,7 +618,11 @@ app.delete('/api/inbox/:inboxId', (c) => {
     }
   }
   
+  // Clean up all tracking for this inbox
   inboxes.delete(inboxId)
+  inboxTtl.delete(inboxId)
+  eventCounters.delete(inboxId)
+  ringBuffers.delete(inboxId)
   
   return c.json({
     success: true,
@@ -539,37 +638,78 @@ app.get('/health', (c) => {
     stats: {
       activeInboxes: inboxes.size,
       activeConnections: connMeta.size,
-      activeInboxSubscriptions: inboxSubs.size
+      activeInboxSubscriptions: inboxSubs.size,
+      inboxTtlTracking: inboxTtl.size,
+      subscriberTtlTracking: subscriberTtl.size,
+      eventCounters: eventCounters.size,
+      ringBuffers: ringBuffers.size
+    },
+    config: {
+      ttlEnabled: config.ttl.enableAutoExpiry,
+      backpressureEnabled: config.broadcasting.enableBackpressure,
+      inboxTtlHours: config.ttl.inboxTtlHours,
+      subscriberTtlHours: config.ttl.subscriberTtlHours,
+      ringBufferSize: config.sse.ringBufferSize,
+      maxRecipientsPerInbox: config.broadcasting.maxRecipientsPerInbox
     }
   })
 })
 
-// Cleanup old inboxes
+// TTL cleanup for inboxes and subscribers
 setInterval(() => {
-  const now = new Date()
-  const maxAge = config.inbox.maxAgeHours * 60 * 60 * 1000
+  if (!config.ttl.enableAutoExpiry) return
   
-  for (const [inboxId, inbox] of inboxes.entries()) {
-    const createdAt = new Date(inbox.createdAt)
-    if (now - createdAt > maxAge) {
-      console.log(`Cleaning up old inbox: ${inbox.email}`)
-      
-      // Close connections using O(k) cleanup
-      const subscribers = inboxSubs.get(inboxId)
-      if (subscribers) {
-        for (const connectionId of subscribers.keys()) {
-          removeConnection(connectionId)
-        }
-      }
-      
-      // Clean up event tracking
-      eventCounters.delete(inboxId)
-      ringBuffers.delete(inboxId)
-      
-      inboxes.delete(inboxId)
+  const now = Date.now()
+  const inboxTtlMs = config.ttl.inboxTtlHours * 60 * 60 * 1000
+  const subscriberTtlMs = config.ttl.subscriberTtlHours * 60 * 60 * 1000
+  
+  // Clean up expired inboxes
+  const expiredInboxes = []
+  for (const [inboxId, createdTimestamp] of inboxTtl.entries()) {
+    if (now - createdTimestamp > inboxTtlMs) {
+      expiredInboxes.push(inboxId)
     }
   }
-}, config.inbox.cleanupIntervalMinutes * 60 * 1000)
+  
+  for (const inboxId of expiredInboxes) {
+    const inbox = inboxes.get(inboxId)
+    console.log(`TTL cleanup: inbox ${inbox?.email || inboxId} expired after ${config.ttl.inboxTtlHours}h`)
+    
+    // Close connections using O(k) cleanup
+    const subscribers = inboxSubs.get(inboxId)
+    if (subscribers) {
+      for (const connectionId of subscribers.keys()) {
+        removeConnection(connectionId)
+      }
+    }
+    
+    // Clean up all tracking for this inbox
+    inboxes.delete(inboxId)
+    inboxTtl.delete(inboxId)
+    eventCounters.delete(inboxId)
+    ringBuffers.delete(inboxId)
+  }
+  
+  // Clean up expired subscribers
+  const expiredSubscribers = []
+  for (const [connectionId, createdTimestamp] of subscriberTtl.entries()) {
+    if (now - createdTimestamp > subscriberTtlMs) {
+      expiredSubscribers.push(connectionId)
+    }
+  }
+  
+  if (expiredSubscribers.length > 0) {
+    console.log(`TTL cleanup: removing ${expiredSubscribers.length} expired subscribers after ${config.ttl.subscriberTtlHours}h`)
+    for (const connectionId of expiredSubscribers) {
+      removeConnection(connectionId)
+    }
+  }
+  
+  if (expiredInboxes.length > 0 || expiredSubscribers.length > 0) {
+    console.log(`TTL cleanup completed: ${expiredInboxes.length} inboxes, ${expiredSubscribers.length} subscribers removed`)
+  }
+  
+}, config.ttl.cleanupIntervalMinutes * 60 * 1000)
 
 // Global cleanup for dead connections
 setInterval(() => {
