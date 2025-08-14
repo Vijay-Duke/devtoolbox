@@ -5,7 +5,7 @@ export class TempEmailTool extends ToolTemplate {
     super();
     this.config = {
       name: 'Temporary Email',
-      description: 'Generate temporary email addresses and receive emails in real-time. Perfect for testing OTPs and email flows.',
+      description: 'Generate temporary @encode.click email addresses and receive emails in real-time. Perfect for testing OTPs and email flows.',
       version: '1.0.0',
       author: 'DevToolbox',
       category: 'Developer Tools',
@@ -20,7 +20,9 @@ export class TempEmailTool extends ToolTemplate {
         showOTPOnly: false,
         selectedInboxId: 'all' // Filter by specific inbox or 'all'
       },
-      serverUrl: 'http://localhost:54322'
+      serverUrl: window.location.hostname === 'localhost' 
+        ? 'http://localhost:54322' 
+        : 'https://api.encode.click'
     };
     
     this.eventSource = null;
@@ -60,13 +62,24 @@ export class TempEmailTool extends ToolTemplate {
         <div class="email-subscription-section mb-6">
           <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Enter Email Addresses (comma-separated):
+              Enter @encode.click Email Addresses (comma-separated):
             </label>
+            <div class="mb-3 p-3 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg">
+              <div class="flex items-start">
+                <svg class="w-4 h-4 text-blue-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                <div class="text-xs text-blue-700 dark:text-blue-300">
+                  <p><strong>How it works:</strong> Enter any @encode.click email addresses to monitor. Emails sent to these addresses will appear here in real-time.</p>
+                  <p class="mt-1"><strong>Example:</strong> Use test123@encode.click, alerts@encode.click, or any custom prefix you want.</p>
+                </div>
+              </div>
+            </div>
             <div class="flex gap-3 mb-3">
               <input 
                 type="text" 
                 id="emails-input"
-                placeholder="user@test.com, another@example.com, test@demo.org"
+                placeholder="user@encode.click, test@encode.click, inbox123@encode.click"
                 class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <button 
@@ -251,6 +264,21 @@ export class TempEmailTool extends ToolTemplate {
     searchFilter.addEventListener('input', updateFilters);
     inboxFilter.addEventListener('change', updateFilters);
     otpFilter.addEventListener('change', updateFilters);
+    
+    // HTML Email View Event Handlers
+    this.container.addEventListener('click', (e) => {
+      // View HTML button
+      if (e.target.classList.contains('view-html-btn')) {
+        const emailId = e.target.dataset.emailId;
+        this.showEmailHTML(emailId);
+      }
+      
+      // Show Text button
+      if (e.target.classList.contains('show-text-btn')) {
+        const emailId = e.target.dataset.emailId;
+        this.showEmailText(emailId);
+      }
+    });
   }
 
   setupButtonRemovalSystem() {
@@ -1031,14 +1059,17 @@ export class TempEmailTool extends ToolTemplate {
     const hasOTP = email.otpCodes && email.otpCodes.length > 0;
     const inboxEmail = this.getInboxEmailFromId(email.inboxId);
     const showInboxInfo = this.state.subscribedEmails && this.state.subscribedEmails.length > 1;
+    const hasHtml = email.hasHtml || (email.html && email.html.trim().length > 0);
+    const emailId = email.id;
     
     return `
-      <div class="email-card p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:shadow-md transition-shadow ${hasOTP ? 'border-green-300 dark:border-green-600' : ''}">
+      <div class="email-card p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:shadow-md transition-shadow ${hasOTP ? 'border-green-300 dark:border-green-600' : ''}" data-email-id="${emailId}">
         <div class="flex items-start justify-between mb-2">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-1">
               <h3 class="font-medium text-gray-900 dark:text-white truncate">${this.highlightSearchTerms(this.escapeHtml(email.subject))}</h3>
               ${hasOTP ? '<span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full font-medium">OTP</span>' : ''}
+              ${hasHtml ? '<span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full font-medium">HTML</span>' : ''}
               ${showInboxInfo && inboxEmail ? `<span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs rounded-full font-medium">${inboxEmail}</span>` : ''}
             </div>
             <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
@@ -1052,11 +1083,38 @@ export class TempEmailTool extends ToolTemplate {
               </p>
             </div>
           </div>
-          <div class="text-xs text-gray-500 dark:text-gray-400 ml-4">${timeAgo}</div>
+          <div class="flex flex-col items-end">
+            <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">${timeAgo}</div>
+            ${hasHtml ? `<button class="view-html-btn text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors" data-email-id="${emailId}">View HTML</button>` : ''}
+          </div>
         </div>
         
-        <div class="text-sm text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-wrap">${this.highlightSearchTerms(this.highlightOTPs(this.escapeHtml(email.body), email.otpCodes))}</div>
+        <!-- Text Content -->
+        <div class="email-text-content text-sm text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-wrap">${this.highlightSearchTerms(this.highlightOTPs(this.escapeHtml(email.text || email.body || 'No content'), email.otpCodes))}</div>
         
+        <!-- HTML Content (Initially Hidden) -->
+        ${hasHtml ? `
+          <div class="email-html-content hidden mb-3">
+            <div class="mb-2 p-2 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded text-xs text-yellow-800 dark:text-yellow-200">
+              <span class="font-medium">⚠️ Security Notice:</span> HTML content is displayed in a secure sandbox. External resources are blocked.
+            </div>
+            <div class="border border-gray-300 dark:border-gray-600 rounded overflow-hidden">
+              <iframe 
+                class="email-html-iframe w-full min-h-96 max-h-96"
+                data-email-id="${emailId}"
+                sandbox="allow-same-origin"
+                style="border: none; background: white;"
+                title="Email HTML Content"
+              ></iframe>
+            </div>
+            <div class="mt-2 flex justify-between text-xs">
+              <button class="show-text-btn text-blue-600 dark:text-blue-400 hover:underline" data-email-id="${emailId}">Show Text Version</button>
+              <span class="text-gray-500 dark:text-gray-400">Content is sandboxed for security</span>
+            </div>
+          </div>
+        ` : ''}
+        
+        <!-- OTP Codes -->
         ${hasOTP ? `
           <div class="flex flex-wrap gap-2">
             ${email.otpCodes.map(otp => `
@@ -1268,5 +1326,169 @@ export class TempEmailTool extends ToolTemplate {
       window.removeEventListener('hashchange', this.hashChangeListener);
       this.hashChangeListener = null;
     }
+  }
+
+  // Secure HTML Email Display Methods
+  
+  showEmailHTML(emailId) {
+    const emailCard = this.container.querySelector(`[data-email-id="${emailId}"]`);
+    if (!emailCard) return;
+    
+    const textContent = emailCard.querySelector('.email-text-content');
+    const htmlContent = emailCard.querySelector('.email-html-content');
+    const iframe = emailCard.querySelector('.email-html-iframe');
+    
+    if (!textContent || !htmlContent || !iframe) return;
+    
+    // Hide text, show HTML
+    textContent.classList.add('hidden');
+    htmlContent.classList.remove('hidden');
+    
+    // Find email data
+    const email = this.state.emails.find(e => e.id === emailId);
+    if (!email || !email.html) return;
+    
+    // Create secure HTML document for iframe
+    const secureHTML = this.createSecureHTMLDocument(email.html);
+    
+    // Load HTML into sandboxed iframe
+    iframe.onload = () => {
+      console.log(`HTML email loaded securely for ${emailId}`);
+    };
+    
+    iframe.onerror = () => {
+      console.error(`Failed to load HTML email for ${emailId}`);
+      iframe.srcdoc = '<p style="padding: 20px; color: #ef4444;">Error loading email content</p>';
+    };
+    
+    // Use srcdoc for secure content loading
+    iframe.srcdoc = secureHTML;
+  }
+  
+  showEmailText(emailId) {
+    const emailCard = this.container.querySelector(`[data-email-id="${emailId}"]`);
+    if (!emailCard) return;
+    
+    const textContent = emailCard.querySelector('.email-text-content');
+    const htmlContent = emailCard.querySelector('.email-html-content');
+    
+    if (!textContent || !htmlContent) return;
+    
+    // Show text, hide HTML
+    textContent.classList.remove('hidden');
+    htmlContent.classList.add('hidden');
+  }
+  
+  createSecureHTMLDocument(emailHTML) {
+    // Create a complete HTML document with security headers and CSP
+    const secureDoc = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta http-equiv="Content-Security-Policy" content="
+          default-src 'none';
+          img-src data: https:;
+          style-src 'unsafe-inline';
+          font-src data: https:;
+          script-src 'none';
+          object-src 'none';
+          media-src 'none';
+          frame-src 'none';
+          form-action 'none';
+          base-uri 'none';
+        ">
+        <title>Email Content</title>
+        <style>
+          body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 100%;
+            margin: 0;
+            padding: 16px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+          }
+          
+          /* Reset potentially dangerous styles */
+          * {
+            max-width: 100% !important;
+            position: static !important;
+          }
+          
+          /* Safe image handling */
+          img {
+            max-width: 100% !important;
+            height: auto !important;
+            display: inline-block !important;
+          }
+          
+          /* Block dangerous elements that might have slipped through sanitization */
+          script, iframe, object, embed, form, input, button, select, textarea {
+            display: none !important;
+          }
+          
+          /* Safe link styling */
+          a {
+            color: #3b82f6;
+            text-decoration: underline;
+            pointer-events: none; /* Disable clicking for security */
+          }
+          
+          /* Safe table styling */
+          table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 100%;
+          }
+          
+          td, th {
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            word-break: break-word;
+          }
+          
+          /* Prevent layout breaking */
+          div, span, p {
+            max-width: 100% !important;
+          }
+        </style>
+      </head>
+      <body>
+        ${emailHTML}
+        
+        <script>
+          // Block any JavaScript execution attempts
+          window.eval = function() { return null; };
+          window.Function = function() { return function() {}; };
+          
+          // Remove any remaining script tags or dangerous attributes
+          document.querySelectorAll('script, iframe, object, embed').forEach(el => el.remove());
+          document.querySelectorAll('*').forEach(el => {
+            // Remove dangerous attributes
+            ['onclick', 'onload', 'onerror', 'onmouseover', 'onfocus'].forEach(attr => {
+              if (el.hasAttribute(attr)) {
+                el.removeAttribute(attr);
+              }
+            });
+            
+            // Remove javascript: and data: protocols from href and src
+            ['href', 'src'].forEach(attr => {
+              if (el.hasAttribute(attr)) {
+                const value = el.getAttribute(attr);
+                if (value && (value.startsWith('javascript:') || value.startsWith('data:') || value.startsWith('vbscript:'))) {
+                  el.setAttribute(attr, '#blocked-for-security');
+                }
+              }
+            });
+          });
+        </script>
+      </body>
+      </html>
+    `;
+    
+    return secureDoc;
   }
 }

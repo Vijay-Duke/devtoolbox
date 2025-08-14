@@ -136,19 +136,19 @@ export class CurlGenerator extends ToolTemplate {
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Request Body</h3>
               <div class="flex flex-wrap gap-4 mb-4">
                 <label class="flex items-center">
-                  <input type="radio" name="body-type" value="none" checked class="mr-2 text-blue-600 focus:ring-blue-500" />
+                  <input type="radio" name="body-type" value="none" checked class="mr-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500" />
                   <span class="text-sm text-gray-700 dark:text-gray-300">None</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="radio" name="body-type" value="json" class="mr-2 text-blue-600 focus:ring-blue-500" />
+                  <input type="radio" name="body-type" value="json" class="mr-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500" />
                   <span class="text-sm text-gray-700 dark:text-gray-300">JSON</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="radio" name="body-type" value="form" class="mr-2 text-blue-600 focus:ring-blue-500" />
+                  <input type="radio" name="body-type" value="form" class="mr-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500" />
                   <span class="text-sm text-gray-700 dark:text-gray-300">Form Data</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="radio" name="body-type" value="raw" class="mr-2 text-blue-600 focus:ring-blue-500" />
+                  <input type="radio" name="body-type" value="raw" class="mr-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500" />
                   <span class="text-sm text-gray-700 dark:text-gray-300">Raw</span>
                 </label>
               </div>
@@ -159,27 +159,27 @@ export class CurlGenerator extends ToolTemplate {
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Options</h3>
               <div class="grid grid-cols-2 gap-3 mb-4">
                 <label class="flex items-center">
-                  <input type="checkbox" id="opt-verbose" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <input type="checkbox" id="opt-verbose" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
                   <span class="text-sm text-gray-700 dark:text-gray-300">Verbose (-v)</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="checkbox" id="opt-follow" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <input type="checkbox" id="opt-follow" checked class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
                   <span class="text-sm text-gray-700 dark:text-gray-300">Follow redirects (-L)</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="checkbox" id="opt-insecure" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <input type="checkbox" id="opt-insecure" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
                   <span class="text-sm text-gray-700 dark:text-gray-300">Allow insecure (-k)</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="checkbox" id="opt-include" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <input type="checkbox" id="opt-include" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
                   <span class="text-sm text-gray-700 dark:text-gray-300">Include headers (-i)</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="checkbox" id="opt-silent" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <input type="checkbox" id="opt-silent" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
                   <span class="text-sm text-gray-700 dark:text-gray-300">Silent mode (-s)</span>
                 </label>
                 <label class="flex items-center">
-                  <input type="checkbox" id="opt-compressed" checked class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
+                  <input type="checkbox" id="opt-compressed" checked class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 mr-2" />
                   <span class="text-sm text-gray-700 dark:text-gray-300">Compressed</span>
                 </label>
               </div>
@@ -720,7 +720,7 @@ export class CurlGenerator extends ToolTemplate {
           </svg>
         </button>
       </div>
-    `;}
+    `;
     
     // Clear params
     this.container.querySelector('#params-list').innerHTML = '';

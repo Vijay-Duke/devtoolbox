@@ -26,6 +26,17 @@ yarn-error.log*
 logs/
 *.log
 
+# Production configuration files
+ecosystem.config.js
+ecosystem.config.cjs
+server/.env.production
+server/ecosystem.config.js
+server/ecosystem.config.cjs
+server/deploy.sh
+server/config.production.json
+config.production.json
+deploy.log
+
 # Cache
 .cache/
 .parcel-cache/

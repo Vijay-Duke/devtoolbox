@@ -528,6 +528,9 @@ query {
     const queryEditor = this.container.querySelector('#query-editor');
     const lineNumbers = this.container.querySelector('#line-numbers');
     
+    // Skip if elements don't exist (simplified editor)
+    if (!lineNumbers || !queryEditor) return;
+    
     const lines = queryEditor.value.split('\n').length;
     const numbers = Array.from({ length: lines }, (_, i) => i + 1).join('\n');
     
@@ -537,6 +540,10 @@ query {
   syncLineNumberScroll() {
     const queryEditor = this.container.querySelector('#query-editor');
     const lineNumbers = this.container.querySelector('#line-numbers');
+    
+    // Skip if elements don't exist (simplified editor)
+    if (!lineNumbers || !queryEditor) return;
+    
     lineNumbers.scrollTop = queryEditor.scrollTop;
   }
   

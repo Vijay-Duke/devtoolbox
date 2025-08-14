@@ -4,9 +4,18 @@ import { cors } from 'hono/cors'
 import { streamSSE } from 'hono/streaming'
 import { v4 as uuidv4 } from 'uuid'
 import { readFileSync } from 'fs'
+import dotenv from 'dotenv'
 
-// Load configuration
-const config = JSON.parse(readFileSync(new URL('./config.json', import.meta.url), 'utf8'))
+// Import webhook security and email sanitization
+import { validateWebhookRequest, getRateLimiterStats } from './webhook-security.js'
+import { sanitizeEmailHTML, sanitizeEmailText, createSafeEmailPreview } from './email-sanitizer.js'
+
+// Load environment variables
+dotenv.config()
+
+// Load configuration (use production config if NODE_ENV is production)
+const configFile = process.env.NODE_ENV === 'production' ? './config.production.json' : './config.json'
+const config = JSON.parse(readFileSync(new URL(configFile, import.meta.url), 'utf8'))
 
 const app = new Hono()
 
@@ -899,13 +908,6 @@ app.use('*', cors({
 }))
 
 // Utility functions
-function generateRandomEmail() {
-  const domains = ['temp-mail.dev', 'throwaway.dev', 'test-inbox.dev']
-  const randomString = Math.random().toString(36).substring(2, 10)
-  const domain = domains[Math.floor(Math.random() * domains.length)]
-  return `${randomString}@${domain}`
-}
-
 function getOrCreateInboxByEmail(emailAddress) {
   // Find existing inbox by email
   for (const [inboxId, inbox] of inboxes.entries()) {
@@ -990,6 +992,92 @@ function generateMockEmail(toAddress) {
 }
 
 // Routes
+
+// ForwardEmail.net webhook endpoint for incoming emails
+app.post('/api/webhook/email', async (c) => {
+  try {
+    // Get raw body for signature verification
+    const rawBody = await c.req.text()
+    
+    // Validate webhook request (IP, signature, rate limiting)
+    const validation = await validateWebhookRequest(c, rawBody, process.env.FORWARDEMAIL_WEBHOOK_SECRET)
+    
+    if (!validation.valid) {
+      console.log(`Webhook validation failed from ${validation.clientIP}: ${validation.errors.join(', ')}`)
+      return c.json({ 
+        error: 'Webhook validation failed',
+        details: validation.errors 
+      }, 403)
+    }
+    
+    // Parse JSON body after validation
+    let emailData
+    try {
+      emailData = JSON.parse(rawBody)
+    } catch (parseError) {
+      console.error('Failed to parse webhook JSON:', parseError)
+      return c.json({ error: 'Invalid JSON payload' }, 400)
+    }
+    
+    console.log('Received ForwardEmail webhook:', {
+      from: emailData.from,
+      to: emailData.to,
+      subject: emailData.subject,
+      clientIP: validation.clientIP
+    })
+    
+    // Extract recipient email addresses
+    const recipients = Array.isArray(emailData.to) ? emailData.to : [emailData.to]
+    
+    for (const toEmail of recipients) {
+      if (!toEmail || !toEmail.includes('@')) {
+        console.log('Invalid recipient email:', toEmail)
+        continue
+      }
+      
+      // Get or create inbox for this email address
+      const { inboxId, inbox } = getOrCreateInboxByEmail(toEmail)
+      
+      // Create sanitized email object
+      const safeEmail = createSafeEmailPreview({
+        id: uuidv4(),
+        from: emailData.from || 'unknown@sender.com',
+        to: toEmail,
+        subject: emailData.subject || 'No Subject',
+        html: emailData.html || emailData.body,
+        text: emailData.text || emailData.textContent,
+        timestamp: new Date().toISOString(),
+        attachments: emailData.attachments || []
+      })
+      
+      // Add email to inbox
+      inbox.emails.push(safeEmail)
+      
+      // Limit inbox size to prevent memory issues
+      if (inbox.emails.length > 100) {
+        inbox.emails = inbox.emails.slice(-50) // Keep last 50 emails
+      }
+      
+      // Broadcast to all connected SSE clients
+      await broadcastEmail(inboxId, safeEmail)
+      
+      console.log(`Email delivered to inbox ${inboxId} (${toEmail})`)
+    }
+    
+    return c.json({ 
+      success: true, 
+      message: 'Email processed successfully',
+      recipients: recipients.length 
+    })
+    
+  } catch (error) {
+    console.error('Webhook processing error:', error)
+    return c.json({ 
+      error: 'Internal server error',
+      message: error.message 
+    }, 500)
+  }
+})
 
 // Generate new temporary inbox
 app.get('/api/inbox/generate', (c) => {
@@ -1497,7 +1585,8 @@ app.get('/health', (c) => {
       globalConnectionManager: globalConnectionManager.getStats(),
       memoryPool: memoryPool.getStats(),
       selectiveSerializer: selectiveSerializer.getCacheStats(),
-      writeStreamManager: writeStreamManager.getStats()
+      writeStreamManager: writeStreamManager.getStats(),
+      webhookRateLimit: getRateLimiterStats()
     },
     config: {
       ttlEnabled: config.ttl.enableAutoExpiry,

@@ -173,10 +173,14 @@ export class APIMockGenerator extends ToolTemplate {
     });
     
     // Code type selection
-    this.container.querySelectorAll('.code-type-btn').forEach(btn => {
+    this.container.querySelectorAll('[data-type]').forEach(btn => {
       btn.addEventListener('click', () => {
-        this.container.querySelectorAll('.code-type-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        this.container.querySelectorAll('[data-type]').forEach(b => {
+          b.classList.remove('bg-blue-600', 'text-white');
+          b.classList.add('bg-gray-200', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-200');
+        });
+        btn.classList.add('bg-blue-600', 'text-white');
+        btn.classList.remove('bg-gray-200', 'dark:bg-gray-600', 'text-gray-700', 'dark:text-gray-200');
         this.generateCode();
       });
     });
@@ -413,7 +417,9 @@ export class APIMockGenerator extends ToolTemplate {
   }
   
   generateCode() {
-    const codeType = this.container.querySelector('.code-type-btn.active').dataset.type;
+    const activeBtn = this.container.querySelector('[data-type].bg-blue-600') || 
+                      this.container.querySelector('[data-type="express"]');
+    const codeType = activeBtn?.dataset.type || 'express';
     const baseUrl = this.container.querySelector('#base-url').value || 'http://localhost:3000';
     
     // Update global headers
