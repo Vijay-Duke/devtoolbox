@@ -1019,15 +1019,30 @@ app.post('/api/webhook/email', async (c) => {
       return c.json({ error: 'Invalid JSON payload' }, 400)
     }
     
-    console.log('Received ForwardEmail webhook:', {
-      from: emailData.from,
-      to: emailData.to,
+    // Log complete payload structure for debugging
+    console.log('Received ForwardEmail webhook payload keys:', Object.keys(emailData))
+    console.log('ForwardEmail webhook details:', {
+      from: emailData.from?.text || emailData.from,
+      recipients: emailData.recipients,
       subject: emailData.subject,
+      hasHtml: !!emailData.html,
+      hasText: !!emailData.text,
       clientIP: validation.clientIP
     })
     
-    // Extract recipient email addresses
-    const recipients = Array.isArray(emailData.to) ? emailData.to : [emailData.to]
+    // Validate required ForwardEmail fields
+    if (!emailData.recipients || !Array.isArray(emailData.recipients) || emailData.recipients.length === 0) {
+      console.log('Invalid or missing recipients in ForwardEmail webhook:', emailData.recipients)
+      return c.json({ error: 'No valid recipients found' }, 400)
+    }
+    
+    if (!emailData.from) {
+      console.log('Missing from field in ForwardEmail webhook')
+      return c.json({ error: 'Missing sender information' }, 400)
+    }
+    
+    // Extract recipient email addresses from ForwardEmail's recipients array
+    const recipients = emailData.recipients
     
     for (const toEmail of recipients) {
       if (!toEmail || !toEmail.includes('@')) {
@@ -1038,16 +1053,53 @@ app.post('/api/webhook/email', async (c) => {
       // Get or create inbox for this email address
       const { inboxId, inbox } = getOrCreateInboxByEmail(toEmail)
       
-      // Create sanitized email object
+      // Extract sender information from ForwardEmail's complex from structure
+      let fromAddress = 'unknown@sender.com'
+      let fromName = ''
+      
+      if (emailData.from?.value?.[0]?.address) {
+        // Primary method: use structured from.value array
+        fromAddress = emailData.from.value[0].address
+        fromName = emailData.from.value[0].name || ''
+      } else if (emailData.from?.text) {
+        // Fallback: parse from.text which contains formatted string like "Name <email@domain.com>"
+        const textMatch = emailData.from.text.match(/^(.*?)\s*<(.+?)>$/)
+        if (textMatch) {
+          fromName = textMatch[1].trim()
+          fromAddress = textMatch[2].trim()
+        } else {
+          // No angle brackets, assume it's just an email address
+          fromAddress = emailData.from.text.trim()
+        }
+      } else if (typeof emailData.from === 'string') {
+        // Last fallback: direct string
+        fromAddress = emailData.from
+      }
+      
+      // Create sanitized email object using correct ForwardEmail fields
       const safeEmail = createSafeEmailPreview({
         id: uuidv4(),
-        from: emailData.from || 'unknown@sender.com',
+        from: fromName ? `${fromName} <${fromAddress}>` : fromAddress,
         to: toEmail,
         subject: emailData.subject || 'No Subject',
-        html: emailData.html || emailData.body,
-        text: emailData.text || emailData.textContent,
-        timestamp: new Date().toISOString(),
-        attachments: emailData.attachments || []
+        html: emailData.html,
+        text: emailData.text,
+        timestamp: emailData.date ? new Date(emailData.date).toISOString() : new Date().toISOString(),
+        // Add ForwardEmail metadata
+        messageId: emailData.messageId,
+        authentication: {
+          dkim: emailData.dkim?.status?.result || 'unknown',
+          spf: emailData.spf?.status?.result || 'unknown', 
+          dmarc: emailData.dmarc?.status?.result || 'unknown',
+          // Add BIMI if available
+          bimi: emailData.bimi?.status?.result || 'unknown'
+        },
+        session: emailData.session ? {
+          clientIP: emailData.session.remoteAddress,
+          sender: emailData.session.sender,
+          arrivalDate: emailData.session.arrivalDate,
+          clientHostname: emailData.session.clientHostname
+        } : null
       })
       
       // Add email to inbox

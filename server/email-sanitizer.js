@@ -182,7 +182,11 @@ export function createSafeEmailPreview(emailData) {
     timestamp: emailData.timestamp,
     otpCodes: extractOTPCodes(emailData.text || emailData.body || ''),
     hasHtml: !!(emailData.html || emailData.body),
-    hasAttachments: !!(emailData.attachments && emailData.attachments.length > 0)
+    hasAttachments: !!(emailData.attachments && emailData.attachments.length > 0),
+    // ForwardEmail metadata
+    messageId: emailData.messageId,
+    authentication: emailData.authentication,
+    session: emailData.session
   }
   
   // Sanitize HTML content if present
