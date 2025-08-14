@@ -1,34 +1,37 @@
-// Webhook Tester - Test and debug webhooks locally
-export class WebhookTester {
+import { ToolTemplate } from './tool-template.js';
+
+export class WebhookTester extends ToolTemplate {
   constructor() {
-    this.container = null;
+    super();
+    this.config = {
+      name: 'Webhook Tester',
+      description: 'Test and debug webhooks locally with a unique URL and inspect incoming requests',
+      version: '1.0.0',
+      author: 'DevToolbox',
+      category: 'Developer Tools',
+      keywords: ['webhook', 'http', 'api', 'testing', 'requests', 'debug', 'curl']
+    };
+    
     this.webhookUrl = null;
     this.requests = [];
     this.activeConnections = new Map();
     this.maxRequests = 100;
   }
   
-  init(containerId) {
-    this.container = document.getElementById(containerId);
-    if (!this.container) return;
-    
-    this.render();
-    this.attachEventListeners();
-    this.generateWebhookUrl();
-  }
-  
   render() {
     this.container.innerHTML = `
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-        <div class="mb-6">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Webhook Tester</h1>
-          <p class="text-gray-600 dark:text-gray-300">Test webhooks with a unique URL and inspect incoming requests</p>
+      <div class="tool-container">
+        <div class="tool-header">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">${this.config.name}</h1>
+          <p class="text-gray-600 dark:text-gray-300">${this.config.description}</p>
         </div>
+        
+        <div class="tool-body bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         
         <div class="mb-6 bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Your Webhook URL</h3>
           <div class="flex gap-2 mb-3">
-            <input type="text" id="webhook-url" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white" readonly>
+            <input type="text" id="webhook-url" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" readonly>
             <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="copy-url">Copy URL</button>
             <button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="regenerate">New URL</button>
           </div>
@@ -44,21 +47,21 @@ export class WebhookTester {
         <div class="mb-6 bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Quick Test</h3>
           <div class="flex gap-2 mb-4">
-            <select id="test-method" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white">
+            <select id="test-method" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
               <option value="GET">GET</option>
               <option value="POST" selected>POST</option>
               <option value="PUT">PUT</option>
               <option value="PATCH">PATCH</option>
               <option value="DELETE">DELETE</option>
             </select>
-            <input type="text" id="test-path" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white" placeholder="/api/test" value="/test">
+            <input type="text" id="test-path" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="/api/test" value="/test">
             <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" data-action="send-test">Send Test Request</button>
           </div>
           
           <div class="space-y-4">
             <div>
               <label for="test-body" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Request Body (JSON)</label>
-              <textarea id="test-body" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white font-mono text-sm" rows="5">{
+              <textarea id="test-body" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" rows="5">{
   "test": true,
   "timestamp": "${new Date().toISOString()}",
   "message": "Hello from Webhook Tester!"
@@ -67,7 +70,7 @@ export class WebhookTester {
             
             <div>
               <label for="test-headers" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Custom Headers (one per line, format: Header: Value)</label>
-              <textarea id="test-headers" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white font-mono text-sm" rows="3">Content-Type: application/json
+              <textarea id="test-headers" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" rows="3">Content-Type: application/json
 X-Custom-Header: test-value</textarea>
             </div>
           </div>
@@ -110,7 +113,7 @@ X-Custom-Header: test-value</textarea>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label for="response-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status Code</label>
-              <select id="response-status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white">
+              <select id="response-status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
                 <option value="200">200 OK</option>
                 <option value="201">201 Created</option>
                 <option value="204">204 No Content</option>
@@ -124,13 +127,13 @@ X-Custom-Header: test-value</textarea>
             
             <div>
               <label for="response-delay" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Response Delay (ms)</label>
-              <input type="number" id="response-delay" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white" value="0" min="0" max="10000">
+              <input type="number" id="response-delay" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" value="0" min="0" max="10000">
             </div>
           </div>
           
           <div class="mb-4">
             <label for="response-body" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Response Body</label>
-            <textarea id="response-body" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white font-mono text-sm" rows="4">{
+            <textarea id="response-body" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-mono text-sm" rows="4">{
   "success": true,
   "message": "Webhook received"
 }</textarea>
@@ -173,11 +176,15 @@ X-Custom-Header: test-value</textarea>
             </button>
           </div>
         </div>
+        </div>
+      </div>
       </div>
     `;
   }
   
   attachEventListeners() {
+    this.generateWebhookUrl();
+    
     // URL actions
     this.container.querySelector('[data-action="copy-url"]').addEventListener('click', () => this.copyWebhookUrl());
     this.container.querySelector('[data-action="regenerate"]').addEventListener('click', () => this.generateWebhookUrl());
@@ -223,13 +230,7 @@ X-Custom-Header: test-value</textarea>
   
   copyWebhookUrl() {
     const urlInput = this.container.querySelector('#webhook-url');
-    urlInput.select();
-    navigator.clipboard.writeText(urlInput.value).then(() => {
-      const btn = this.container.querySelector('[data-action="copy-url"]');
-      const originalText = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = originalText, 2000);
-    });
+    this.copyToClipboard(urlInput.value);
   }
   
   sendTestRequest() {
