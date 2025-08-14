@@ -33,7 +33,9 @@
     "retryMs": 3000,
     "enableEventIds": true,
     "ringBufferSize": 50,
-    "emailSummaryFields": ["id", "from", "subject", "timestamp", "otpCodes"]
+    "emailSummaryFields": ["id", "from", "subject", "timestamp", "otpCodes"],
+    "maxInboxesPerConnection": 10,
+    "enableMultiInboxSubscription": true
   },
   "inbox": {
     "maxAgeHours": 2,

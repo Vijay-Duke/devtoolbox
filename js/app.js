@@ -7,32 +7,49 @@ import { HistoryPersistence } from './history-persistence.js';
 import { SettingsManager } from './settings-manager.js';
 import { SearchAliases } from './search-aliases.js';
 
-// Theme Toggle
+// Theme Management with System Default
 const themeToggle = document.querySelector('[data-theme-toggle]');
 const html = document.documentElement;
 
-// Initialize theme on load
-const savedTheme = localStorage.getItem('theme') || 'light';
-if (savedTheme === 'dark') {
-  html.classList.add('dark');
-  html.setAttribute('data-theme', 'dark');
-} else {
-  html.classList.remove('dark');
-  html.setAttribute('data-theme', 'light');
+// Detect system preference
+function getSystemTheme() {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
-themeToggle?.addEventListener('click', () => {
-  const isDark = html.classList.contains('dark');
-  
-  if (isDark) {
-    html.classList.remove('dark');
-    html.setAttribute('data-theme', 'light');
-    localStorage.setItem('theme', 'light');
-  } else {
+// Apply theme
+function applyTheme(theme) {
+  if (theme === 'dark') {
     html.classList.add('dark');
     html.setAttribute('data-theme', 'dark');
-    localStorage.setItem('theme', 'dark');
+  } else {
+    html.classList.remove('dark');
+    html.setAttribute('data-theme', 'light');
   }
+}
+
+// Initialize theme: use saved preference or fall back to system default
+const savedTheme = localStorage.getItem('theme');
+const initialTheme = savedTheme || getSystemTheme();
+applyTheme(initialTheme);
+
+// Only listen for system changes if no manual preference is saved
+if (!savedTheme) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    // Only update if user hasn't manually set a preference
+    if (!localStorage.getItem('theme')) {
+      const newTheme = e.matches ? 'dark' : 'light';
+      applyTheme(newTheme);
+    }
+  });
+}
+
+// Manual theme toggle functionality
+themeToggle?.addEventListener('click', () => {
+  const isDark = html.classList.contains('dark');
+  const newTheme = isDark ? 'light' : 'dark';
+  
+  applyTheme(newTheme);
+  localStorage.setItem('theme', newTheme);
 });
 
 // Mobile Menu Toggle
@@ -453,3 +470,84 @@ const settingsManager = new SettingsManager();
 
 // Initialize search aliases
 const searchAliases = new SearchAliases();
+
+// System Notification Function
+function showSystemNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  const bgColor = type === 'error' ? 'bg-red-100 dark:bg-red-900 border-red-300 dark:border-red-700 text-red-800 dark:text-red-200' :
+                   type === 'success' ? 'bg-green-100 dark:bg-green-900 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200' :
+                   type === 'warning' ? 'bg-yellow-100 dark:bg-yellow-900 border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-200' :
+                   'bg-blue-100 dark:bg-blue-900 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200';
+  
+  notification.className = `fixed top-4 right-4 max-w-sm p-4 rounded-lg border shadow-lg z-50 transition-all duration-300 ${bgColor}`;
+  notification.innerHTML = `
+    <div class="flex items-center">
+      <span class="flex-1">${message}</span>
+      <button class="ml-3 text-current opacity-70 hover:opacity-100" onclick="this.parentElement.parentElement.remove()">×</button>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto-remove after 4 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 4000);
+}
+
+// Clear Everything Function
+function clearEverything() {
+  if (confirm('This will clear all storage (localStorage, sessionStorage), disconnect from all services, and return to the home page. Continue?')) {
+    // Clear all localStorage
+    localStorage.clear();
+    
+    // Clear sessionStorage
+    sessionStorage.clear();
+    
+    // Clear any cookies for this domain
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+    
+    // Close any open EventSource connections (for tools like temp-email)
+    if (window.tempEmailTool && window.tempEmailTool.disconnect) {
+      window.tempEmailTool.disconnect();
+    }
+    
+    // Reset to system theme
+    const systemTheme = getSystemTheme();
+    applyTheme(systemTheme);
+    
+    // Navigate to home
+    window.location.href = '/';
+    
+    showSystemNotification('All storage cleared successfully', 'success');
+  }
+}
+
+// DevToolbox Navigation (go to home)
+function navigateHome() {
+  // Close mobile sidebar if open
+  if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+    sidebar.classList.add('-translate-x-full');
+    if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+    if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+  }
+  
+  // Navigate to home
+  window.location.href = '/';
+}
+
+// Add DevToolbox click handler
+const devToolboxTitle = document.querySelector('header .flex.items-center.space-x-2');
+if (devToolboxTitle) {
+  devToolboxTitle.style.cursor = 'pointer';
+  devToolboxTitle.addEventListener('click', navigateHome);
+}
+
+// Make functions available globally
+window.showSystemNotification = showSystemNotification;
+window.clearEverything = clearEverything;
+window.navigateHome = navigateHome;

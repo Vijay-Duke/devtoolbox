@@ -13,11 +13,12 @@ export class TempEmailTool extends ToolTemplate {
     };
     
     this.state = {
-      currentInbox: null,
-      emails: [],
+      subscribedEmails: [], // Array of email addresses being monitored
+      emails: [], // Array of emails with inboxId included
       filters: {
         search: '',
-        showOTPOnly: false
+        showOTPOnly: false,
+        selectedInboxId: 'all' // Filter by specific inbox or 'all'
       },
       serverUrl: 'http://localhost:54322'
     };
@@ -27,15 +28,31 @@ export class TempEmailTool extends ToolTemplate {
     this.lastEventId = null;
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 10;
+    
+    // Performance optimizations
+    this.searchRegexCache = new Map(); // Cache compiled regex patterns
+    this.lastRenderHash = null; // Track rendered content to avoid unnecessary rebuilds
+    this.maxEmailsPerInbox = 100; // Limit emails per inbox to prevent memory growth
   }
 
   render() {
     this.container.innerHTML = `
-      <div class="temp-email-tool">
+      <div class="temp-email-tool max-w-6xl mx-auto p-6">
         <!-- Header -->
         <div class="tool-header mb-6">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">${this.config.name}</h1>
-          <p class="text-gray-600 dark:text-gray-400">${this.config.description}</p>
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">${this.config.name}</h1>
+              <p class="text-gray-600 dark:text-gray-400">${this.config.description}</p>
+            </div>
+            <button 
+              id="tool-clear-btn"
+              class="px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              title="Clear this tool - clear all data and disconnect"
+            >
+              Clear Tool
+            </button>
+          </div>
         </div>
 
         <!-- Server Status -->
@@ -46,74 +63,88 @@ export class TempEmailTool extends ToolTemplate {
           </div>
         </div>
 
-        <!-- Inbox Section -->
-        <div class="inbox-section mb-6">
-          <div class="flex flex-wrap items-center gap-3 mb-4">
-            <button 
-              id="generate-inbox-btn" 
-              class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              Generate New Inbox
-            </button>
+        <!-- Email Subscription Section -->
+        <div class="email-subscription-section mb-6">
+          <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Enter Email Addresses (comma-separated):
+            </label>
+            <div class="flex gap-3 mb-3">
+              <input 
+                type="text" 
+                id="emails-input"
+                placeholder="user@test.com, another@example.com, test@demo.org"
+                class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <button 
+                id="start-monitoring-btn" 
+                class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Start Monitoring
+              </button>
+            </div>
             
-            <button 
-              id="simulate-email-btn" 
-              class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled
-            >
-              Simulate Email
-            </button>
-            
-            <button 
-              id="clear-emails-btn" 
-              class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled
-            >
-              Clear Inbox
-            </button>
-          </div>
-
-          <!-- Current Inbox Info -->
-          <div id="current-inbox" class="hidden p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
-            <div class="flex items-center justify-between">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Email Address:</label>
-                <div class="flex items-center gap-2">
-                  <code id="inbox-email" class="text-lg font-mono bg-white dark:bg-gray-900 px-3 py-1 rounded border text-blue-600 dark:text-blue-400"></code>
-                  <button 
-                    id="copy-email-btn" 
-                    class="p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                    title="Copy email address"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
-                      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="text-right">
-                <div class="text-sm text-gray-500 dark:text-gray-400">Connection Status:</div>
+            <div class="flex flex-wrap items-center gap-3">
+              <button 
+                id="clear-emails-btn" 
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled
+              >
+                Clear Emails
+              </button>
+              
+              <div class="ml-auto flex items-center space-x-3">
                 <div class="flex items-center">
                   <div id="connection-indicator" class="w-2 h-2 rounded-full mr-2 bg-gray-400"></div>
                   <span id="connection-status" class="text-sm font-medium">Disconnected</span>
                 </div>
+                <button 
+                  id="connection-toggle-btn" 
+                  class="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-medium hidden"
+                  data-state="disconnected"
+                >
+                  Connect
+                </button>
               </div>
+            </div>
+            
+            <!-- Subscribed Emails Display -->
+            <div id="subscribed-emails" class="hidden mt-4">
+              <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Monitoring:</div>
+              <div id="subscribed-emails-list" class="flex flex-wrap gap-2"></div>
             </div>
           </div>
         </div>
 
         <!-- Filters Section -->
         <div id="filters-section" class="hidden mb-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search emails</label>
-              <input 
-                type="text" 
-                id="search-filter"
-                placeholder="Search in sender, subject, or body..."
+              <div class="relative">
+                <input 
+                  type="text" 
+                  id="search-filter"
+                  placeholder="Search in from, to, subject, or body..."
+                  class="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <div id="search-icon" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by inbox</label>
+              <select 
+                id="inbox-filter"
                 class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+              >
+                <option value="all">All Inboxes</option>
+              </select>
             </div>
             
             <div class="flex items-end">
@@ -168,84 +199,210 @@ export class TempEmailTool extends ToolTemplate {
   }
 
   attachEventListeners() {
-    // Generate inbox button
-    const generateBtn = this.container.querySelector('#generate-inbox-btn');
-    generateBtn.addEventListener('click', () => this.generateInbox());
+    // Start monitoring button
+    const startBtn = this.container.querySelector('#start-monitoring-btn');
+    startBtn.addEventListener('click', () => this.startMonitoring());
 
-    // Simulate email button
-    const simulateBtn = this.container.querySelector('#simulate-email-btn');
-    simulateBtn.addEventListener('click', () => this.simulateEmail());
+    // Emails input (enter key and input changes)
+    const emailsInput = this.container.querySelector('#emails-input');
+    emailsInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        this.startMonitoring();
+      }
+    });
+    
+    // Update toggle button visibility when input changes
+    emailsInput.addEventListener('input', () => {
+      this.updateToggleButtonVisibility();
+    });
+
 
     // Clear emails button
     const clearBtn = this.container.querySelector('#clear-emails-btn');
     clearBtn.addEventListener('click', () => this.clearEmails());
 
-    // Copy email button
-    const copyBtn = this.container.querySelector('#copy-email-btn');
-    copyBtn.addEventListener('click', () => this.copyEmailAddress());
+    // Connection toggle button
+    const connectionToggleBtn = this.container.querySelector('#connection-toggle-btn');
+    connectionToggleBtn.addEventListener('click', () => this.toggleConnection());
+
+    // Tool clear button
+    const toolClearBtn = this.container.querySelector('#tool-clear-btn');
+    toolClearBtn.addEventListener('click', () => this.clearTool());
 
     // Filter inputs
     const searchFilter = this.container.querySelector('#search-filter');
+    const inboxFilter = this.container.querySelector('#inbox-filter');
     const otpFilter = this.container.querySelector('#otp-only-filter');
 
-    const updateFilters = this.debounce(() => this.updateFilters(), 300);
+    // Optimized real-time search with progressive debouncing
+    const updateFilters = () => {
+      // Clear any existing timeout
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+      
+      // Immediate update for clearing search (better UX)
+      const searchValue = this.container.querySelector('#search-filter').value;
+      if (!searchValue) {
+        this.updateFilters();
+        return;
+      }
+      
+      // Progressive debouncing: shorter delay for longer search terms
+      const delay = searchValue.length > 3 ? 100 : 150;
+      
+      this.searchTimeout = setTimeout(() => {
+        this.updateFilters();
+      }, delay);
+    };
     
     searchFilter.addEventListener('input', updateFilters);
+    inboxFilter.addEventListener('change', updateFilters);
     otpFilter.addEventListener('change', updateFilters);
   }
 
-  async generateInbox() {
+  startMonitoring() {
+    const emailsInput = this.container.querySelector('#emails-input');
+    const emailText = emailsInput.value.trim();
+    
+    if (!emailText) {
+      this.showNotification('Please enter at least one email address', 'error');
+      return;
+    }
+    
+    // Parse comma-separated emails
+    const emailAddresses = emailText.split(',')
+      .map(email => email.trim())
+      .filter(email => email.length > 0);
+    
+    if (emailAddresses.length === 0) {
+      this.showNotification('Please enter valid email addresses', 'error');
+      return;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const invalidEmails = emailAddresses.filter(email => !emailRegex.test(email));
+    
+    if (invalidEmails.length > 0) {
+      this.showNotification(`Invalid email format: ${invalidEmails.join(', ')}`, 'error');
+      return;
+    }
+    
     try {
-      const response = await fetch(`${this.state.serverUrl}/api/inbox/generate`);
+      // Cleanup existing connection
+      this.disconnect();
       
-      if (!response.ok) {
-        throw new Error('Failed to connect to server');
-      }
+      this.state.subscribedEmails = emailAddresses;
+      this.state.emails = [];
       
-      const data = await response.json();
+      this.showSubscribedEmails();
+      this.connectToMultiInboxSSE();
+      this.enableButtons();
+      this.hideServerError();
+      this.showNotification(`Monitoring ${emailAddresses.length} email address(es)`);
       
-      if (data.success) {
-        // Cleanup existing connection
-        this.disconnect();
-        
-        this.state.currentInbox = data.data;
-        this.state.emails = [];
-        
-        this.showInboxInfo();
-        this.connectToSSE();
-        this.enableButtons();
-        this.hideServerError();
-        this.showNotification('New inbox created successfully!');
-        
-        this.saveState();
-      } else {
-        throw new Error('Failed to create inbox');
-      }
+      this.saveState();
     } catch (error) {
-      console.error('Error generating inbox:', error);
+      console.error('Error starting monitoring:', error);
       this.showServerError();
-      this.showNotification('Failed to generate inbox. Check if server is running.', 'error');
+      this.showNotification('Failed to start monitoring. Check if server is running.', 'error');
     }
   }
 
-  async simulateEmail() {
-    if (!this.state.currentInbox) return;
+  toggleConnection() {
+    const toggleBtn = this.container.querySelector('#connection-toggle-btn');
+    const currentState = toggleBtn.getAttribute('data-state');
     
-    try {
-      const response = await fetch(`${this.state.serverUrl}/api/emails/${this.state.currentInbox.id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ auto: true })
-      });
+    if (currentState === 'disconnected') {
+      // Connect - check if we have emails to monitor
+      const emailsInput = this.container.querySelector('#emails-input');
+      const emailText = emailsInput.value.trim();
       
-      if (response.ok) {
-        this.showNotification('Mock email sent!');
+      if (!emailText && (!this.state.subscribedEmails || this.state.subscribedEmails.length === 0)) {
+        this.showNotification('Please enter email addresses to monitor first', 'warning');
+        return;
       }
-    } catch (error) {
-      console.error('Error simulating email:', error);
-      this.showNotification('Failed to simulate email', 'error');
+      
+      // If there's text in input, use that, otherwise use existing subscribed emails
+      if (emailText) {
+        this.startMonitoring();
+      } else {
+        // Reconnect to existing subscribed emails
+        this.connectToMultiInboxSSE();
+        this.showNotification(`Reconnected to ${this.state.subscribedEmails.length} email address(es)`);
+      }
+    } else {
+      // Disconnect
+      this.disconnect();
+      this.showNotification('Disconnected from monitoring', 'success');
+    }
+  }
+
+  clearTool() {
+    if (confirm('This will clear all emails, disconnect from monitoring, and clear all stored data for this tool. Continue?')) {
+      // Disconnect from any active connections
+      this.disconnect();
+      
+      // Reset all state
+      this.state = {
+        subscribedEmails: [],
+        emails: [],
+        filters: {
+          search: '',
+          showOTPOnly: false,
+          selectedInboxId: 'all'
+        },
+        serverUrl: 'http://localhost:54322'
+      };
+      
+      // Clear localStorage for this tool
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('temp-email-') || key.includes('tempEmail'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      // Reset UI elements
+      const emailsInput = this.container.querySelector('#emails-input');
+      if (emailsInput) emailsInput.value = '';
+      
+      // Clear displayed emails and subscriptions
+      this.renderEmails();
+      this.showSubscribedEmails();
+      this.updateInboxFilter();
+      
+      // Reset connection status
+      this.updateConnectionStatus('Disconnected', 'bg-gray-400');
+      
+      // Reset filters
+      const searchFilter = this.container.querySelector('#search-filter');
+      const inboxFilter = this.container.querySelector('#inbox-filter');
+      if (searchFilter) searchFilter.value = '';
+      if (inboxFilter) inboxFilter.value = 'all';
+      
+      // Hide server errors and notifications
+      this.hideServerError();
+      
+      // Show success notification
+      this.showNotification('Tool cleared successfully - all data removed', 'success');
+    }
+  }
+
+  showSubscribedEmails() {
+    const subscribedEmailsDiv = this.container.querySelector('#subscribed-emails');
+    const subscribedEmailsList = this.container.querySelector('#subscribed-emails-list');
+    
+    if (this.state.subscribedEmails.length > 0) {
+      subscribedEmailsDiv.classList.remove('hidden');
+      subscribedEmailsList.innerHTML = this.state.subscribedEmails
+        .map(email => `<span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-sm">${email}</span>`)
+        .join('');
+    } else {
+      subscribedEmailsDiv.classList.add('hidden');
     }
   }
 
@@ -260,6 +417,181 @@ export class TempEmailTool extends ToolTemplate {
     if (this.state.currentInbox) {
       this.copyToClipboard(this.state.currentInbox.email);
     }
+  }
+
+  toggleMultiInboxMode() {
+    this.state.multiInboxMode = !this.state.multiInboxMode;
+    
+    const toggleBtn = this.container.querySelector('#toggle-multi-inbox-btn');
+    const multiInboxControls = this.container.querySelector('#multi-inbox-controls');
+    const currentInboxSection = this.container.querySelector('#current-inbox');
+    
+    if (this.state.multiInboxMode) {
+      toggleBtn.textContent = 'Disable Multi-Inbox Mode';
+      toggleBtn.className = 'px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium';
+      multiInboxControls.classList.remove('hidden');
+      currentInboxSection.classList.add('hidden');
+      
+      // If we have a current inbox, add it to subscribed inboxes
+      if (this.state.currentInbox) {
+        this.addInboxToSubscription(this.state.currentInbox.id);
+      }
+      
+      this.showFiltersAndEmails();
+      this.updateInboxFilter();
+      this.connectToMultiInboxSSE();
+    } else {
+      toggleBtn.textContent = 'Enable Multi-Inbox Mode';
+      toggleBtn.className = 'px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium';
+      multiInboxControls.classList.add('hidden');
+      
+      // Disconnect multi-inbox and clear subscriptions
+      this.disconnect();
+      this.state.subscribedInboxes = [];
+      this.renderSubscribedInboxes();
+      
+      // Return to single inbox mode
+      if (this.state.currentInbox) {
+        currentInboxSection.classList.remove('hidden');
+        this.connectToSSE();
+      }
+    }
+    
+    this.saveState();
+  }
+
+  async addInboxToSubscription(inboxId = null) {
+    const inputInboxId = inboxId || this.container.querySelector('#add-inbox-input').value.trim();
+    
+    if (!inputInboxId) {
+      this.showNotification('Please enter an inbox ID', 'error');
+      return;
+    }
+    
+    // Check if already subscribed
+    if (this.state.subscribedInboxes.some(inbox => inbox.id === inputInboxId)) {
+      this.showNotification('Already subscribed to this inbox', 'error');
+      return;
+    }
+    
+    try {
+      // Validate inbox exists
+      const response = await fetch(`${this.state.serverUrl}/api/emails/${inputInboxId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          this.showNotification('Inbox not found', 'error');
+        } else {
+          this.showNotification('Failed to validate inbox', 'error');
+        }
+        return;
+      }
+      
+      const data = await response.json();
+      if (data.success) {
+        // Add to subscribed inboxes
+        this.state.subscribedInboxes.push({
+          id: inputInboxId,
+          email: data.data.inbox.email
+        });
+        
+        // Clear input
+        if (!inboxId) {
+          this.container.querySelector('#add-inbox-input').value = '';
+        }
+        
+        this.renderSubscribedInboxes();
+        this.updateInboxFilter();
+        this.connectToMultiInboxSSE();
+        this.showNotification(`Subscribed to ${data.data.inbox.email}`, 'success');
+        this.saveState();
+      }
+    } catch (error) {
+      console.error('Error adding inbox to subscription:', error);
+      this.showNotification('Failed to subscribe to inbox', 'error');
+    }
+  }
+
+  removeInboxFromSubscription(inboxId) {
+    this.state.subscribedInboxes = this.state.subscribedInboxes.filter(inbox => inbox.id !== inboxId);
+    
+    // Remove emails from this inbox
+    this.state.emails = this.state.emails.filter(email => email.inboxId !== inboxId);
+    
+    this.renderSubscribedInboxes();
+    this.updateInboxFilter();
+    this.renderEmails();
+    this.connectToMultiInboxSSE();
+    this.saveState();
+  }
+
+  renderSubscribedInboxes() {
+    const container = this.container.querySelector('#subscribed-inboxes-list');
+    
+    if (this.state.subscribedInboxes.length === 0) {
+      container.innerHTML = '<p class="text-sm text-purple-600 dark:text-purple-400">No inboxes subscribed yet</p>';
+      return;
+    }
+    
+    container.innerHTML = this.state.subscribedInboxes.map(inbox => `
+      <div class="flex items-center justify-between p-3 bg-white dark:bg-purple-800 rounded border border-purple-200 dark:border-purple-600">
+        <div>
+          <code class="text-sm font-mono text-purple-700 dark:text-purple-300">${inbox.email}</code>
+          <span class="text-xs text-purple-500 dark:text-purple-400 ml-2">(${inbox.id.substring(0, 8)}...)</span>
+        </div>
+        <button 
+          class="remove-inbox-btn text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200 text-sm font-medium"
+          data-inbox-id="${inbox.id}"
+        >
+          Remove
+        </button>
+      </div>
+    `).join('');
+    
+    // Add event listeners for remove buttons
+    container.querySelectorAll('.remove-inbox-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const inboxId = e.target.dataset.inboxId;
+        this.removeInboxFromSubscription(inboxId);
+      });
+    });
+  }
+
+  updateInboxFilter() {
+    const inboxFilter = this.container.querySelector('#inbox-filter');
+    
+    // Clear existing options except "All Inboxes"
+    inboxFilter.innerHTML = '<option value="all">All Inboxes</option>';
+    
+    // Add options for subscribed inboxes
+    for (const inbox of this.state.subscribedInboxes) {
+      const option = document.createElement('option');
+      option.value = inbox.id;
+      option.textContent = inbox.email;
+      inboxFilter.appendChild(option);
+    }
+  }
+
+  connectToMultiInboxSSE() {
+    if (!this.state.subscribedEmails || this.state.subscribedEmails.length === 0) {
+      this.disconnect();
+      return;
+    }
+    
+    this.disconnect(); // Close any existing connection
+    
+    const url = `${this.state.serverUrl}/api/emails/stream?emails=${this.state.subscribedEmails.join(',')}`;
+    this.eventSource = new EventSource(url);
+    
+    this.setupEventSourceHandlers();
+  }
+
+  showFiltersAndEmails() {
+    const filtersSection = this.container.querySelector('#filters-section');
+    const emailsContainer = this.container.querySelector('#emails-container');
+    
+    filtersSection.classList.remove('hidden');
+    emailsContainer.classList.remove('hidden');
   }
 
   connectToSSE() {
@@ -346,8 +678,8 @@ export class TempEmailTool extends ToolTemplate {
     this.updateConnectionStatus(`Reconnecting (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`, 'bg-yellow-500');
     
     setTimeout(() => {
-      if (this.state.currentInbox && !this.isConnected) {
-        this.connectToSSEWithReplay();
+      if (this.state.subscribedEmails && this.state.subscribedEmails.length > 0 && !this.isConnected) {
+        this.connectToMultiInboxSSE();
       }
     }, delay);
   }
@@ -381,6 +713,7 @@ export class TempEmailTool extends ToolTemplate {
       this.isConnected = true;
       this.reconnectAttempts = 0;
       this.updateConnectionStatus('Connected', 'bg-green-500');
+      this.showFiltersAndEmails();
     };
     
     this.eventSource.addEventListener('email', (event) => {
@@ -391,7 +724,8 @@ export class TempEmailTool extends ToolTemplate {
       
       const data = JSON.parse(event.data);
       if (data.type === 'email') {
-        this.addEmail(data.data);
+        // Add email with inbox ID for multi-inbox support
+        this.addEmail(data.data, data.inboxId);
       }
     });
     
@@ -404,7 +738,13 @@ export class TempEmailTool extends ToolTemplate {
         this.showReconnectionNotification(data.replayedMessages);
       }
       
-      this.updateConnectionStatus('Connected', 'bg-green-500');
+      // Show subscription info
+      if (data.subscribedEmails && data.subscribedEmails.length > 1) {
+        console.log(`Monitoring ${data.subscribedEmails.length} email addresses: ${data.subscribedEmails.join(', ')}`);
+        this.updateConnectionStatus(`Connected (${data.subscribedEmails.length} emails)`, 'bg-green-500');
+      } else {
+        this.updateConnectionStatus('Connected', 'bg-green-500');
+      }
     });
     
     this.eventSource.addEventListener('ping', () => {
@@ -416,14 +756,12 @@ export class TempEmailTool extends ToolTemplate {
       this.isConnected = false;
       
       if (this.eventSource.readyState === EventSource.CLOSED) {
-        console.log('Inbox not found (likely server restart). Clearing old state.');
-        this.state.currentInbox = null;
+        console.log('Connection closed (likely server restart). Clearing old state.');
+        this.state.subscribedEmails = [];
         this.state.emails = [];
         this.lastEventId = null;
-        this.hideInboxInfo();
-        this.updateConnectionStatus('Inbox Expired', 'bg-yellow-500');
-        this.showNotification('Inbox expired or server restarted. Please generate a new inbox.', 'error');
-        this.saveState();
+        this.updateConnectionStatus('Connection Expired', 'bg-yellow-500');
+        this.showNotification('Connection expired or server restarted. Please enter emails again.', 'error');
         return;
       }
       
@@ -472,20 +810,53 @@ export class TempEmailTool extends ToolTemplate {
     console.log(message);
   }
 
-  addEmail(email) {
+  addEmail(email, inboxId = null) {
+    // Add inbox ID to email for multi-inbox support
+    if (inboxId) {
+      email.inboxId = inboxId;
+    } else if (this.state.currentInbox) {
+      email.inboxId = this.state.currentInbox.id;
+    }
+    
     // Add to beginning of array (newest first)
     this.state.emails.unshift(email);
+    
+    // Limit emails to prevent memory growth
+    if (this.state.emails.length > this.maxEmailsPerInbox) {
+      const removedCount = this.state.emails.length - this.maxEmailsPerInbox;
+      this.state.emails = this.state.emails.slice(0, this.maxEmailsPerInbox);
+      
+      // Clear render hash to force re-render after cleanup
+      this.lastRenderHash = null;
+      
+      console.log(`Email limit reached. Removed ${removedCount} oldest emails. Current count: ${this.state.emails.length}`);
+    }
+    
     this.renderEmails();
     this.saveState();
     
     // Show notification for new emails with OTPs
     if (email.otpCodes && email.otpCodes.length > 0) {
-      this.showNotification(`New email with OTP: ${email.otpCodes.join(', ')}`, 'success');
+      const inboxInfo = this.getInboxEmailFromId(email.inboxId);
+      const inboxDisplay = inboxInfo ? ` to ${inboxInfo}` : '';
+      this.showNotification(`New email with OTP${inboxDisplay}: ${email.otpCodes.join(', ')}`, 'success');
     }
+  }
+
+  getInboxEmailFromId(inboxId) {
+    // Check current inbox
+    if (this.state.currentInbox && this.state.currentInbox.id === inboxId) {
+      return this.state.currentInbox.email;
+    }
+    
+    // Check subscribed inboxes
+    const subscribedInbox = this.state.subscribedInboxes.find(inbox => inbox.id === inboxId);
+    return subscribedInbox ? subscribedInbox.email : null;
   }
 
   updateFilters() {
     this.state.filters.search = this.container.querySelector('#search-filter').value.toLowerCase();
+    this.state.filters.selectedInboxId = this.container.querySelector('#inbox-filter').value;
     this.state.filters.showOTPOnly = this.container.querySelector('#otp-only-filter').checked;
     
     this.renderEmails();
@@ -494,10 +865,17 @@ export class TempEmailTool extends ToolTemplate {
 
   getFilteredEmails() {
     return this.state.emails.filter(email => {
-      // Fuzzy search across all fields
+      // Inbox filter
+      if (this.state.filters.selectedInboxId !== 'all') {
+        if (email.inboxId !== this.state.filters.selectedInboxId) {
+          return false;
+        }
+      }
+      
+      // Fuzzy search across all fields including TO address
       if (this.state.filters.search) {
         const searchTerm = this.state.filters.search;
-        const searchableText = `${email.from} ${email.subject} ${email.body}`.toLowerCase();
+        const searchableText = `${email.from} ${email.to} ${email.subject} ${email.body}`.toLowerCase();
         
         // Split search term into words for better fuzzy matching
         const searchWords = searchTerm.split(/\s+/).filter(word => word.length > 0);
@@ -532,8 +910,26 @@ export class TempEmailTool extends ToolTemplate {
     
     const filteredEmails = this.getFilteredEmails();
     
-    // Update stats
-    emailCount.textContent = `${this.state.emails.length} email${this.state.emails.length !== 1 ? 's' : ''}`;
+    // Create a hash of current render state to avoid unnecessary rebuilds
+    const renderHash = JSON.stringify({
+      emails: filteredEmails.map(e => e.id),
+      search: this.state.filters.search,
+      selectedInbox: this.state.filters.selectedInboxId,
+      showOTPOnly: this.state.filters.showOTPOnly
+    });
+    
+    // Skip render if nothing changed
+    if (this.lastRenderHash === renderHash) {
+      return;
+    }
+    this.lastRenderHash = renderHash;
+    
+    // Update stats with performance indicator
+    const totalEmails = this.state.emails.length;
+    const isNearLimit = totalEmails > this.maxEmailsPerInbox * 0.8; // 80% of limit
+    const limitText = isNearLimit ? ` (${totalEmails}/${this.maxEmailsPerInbox})` : '';
+    
+    emailCount.textContent = `${totalEmails} email${totalEmails !== 1 ? 's' : ''}${limitText}`;
     filteredCount.textContent = `${filteredEmails.length} visible`;
     
     if (filteredEmails.length === 0) {
@@ -544,36 +940,86 @@ export class TempEmailTool extends ToolTemplate {
       emptyState.classList.add('hidden');
       emailStats.classList.remove('hidden');
       
-      container.innerHTML = filteredEmails.map(email => this.renderEmailCard(email)).join('');
+      // Use document fragment for efficient DOM manipulation
+      const fragment = document.createDocumentFragment();
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = filteredEmails.map(email => this.renderEmailCard(email)).join('');
       
-      // Add copy OTP functionality
-      container.querySelectorAll('.copy-otp-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+      while (tempDiv.firstChild) {
+        fragment.appendChild(tempDiv.firstChild);
+      }
+      
+      // Single DOM update
+      container.innerHTML = '';
+      container.appendChild(fragment);
+      
+      // Add copy OTP functionality with event delegation for better performance
+      container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('copy-otp-btn')) {
           const otp = e.target.dataset.otp;
           this.copyToClipboard(otp);
-        });
+        }
       });
     }
+  }
+
+  highlightSearchTerms(text) {
+    if (!this.state.filters.search) return text;
+    
+    const searchWords = this.state.filters.search.split(/\s+/).filter(word => word.length > 0);
+    let highlightedText = text;
+    
+    searchWords.forEach(word => {
+      // Use cached regex or create and cache new one
+      let regex = this.searchRegexCache.get(word.toLowerCase());
+      if (!regex) {
+        const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        regex = new RegExp(`(${escapedWord})`, 'gi');
+        this.searchRegexCache.set(word.toLowerCase(), regex);
+        
+        // Limit cache size to prevent memory growth
+        if (this.searchRegexCache.size > 50) {
+          const firstKey = this.searchRegexCache.keys().next().value;
+          this.searchRegexCache.delete(firstKey);
+        }
+      }
+      
+      highlightedText = highlightedText.replace(regex, '<mark class="bg-yellow-200 dark:bg-yellow-600 px-1 rounded">$1</mark>');
+    });
+    
+    return highlightedText;
   }
 
   renderEmailCard(email) {
     const timeAgo = this.getTimeAgo(new Date(email.timestamp));
     const hasOTP = email.otpCodes && email.otpCodes.length > 0;
+    const inboxEmail = this.getInboxEmailFromId(email.inboxId);
+    const showInboxInfo = this.state.subscribedEmails && this.state.subscribedEmails.length > 1;
     
     return `
       <div class="email-card p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 hover:shadow-md transition-shadow ${hasOTP ? 'border-green-300 dark:border-green-600' : ''}">
         <div class="flex items-start justify-between mb-2">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-1">
-              <h3 class="font-medium text-gray-900 dark:text-white truncate">${this.escapeHtml(email.subject)}</h3>
+              <h3 class="font-medium text-gray-900 dark:text-white truncate">${this.highlightSearchTerms(this.escapeHtml(email.subject))}</h3>
               ${hasOTP ? '<span class="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs rounded-full font-medium">OTP</span>' : ''}
+              ${showInboxInfo && inboxEmail ? `<span class="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs rounded-full font-medium">${inboxEmail}</span>` : ''}
             </div>
-            <p class="text-sm text-gray-600 dark:text-gray-400 truncate">${this.escapeHtml(email.from)}</p>
+            <div class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+              <p class="truncate">
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-500">FROM:</span> 
+                ${this.highlightSearchTerms(this.escapeHtml(email.from))}
+              </p>
+              <p class="truncate">
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-500">TO:</span> 
+                <span class="font-medium text-blue-600 dark:text-blue-400">${this.highlightSearchTerms(this.escapeHtml(email.to))}</span>
+              </p>
+            </div>
           </div>
           <div class="text-xs text-gray-500 dark:text-gray-400 ml-4">${timeAgo}</div>
         </div>
         
-        <div class="text-sm text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-wrap">${this.highlightOTPs(this.escapeHtml(email.body), email.otpCodes)}</div>
+        <div class="text-sm text-gray-700 dark:text-gray-300 mb-3 whitespace-pre-wrap">${this.highlightSearchTerms(this.highlightOTPs(this.escapeHtml(email.body), email.otpCodes))}</div>
         
         ${hasOTP ? `
           <div class="flex flex-wrap gap-2">
@@ -640,21 +1086,65 @@ export class TempEmailTool extends ToolTemplate {
     emailsContainer.classList.add('hidden');
     
     // Disable buttons
-    this.container.querySelector('#simulate-email-btn').disabled = true;
     this.container.querySelector('#clear-emails-btn').disabled = true;
   }
 
   enableButtons() {
-    this.container.querySelector('#simulate-email-btn').disabled = false;
     this.container.querySelector('#clear-emails-btn').disabled = false;
   }
 
   updateConnectionStatus(status, colorClass) {
     const indicator = this.container.querySelector('#connection-indicator');
     const statusText = this.container.querySelector('#connection-status');
+    const toggleBtn = this.container.querySelector('#connection-toggle-btn');
     
     indicator.className = `w-2 h-2 rounded-full mr-2 ${colorClass}`;
     statusText.textContent = status;
+    
+    // Update toggle button based on connection status
+    if (status === 'Disconnected') {
+      toggleBtn.textContent = 'Connect';
+      toggleBtn.className = 'px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-medium';
+      toggleBtn.setAttribute('data-state', 'disconnected');
+      
+      // Show toggle button only if we have subscribed emails or input text
+      const emailsInput = this.container.querySelector('#emails-input');
+      const hasEmailsToConnect = emailsInput.value.trim() || (this.state.subscribedEmails && this.state.subscribedEmails.length > 0);
+      toggleBtn.classList.toggle('hidden', !hasEmailsToConnect);
+    } else if (status.startsWith('Connected') || status.startsWith('Reconnecting')) {
+      toggleBtn.textContent = 'Disconnect';
+      toggleBtn.className = 'px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-medium';
+      toggleBtn.setAttribute('data-state', 'connected');
+      toggleBtn.classList.remove('hidden');
+    } else {
+      // For other states like "Connection Failed", "Inbox Expired", etc.
+      toggleBtn.textContent = 'Connect';
+      toggleBtn.className = 'px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-medium';
+      toggleBtn.setAttribute('data-state', 'disconnected');
+      
+      // Show toggle button if we have emails to potentially reconnect to
+      const hasEmailsToConnect = this.state.subscribedEmails && this.state.subscribedEmails.length > 0;
+      toggleBtn.classList.toggle('hidden', !hasEmailsToConnect);
+    }
+  }
+
+  updateToggleButtonVisibility() {
+    const toggleBtn = this.container.querySelector('#connection-toggle-btn');
+    const emailsInput = this.container.querySelector('#emails-input');
+    const currentState = toggleBtn.getAttribute('data-state');
+    
+    // If already connected, always show the disconnect button
+    if (currentState === 'connected') {
+      toggleBtn.classList.remove('hidden');
+      return;
+    }
+    
+    // For disconnected state, show button only if there are emails to connect to
+    const hasInputText = emailsInput.value.trim().length > 0;
+    const hasSubscribedEmails = this.state.subscribedEmails && this.state.subscribedEmails.length > 0;
+    const hasEmailsToConnect = hasInputText || hasSubscribedEmails;
+    
+    toggleBtn.classList.toggle('hidden', !hasEmailsToConnect);
   }
 
   showServerError() {
@@ -666,6 +1156,17 @@ export class TempEmailTool extends ToolTemplate {
   }
 
   async applyState() {
+    // Restore multi-inbox mode if enabled
+    if (this.state.multiInboxMode) {
+      this.toggleMultiInboxMode(); // This will set up the UI
+      if (this.state.subscribedInboxes && this.state.subscribedInboxes.length > 0) {
+        this.renderSubscribedInboxes();
+        this.updateInboxFilter();
+        this.connectToMultiInboxSSE();
+      }
+      return;
+    }
+    
     if (this.state.currentInbox) {
       // Validate that the inbox still exists on the server
       try {
@@ -680,6 +1181,7 @@ export class TempEmailTool extends ToolTemplate {
           
           // Restore filter values
           this.container.querySelector('#search-filter').value = this.state.filters.search || '';
+          this.container.querySelector('#inbox-filter').value = this.state.filters.selectedInboxId || 'all';
           this.container.querySelector('#otp-only-filter').checked = this.state.filters.showOTPOnly || false;
           
           this.hideServerError();
