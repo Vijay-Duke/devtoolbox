@@ -41,6 +41,41 @@ export class TempEmailTool extends ToolTemplate {
     this.buttonObserver = null;
     this.buttonRemovalTimers = [];
   }
+  
+  init(containerId) {
+    this.container = document.getElementById(containerId);
+    if (!this.container) {
+      console.error(`Container ${containerId} not found`);
+      return;
+    }
+    
+    // Ensure state is properly initialized
+    this.ensureStateInitialized();
+    
+    this.render();
+    this.attachEventListeners();
+    this.loadState();
+  }
+  
+  ensureStateInitialized() {
+    // Backward compatibility: ensure all required state properties exist
+    if (!this.state.subscribedInboxes) {
+      this.state.subscribedInboxes = [];
+    }
+    if (!this.state.subscribedEmails) {
+      this.state.subscribedEmails = [];
+    }
+    if (!this.state.emails) {
+      this.state.emails = [];
+    }
+    if (!this.state.filters) {
+      this.state.filters = {
+        search: '',
+        showOTPOnly: false,
+        selectedInboxId: 'all'
+      };
+    }
+  }
 
   render() {
     this.container.innerHTML = `
@@ -206,8 +241,7 @@ export class TempEmailTool extends ToolTemplate {
   }
 
   attachEventListeners() {
-    // Set up persistent button removal system
-    this.setupButtonRemovalSystem();
+    // Button removal system disabled to prevent notification spam
 
     // Start monitoring button
     const startBtn = this.container.querySelector('#start-monitoring-btn');
@@ -283,23 +317,8 @@ export class TempEmailTool extends ToolTemplate {
   }
 
   setupButtonRemovalSystem() {
-    // Strategy 1: Immediate removal
-    this.removeInjectedButtons();
-    
-    // Strategy 2: Multiple timeout-based removals to catch different injection times
-    const timeouts = [100, 300, 500, 800, 1200]; // Cover ShareableLinks (100ms) and HistoryPersistence (300ms) plus safety margins
-    timeouts.forEach(delay => {
-      const timer = setTimeout(() => {
-        this.removeInjectedButtons();
-      }, delay);
-      this.buttonRemovalTimers.push(timer);
-    });
-    
-    // Strategy 3: MutationObserver for persistent monitoring
-    this.setupButtonRemovalObserver();
-    
-    // Strategy 4: Listen for navigation events to re-run removal
-    this.setupNavigationListener();
+    // Disabled button removal system to prevent notification spam
+    // This system was causing excessive "Copied to clipboard" notifications
   }
 
   removeInjectedButtons() {
@@ -310,14 +329,12 @@ export class TempEmailTool extends ToolTemplate {
     const shareButton = toolHeader.querySelector('.share-button');
     if (shareButton) {
       shareButton.remove();
-      console.log('Temp-email: Removed share button');
     }
     
     // Remove history button (injected by HistoryPersistence service)  
     const historyButton = toolHeader.querySelector('.history-button');
     if (historyButton) {
       historyButton.remove();
-      console.log('Temp-email: Removed history button');
     }
   }
 
@@ -668,7 +685,7 @@ export class TempEmailTool extends ToolTemplate {
     this.eventSource = new EventSource(url);
     
     this.eventSource.onopen = () => {
-      console.log('SSE connection opened');
+      // Connection opened
       this.isConnected = true;
       this.reconnectAttempts = 0; // Reset reconnect attempts on successful connection
       this.updateConnectionStatus('Connected', 'bg-green-500');
@@ -688,7 +705,7 @@ export class TempEmailTool extends ToolTemplate {
     
     this.eventSource.addEventListener('connected', (event) => {
       const data = JSON.parse(event.data);
-      console.log('SSE connection confirmed:', data.timestamp);
+      // Connection confirmed
       
       // Show replay notification if messages were replayed
       if (data.replayedMessages && data.replayedMessages > 0) {
@@ -700,7 +717,7 @@ export class TempEmailTool extends ToolTemplate {
     
     this.eventSource.addEventListener('ping', () => {
       // Keepalive ping - just update last activity
-      console.log('Received keepalive ping');
+      // Keepalive ping received
     });
     
     this.eventSource.onerror = (error) => {
@@ -710,7 +727,7 @@ export class TempEmailTool extends ToolTemplate {
       // Check if this is a 404 error (inbox not found)
       if (this.eventSource.readyState === EventSource.CLOSED) {
         // Likely a 404 or server restart - clear the old inbox
-        console.log('Inbox not found (likely server restart). Clearing old state.');
+        // Inbox not found, clearing old state
         this.state.currentInbox = null;
         this.state.emails = [];
         this.lastEventId = null;
@@ -730,7 +747,7 @@ export class TempEmailTool extends ToolTemplate {
   
   attemptReconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('Max reconnect attempts reached');
+      // Max reconnect attempts reached
       this.updateConnectionStatus('Connection Failed', 'bg-red-500');
       this.showNotification('Connection failed after multiple attempts. Please refresh.', 'error');
       return;
@@ -739,7 +756,7 @@ export class TempEmailTool extends ToolTemplate {
     this.reconnectAttempts++;
     const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000); // Cap at 30 seconds
     
-    console.log(`Attempting reconnect ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${delay}ms`);
+    // Attempting reconnect
     this.updateConnectionStatus(`Reconnecting (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`, 'bg-yellow-500');
     
     setTimeout(() => {
@@ -774,7 +791,7 @@ export class TempEmailTool extends ToolTemplate {
   
   setupEventSourceHandlers() {
     this.eventSource.onopen = () => {
-      console.log('SSE connection opened');
+      // Connection opened
       this.isConnected = true;
       this.reconnectAttempts = 0;
       this.updateConnectionStatus('Connected', 'bg-green-500');
@@ -796,7 +813,7 @@ export class TempEmailTool extends ToolTemplate {
     
     this.eventSource.addEventListener('connected', (event) => {
       const data = JSON.parse(event.data);
-      console.log('SSE connection confirmed:', data.timestamp);
+      // Connection confirmed
       
       // Show replay notification if messages were replayed
       if (data.replayedMessages && data.replayedMessages > 0) {
@@ -805,7 +822,7 @@ export class TempEmailTool extends ToolTemplate {
       
       // Show subscription info
       if (data.subscribedEmails && data.subscribedEmails.length > 1) {
-        console.log(`Monitoring ${data.subscribedEmails.length} email addresses: ${data.subscribedEmails.join(', ')}`);
+        // Monitoring email addresses
         this.updateConnectionStatus(`Connected (${data.subscribedEmails.length} emails)`, 'bg-green-500');
       } else {
         this.updateConnectionStatus('Connected', 'bg-green-500');
@@ -813,7 +830,7 @@ export class TempEmailTool extends ToolTemplate {
     });
     
     this.eventSource.addEventListener('ping', () => {
-      console.log('Received keepalive ping');
+      // Keepalive ping received
     });
     
     this.eventSource.onerror = (error) => {
@@ -821,7 +838,7 @@ export class TempEmailTool extends ToolTemplate {
       this.isConnected = false;
       
       if (this.eventSource.readyState === EventSource.CLOSED) {
-        console.log('Connection closed (likely server restart). Clearing old state.');
+        // Connection closed, clearing state
         this.state.subscribedEmails = [];
         this.state.emails = [];
         this.lastEventId = null;
@@ -872,7 +889,7 @@ export class TempEmailTool extends ToolTemplate {
       }, 300);
     }, 4000);
     
-    console.log(message);
+    // Debug message logged
   }
 
   addEmail(email, inboxId = null) {
@@ -894,7 +911,7 @@ export class TempEmailTool extends ToolTemplate {
       // Clear render hash to force re-render after cleanup
       this.lastRenderHash = null;
       
-      console.log(`Email limit reached. Removed ${removedCount} oldest emails. Current count: ${this.state.emails.length}`);
+      // Email limit reached, removed oldest emails
     }
     
     this.renderEmails();
@@ -914,13 +931,14 @@ export class TempEmailTool extends ToolTemplate {
       return this.state.currentInbox.email;
     }
     
-    // Check subscribed inboxes (with null check)
-    if (this.state.subscribedInboxes) {
-      const subscribedInbox = this.state.subscribedInboxes.find(inbox => inbox.id === inboxId);
-      return subscribedInbox ? subscribedInbox.email : null;
+    // Initialize subscribedInboxes if undefined (backward compatibility)
+    if (!this.state.subscribedInboxes) {
+      this.state.subscribedInboxes = [];
     }
     
-    return null;
+    // Check subscribed inboxes
+    const subscribedInbox = this.state.subscribedInboxes.find(inbox => inbox.id === inboxId);
+    return subscribedInbox ? subscribedInbox.email : null;
   }
 
   updateFilters() {
@@ -1289,7 +1307,7 @@ export class TempEmailTool extends ToolTemplate {
           this.hideServerError();
         } else {
           // Inbox no longer exists (404), clear the state
-          console.log('Saved inbox no longer exists, clearing state');
+          // Saved inbox no longer exists, clearing state
           this.state.currentInbox = null;
           this.state.emails = [];
           this.hideInboxInfo();
@@ -1358,7 +1376,7 @@ export class TempEmailTool extends ToolTemplate {
     
     // Load HTML into sandboxed iframe
     iframe.onload = () => {
-      console.log(`HTML email loaded securely for ${emailId}`);
+      // HTML email loaded securely
     };
     
     iframe.onerror = () => {
