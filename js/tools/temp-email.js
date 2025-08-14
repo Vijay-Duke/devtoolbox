@@ -14,6 +14,7 @@ export class TempEmailTool extends ToolTemplate {
     
     this.state = {
       subscribedEmails: [], // Array of email addresses being monitored
+      subscribedInboxes: [], // Array of inbox objects for multi-inbox mode
       emails: [], // Array of emails with inboxId included
       filters: {
         search: '',
@@ -21,7 +22,7 @@ export class TempEmailTool extends ToolTemplate {
         selectedInboxId: 'all' // Filter by specific inbox or 'all'
       },
       serverUrl: window.location.hostname === 'localhost' 
-        ? 'http://localhost:54322' 
+        ? 'http://localhost:8443' 
         : 'https://api.encode.click'
     };
     
@@ -913,9 +914,13 @@ export class TempEmailTool extends ToolTemplate {
       return this.state.currentInbox.email;
     }
     
-    // Check subscribed inboxes
-    const subscribedInbox = this.state.subscribedInboxes.find(inbox => inbox.id === inboxId);
-    return subscribedInbox ? subscribedInbox.email : null;
+    // Check subscribed inboxes (with null check)
+    if (this.state.subscribedInboxes) {
+      const subscribedInbox = this.state.subscribedInboxes.find(inbox => inbox.id === inboxId);
+      return subscribedInbox ? subscribedInbox.email : null;
+    }
+    
+    return null;
   }
 
   updateFilters() {

@@ -103,9 +103,10 @@ export class IPLookup {
         <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
           <h4 class="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">API Information</h4>
           <p class="text-sm text-blue-700 dark:text-blue-300">
-            This tool uses the free ip-api.com service for real-time geolocation data.
-            <br/>• Rate limit: 45 requests per minute
+            This tool uses the free ipapi.co service for real-time geolocation data.
+            <br/>• Rate limit: 1000 requests per day
             <br/>• Provides accurate location, ISP, and network information
+            <br/>• HTTPS secure API compatible with modern browsers
             <br/>• Works with both IPv4 and IPv6 addresses
           </p>
         </div>
@@ -175,10 +176,10 @@ export class IPLookup {
   async getCurrentIP() {
     try {
       // Use ip-api.com to get current IP
-      const response = await fetch('http://ip-api.com/json/');
+      const response = await fetch('https://ipapi.co/json/');
       if (!response.ok) throw new Error('Failed to fetch IP');
       const data = await response.json();
-      return data.query; // 'query' field contains the IP address
+      return data.ip; // 'ip' field contains the IP address
     } catch (error) {
       console.error('Failed to get current IP from ip-api.com:', error);
       // Fallback to ipify
@@ -264,9 +265,8 @@ export class IPLookup {
     }
     
     try {
-      // Use ip-api.com for real IP information
-      const fields = 'status,message,continent,continentCode,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,asname,reverse,mobile,proxy,hosting,query';
-      const response = await fetch(`http://ip-api.com/json/${ip}?fields=${fields}`);
+      // Use ipapi.co for real IP information (HTTPS compatible)
+      const response = await fetch(`https://ipapi.co/${ip}/json/`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -274,33 +274,33 @@ export class IPLookup {
       
       const data = await response.json();
       
-      if (data.status === 'fail') {
-        throw new Error(data.message || 'IP lookup failed');
+      if (data.error) {
+        throw new Error(data.reason || 'IP lookup failed');
       }
       
-      // Map API response to our format
+      // Map ipapi.co response to our format
       return {
-        ip: data.query || ip,
+        ip: data.ip || ip,
         type: isIPv6 ? 'IPv6' : 'IPv4',
-        continent: data.continent || 'Unknown',
-        continent_code: data.continentCode || 'N/A',
-        country: data.country || 'Unknown',
-        country_code: data.countryCode || 'N/A',
-        region: data.regionName || data.region || 'Unknown',
-        region_code: data.region || 'N/A',
+        continent: data.continent_code || 'Unknown',
+        continent_code: data.continent_code || 'N/A',
+        country: data.country_name || 'Unknown',
+        country_code: data.country_code || 'N/A',
+        region: data.region || 'Unknown',
+        region_code: data.region_code || 'N/A',
         city: data.city || 'Unknown',
-        zip: data.zip || 'N/A',
-        latitude: data.lat || null,
-        longitude: data.lon || null,
+        zip: data.postal || 'N/A',
+        latitude: data.latitude || null,
+        longitude: data.longitude || null,
         timezone: data.timezone || 'N/A',
-        isp: data.isp || 'Unknown',
+        isp: data.org || 'Unknown',
         org: data.org || 'Unknown',
-        as: data.as || 'N/A',
-        asname: data.asname || 'N/A',
-        reverse: data.reverse || 'N/A',
-        mobile: data.mobile || false,
-        proxy: data.proxy || false,
-        hosting: data.hosting || false
+        as: data.asn ? `AS${data.asn}` : 'N/A',
+        asname: data.org || 'N/A',
+        reverse: 'N/A', // ipapi.co doesn't provide reverse DNS
+        mobile: false, // ipapi.co doesn't provide this flag
+        proxy: false, // ipapi.co doesn't provide this flag
+        hosting: false // ipapi.co doesn't provide this flag
       };
     } catch (error) {
       console.error('Failed to get IP info:', error);
