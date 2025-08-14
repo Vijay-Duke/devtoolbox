@@ -1,0 +1,33 @@
+{
+  "server": {
+    "port": 54322,
+    "cors": {
+      "origins": [
+        "http://localhost:8081",
+        "http://127.0.0.1:8081", 
+        "http://localhost:52474",
+        "http://127.0.0.1:52474"
+      ]
+    }
+  },
+  "broadcasting": {
+    "maxRecipientsPerInbox": 20,
+    "writeSchedulingBatchSize": 100,
+    "enableWriteScheduling": true
+  },
+  "timeouts": {
+    "pingIntervalMs": 30000,
+    "heartbeatTimeoutMs": 60000,
+    "globalCleanupIntervalMs": 120000,
+    "connectionTimeoutMs": 120000
+  },
+  "sse": {
+    "retryMs": 3000,
+    "enableEventIds": true,
+    "ringBufferSize": 100
+  },
+  "inbox": {
+    "maxAgeHours": 2,
+    "cleanupIntervalMinutes": 5
+  }
+}

@@ -3,6 +3,10 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { streamSSE } from 'hono/streaming'
 import { v4 as uuidv4 } from 'uuid'
+import { readFileSync } from 'fs'
+
+// Load configuration
+const config = JSON.parse(readFileSync(new URL('./config.json', import.meta.url), 'utf8'))
 
 const app = new Hono()
 
@@ -13,6 +17,62 @@ const inboxes = new Map()
 const inboxSubs = new Map() // Map<inboxId, Map<connectionId, stream>>
 const connMeta = new Map()  // Map<connectionId, inboxId>
 const connHeartbeats = new Map() // Map<connectionId, lastHeartbeat>
+
+// Event tracking for message replay
+const eventCounters = new Map() // Map<inboxId, currentEventId>
+const ringBuffers = new Map()   // Map<inboxId, CircularBuffer>
+
+// Circular buffer for message replay
+class CircularBuffer {
+  constructor(size) {
+    this.size = size
+    this.buffer = new Array(size)
+    this.head = 0
+    this.count = 0
+  }
+  
+  add(item) {
+    this.buffer[this.head] = item
+    this.head = (this.head + 1) % this.size
+    if (this.count < this.size) {
+      this.count++
+    }
+  }
+  
+  getFromId(eventId) {
+    if (this.count === 0) return []
+    
+    const messages = []
+    let current = this.head - this.count
+    if (current < 0) current += this.size
+    
+    for (let i = 0; i < this.count; i++) {
+      const msg = this.buffer[current]
+      if (msg && msg.id > eventId) {
+        messages.push(msg)
+      }
+      current = (current + 1) % this.size
+    }
+    
+    return messages
+  }
+  
+  getAll() {
+    if (this.count === 0) return []
+    
+    const messages = []
+    let current = this.head - this.count
+    if (current < 0) current += this.size
+    
+    for (let i = 0; i < this.count; i++) {
+      const msg = this.buffer[current]
+      if (msg) messages.push(msg)
+      current = (current + 1) % this.size
+    }
+    
+    return messages
+  }
+}
 
 // Helper functions for connection management
 function addConnection(connectionId, inboxId, stream) {
@@ -27,6 +87,12 @@ function addConnection(connectionId, inboxId, stream) {
   
   // Initialize heartbeat tracking
   connHeartbeats.set(connectionId, Date.now())
+  
+  // Initialize event tracking for this inbox
+  if (!eventCounters.has(inboxId)) {
+    eventCounters.set(inboxId, 0)
+    ringBuffers.set(inboxId, new CircularBuffer(config.sse.ringBufferSize))
+  }
   
   console.log(`Connection added: ${connectionId} for inbox ${inboxId}`)
 }
@@ -64,14 +130,32 @@ async function broadcastEmail(inboxId, email) {
   const subscriberCount = subscribers.size
   console.log(`Broadcasting email to ${subscriberCount} subscribers for inbox ${inboxId}`)
   
+  // Generate event ID
+  const eventId = eventCounters.get(inboxId) + 1
+  eventCounters.set(inboxId, eventId)
+  
+  // Create event with ID for ring buffer
+  const eventData = {
+    id: eventId,
+    type: 'email',
+    data: email,
+    timestamp: Date.now()
+  }
+  
+  // Add to ring buffer for replay capability
+  const ringBuffer = ringBuffers.get(inboxId)
+  if (ringBuffer) {
+    ringBuffer.add(eventData)
+  }
+  
   // Bounded broadcast: cap max recipients per inbox to prevent hot inbox starvation
-  const MAX_RECIPIENTS = 20
-  const cappedSubscribers = subscriberCount > MAX_RECIPIENTS 
-    ? Array.from(subscribers.entries()).slice(0, MAX_RECIPIENTS)
+  const maxRecipients = config.broadcasting.maxRecipientsPerInbox
+  const cappedSubscribers = subscriberCount > maxRecipients 
+    ? Array.from(subscribers.entries()).slice(0, maxRecipients)
     : subscribers.entries()
   
-  if (subscriberCount > MAX_RECIPIENTS) {
-    console.log(`Capping broadcast to ${MAX_RECIPIENTS} recipients (${subscriberCount} total)`)
+  if (subscriberCount > maxRecipients) {
+    console.log(`Capping broadcast to ${maxRecipients} recipients (${subscriberCount} total)`)
   }
   
   // Single stringify per email - don't JSON.stringify for every subscriber
@@ -85,14 +169,17 @@ async function broadcastEmail(inboxId, email) {
   for (const [connectionId, stream] of cappedSubscribers) {
     try {
       await stream.writeSSE({
+        id: config.sse.enableEventIds ? eventId.toString() : undefined,
         data: serializedEmail,
-        event: 'email'
+        event: 'email',
+        retry: config.sse.retryMs
       })
       
       writeCount++
       
-      // Write scheduling: batch microtasks after every ~100 writes to keep event loop responsive
-      if (writeCount % 100 === 0) {
+      // Write scheduling: batch microtasks after configured batch size to keep event loop responsive
+      if (config.broadcasting.enableWriteScheduling && 
+          writeCount % config.broadcasting.writeSchedulingBatchSize === 0) {
         await new Promise(resolve => queueMicrotask(resolve))
       }
       
@@ -110,9 +197,9 @@ async function broadcastEmail(inboxId, email) {
 
 // CORS configuration
 app.use('*', cors({
-  origin: ['http://localhost:8081', 'http://127.0.0.1:8081', 'http://localhost:52474', 'http://127.0.0.1:52474'],
+  origin: config.server.cors.origins,
   allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowHeaders: ['Content-Type', 'Accept', 'Cache-Control', 'X-Requested-With', 'Authorization'],
+  allowHeaders: ['Content-Type', 'Accept', 'Cache-Control', 'X-Requested-With', 'Authorization', 'Last-Event-ID'],
   credentials: false
 }))
 
@@ -237,28 +324,71 @@ app.get('/api/emails/:inboxId/stream', (c) => {
     })
     
     try {
-      // Send existing emails immediately
-      const inbox = inboxes.get(inboxId)
-      console.log(`Sending ${inbox.emails.length} existing emails to new connection`)
-      for (const email of inbox.emails) {
-        try {
-          await stream.writeSSE({
-            data: JSON.stringify({ type: 'email', data: email }),
-            event: 'email'
-          })
-        } catch (writeError) {
-          console.log('Error writing existing email to stream:', writeError.message)
-          removeConnection(connectionId)
-          throw writeError
+      // Handle Last-Event-ID for message replay
+      const lastEventId = c.req.header('Last-Event-ID')
+      let replayedCount = 0
+      
+      if (lastEventId && config.sse.enableEventIds) {
+        const lastId = parseInt(lastEventId)
+        const ringBuffer = ringBuffers.get(inboxId)
+        
+        if (ringBuffer && !isNaN(lastId)) {
+          const missedMessages = ringBuffer.getFromId(lastId)
+          console.log(`Replaying ${missedMessages.length} missed messages from event ID ${lastId}`)
+          
+          for (const msg of missedMessages) {
+            try {
+              await stream.writeSSE({
+                id: config.sse.enableEventIds ? msg.id.toString() : undefined,
+                data: JSON.stringify({ type: msg.type, data: msg.data }),
+                event: msg.type,
+                retry: config.sse.retryMs
+              })
+              replayedCount++
+            } catch (writeError) {
+              console.log('Error replaying message:', writeError.message)
+              removeConnection(connectionId)
+              throw writeError
+            }
+          }
+        }
+      } else {
+        // Send existing emails immediately (for new connections without Last-Event-ID)
+        const inbox = inboxes.get(inboxId)
+        console.log(`Sending ${inbox.emails.length} existing emails to new connection`)
+        for (const email of inbox.emails) {
+          try {
+            // Generate event IDs for existing emails if not replaying
+            const eventId = eventCounters.get(inboxId) + 1
+            eventCounters.set(inboxId, eventId)
+            
+            await stream.writeSSE({
+              id: config.sse.enableEventIds ? eventId.toString() : undefined,
+              data: JSON.stringify({ type: 'email', data: email }),
+              event: 'email',
+              retry: config.sse.retryMs
+            })
+          } catch (writeError) {
+            console.log('Error writing existing email to stream:', writeError.message)
+            removeConnection(connectionId)
+            throw writeError
+          }
         }
       }
       
-      // Send initial connection confirmation
+      // Send initial connection confirmation with replay info
+      const confirmationData = {
+        type: 'connected',
+        timestamp: new Date().toISOString(),
+        replayedMessages: replayedCount
+      }
+      
       await stream.writeSSE({
-        data: JSON.stringify({ type: 'connected', timestamp: new Date().toISOString() }),
-        event: 'connected'
+        data: JSON.stringify(confirmationData),
+        event: 'connected',
+        retry: config.sse.retryMs
       })
-      console.log(`Connection confirmation sent to ${connectionId}`)
+      console.log(`Connection confirmation sent to ${connectionId}, replayed ${replayedCount} messages`)
       
     } catch (error) {
       console.log('Error setting up SSE stream:', error.message)
@@ -267,16 +397,13 @@ app.get('/api/emails/:inboxId/stream', (c) => {
     }
     
     // Send keepalive ping with aggressive timeout management
-    const PING_INTERVAL = 30000 // 30 seconds
-    const HEARTBEAT_TIMEOUT = 60000 // 60 seconds (2 intervals)
-    
     pingInterval = setInterval(async () => {
       if (connMeta.has(connectionId)) {
         const lastHeartbeat = connHeartbeats.get(connectionId)
         const now = Date.now()
         
-        // Check if connection is idle/dead - remove if no heartbeat within 2 intervals
-        if (now - lastHeartbeat > HEARTBEAT_TIMEOUT) {
+        // Check if connection is idle/dead - remove if no heartbeat within timeout
+        if (now - lastHeartbeat > config.timeouts.heartbeatTimeoutMs) {
           console.log(`Connection ${connectionId} timed out, removing`)
           clearInterval(pingInterval)
           removeConnection(connectionId)
@@ -286,7 +413,8 @@ app.get('/api/emails/:inboxId/stream', (c) => {
         try {
           await stream.writeSSE({
             data: JSON.stringify({ type: 'ping', timestamp: new Date().toISOString() }),
-            event: 'ping'
+            event: 'ping',
+            retry: config.sse.retryMs
           })
           
           // Update heartbeat on successful ping
@@ -300,7 +428,7 @@ app.get('/api/emails/:inboxId/stream', (c) => {
       } else {
         clearInterval(pingInterval)
       }
-    }, PING_INTERVAL)
+    }, config.timeouts.pingIntervalMs)
     
     // Keep the stream alive - this is important for SSE
     await new Promise((resolve) => {
@@ -416,10 +544,10 @@ app.get('/health', (c) => {
   })
 })
 
-// Cleanup old inboxes (run every 5 minutes)
+// Cleanup old inboxes
 setInterval(() => {
   const now = new Date()
-  const maxAge = 2 * 60 * 60 * 1000 // 2 hours
+  const maxAge = config.inbox.maxAgeHours * 60 * 60 * 1000
   
   for (const [inboxId, inbox] of inboxes.entries()) {
     const createdAt = new Date(inbox.createdAt)
@@ -434,19 +562,22 @@ setInterval(() => {
         }
       }
       
+      // Clean up event tracking
+      eventCounters.delete(inboxId)
+      ringBuffers.delete(inboxId)
+      
       inboxes.delete(inboxId)
     }
   }
-}, 5 * 60 * 1000)
+}, config.inbox.cleanupIntervalMinutes * 60 * 1000)
 
-// Global cleanup for dead connections (run every 2 minutes)
+// Global cleanup for dead connections
 setInterval(() => {
   const now = Date.now()
-  const GLOBAL_TIMEOUT = 120000 // 2 minutes
   const deadConnections = []
   
   for (const [connectionId, lastHeartbeat] of connHeartbeats.entries()) {
-    if (now - lastHeartbeat > GLOBAL_TIMEOUT) {
+    if (now - lastHeartbeat > config.timeouts.connectionTimeoutMs) {
       deadConnections.push(connectionId)
     }
   }
@@ -457,9 +588,9 @@ setInterval(() => {
       removeConnection(connectionId)
     }
   }
-}, 2 * 60 * 1000)
+}, config.timeouts.globalCleanupIntervalMs)
 
-const port = process.env.PORT || 54322
+const port = process.env.PORT || config.server.port
 console.log(`🚀 Temporary Email Server starting on port ${port}`)
 
 serve({

@@ -24,6 +24,9 @@ export class TempEmailTool extends ToolTemplate {
     
     this.eventSource = null;
     this.isConnected = false;
+    this.lastEventId = null;
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 10;
   }
 
   render() {
@@ -270,10 +273,16 @@ export class TempEmailTool extends ToolTemplate {
     this.eventSource.onopen = () => {
       console.log('SSE connection opened');
       this.isConnected = true;
+      this.reconnectAttempts = 0; // Reset reconnect attempts on successful connection
       this.updateConnectionStatus('Connected', 'bg-green-500');
     };
     
     this.eventSource.addEventListener('email', (event) => {
+      // Store last event ID for reconnection
+      if (event.lastEventId) {
+        this.lastEventId = event.lastEventId;
+      }
+      
       const data = JSON.parse(event.data);
       if (data.type === 'email') {
         this.addEmail(data.data);
@@ -283,6 +292,12 @@ export class TempEmailTool extends ToolTemplate {
     this.eventSource.addEventListener('connected', (event) => {
       const data = JSON.parse(event.data);
       console.log('SSE connection confirmed:', data.timestamp);
+      
+      // Show replay notification if messages were replayed
+      if (data.replayedMessages && data.replayedMessages > 0) {
+        this.showReconnectionNotification(data.replayedMessages);
+      }
+      
       this.updateConnectionStatus('Connected', 'bg-green-500');
     });
     
@@ -301,6 +316,7 @@ export class TempEmailTool extends ToolTemplate {
         console.log('Inbox not found (likely server restart). Clearing old state.');
         this.state.currentInbox = null;
         this.state.emails = [];
+        this.lastEventId = null;
         this.hideInboxInfo();
         this.updateConnectionStatus('Inbox Expired', 'bg-yellow-500');
         this.showNotification('Inbox expired or server restarted. Please generate a new inbox.', 'error');
@@ -308,15 +324,111 @@ export class TempEmailTool extends ToolTemplate {
         return;
       }
       
-      this.updateConnectionStatus('Connection Error', 'bg-red-500');
+      this.updateConnectionStatus('Reconnecting...', 'bg-yellow-500');
       
-      // Attempt to reconnect after a delay for other errors
-      setTimeout(() => {
-        if (this.state.currentInbox && !this.isConnected) {
-          console.log('Attempting to reconnect...');
-          this.connectToSSE();
-        }
-      }, 5000);
+      // Attempt to reconnect with exponential backoff
+      this.attemptReconnect();
+    };
+  }
+  
+  attemptReconnect() {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.log('Max reconnect attempts reached');
+      this.updateConnectionStatus('Connection Failed', 'bg-red-500');
+      this.showNotification('Connection failed after multiple attempts. Please refresh.', 'error');
+      return;
+    }
+    
+    this.reconnectAttempts++;
+    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000); // Cap at 30 seconds
+    
+    console.log(`Attempting reconnect ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${delay}ms`);
+    this.updateConnectionStatus(`Reconnecting (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`, 'bg-yellow-500');
+    
+    setTimeout(() => {
+      if (this.state.currentInbox && !this.isConnected) {
+        this.connectToSSEWithReplay();
+      }
+    }, delay);
+  }
+  
+  connectToSSEWithReplay() {
+    if (!this.state.currentInbox) return;
+    
+    this.disconnect(); // Close any existing connection
+    
+    // Build URL with Last-Event-ID if available
+    let url = `${this.state.serverUrl}/api/emails/${this.state.currentInbox.id}/stream`;
+    
+    // Create EventSource with replay capability
+    const eventSourceInitDict = {};
+    if (this.lastEventId) {
+      // Set Last-Event-ID header for replay
+      eventSourceInitDict.headers = {
+        'Last-Event-ID': this.lastEventId
+      };
+    }
+    
+    this.eventSource = new EventSource(url);
+    
+    // Set up all the same event handlers as connectToSSE
+    this.setupEventSourceHandlers();
+  }
+  
+  setupEventSourceHandlers() {
+    this.eventSource.onopen = () => {
+      console.log('SSE connection opened');
+      this.isConnected = true;
+      this.reconnectAttempts = 0;
+      this.updateConnectionStatus('Connected', 'bg-green-500');
+    };
+    
+    this.eventSource.addEventListener('email', (event) => {
+      // Store last event ID for reconnection
+      if (event.lastEventId) {
+        this.lastEventId = event.lastEventId;
+      }
+      
+      const data = JSON.parse(event.data);
+      if (data.type === 'email') {
+        this.addEmail(data.data);
+      }
+    });
+    
+    this.eventSource.addEventListener('connected', (event) => {
+      const data = JSON.parse(event.data);
+      console.log('SSE connection confirmed:', data.timestamp);
+      
+      // Show replay notification if messages were replayed
+      if (data.replayedMessages && data.replayedMessages > 0) {
+        this.showReconnectionNotification(data.replayedMessages);
+      }
+      
+      this.updateConnectionStatus('Connected', 'bg-green-500');
+    });
+    
+    this.eventSource.addEventListener('ping', () => {
+      console.log('Received keepalive ping');
+    });
+    
+    this.eventSource.onerror = (error) => {
+      console.error('SSE error:', error);
+      this.isConnected = false;
+      
+      if (this.eventSource.readyState === EventSource.CLOSED) {
+        console.log('Inbox not found (likely server restart). Clearing old state.');
+        this.state.currentInbox = null;
+        this.state.emails = [];
+        this.lastEventId = null;
+        this.hideInboxInfo();
+        this.updateConnectionStatus('Inbox Expired', 'bg-yellow-500');
+        this.showNotification('Inbox expired or server restarted. Please generate a new inbox.', 'error');
+        this.saveState();
+        return;
+      }
+      
+      this.updateConnectionStatus('Reconnecting...', 'bg-yellow-500');
+      this.attemptReconnect();
     };
   }
 
@@ -326,7 +438,38 @@ export class TempEmailTool extends ToolTemplate {
       this.eventSource = null;
     }
     this.isConnected = false;
+    this.reconnectAttempts = 0;
     this.updateConnectionStatus('Disconnected', 'bg-gray-400');
+  }
+  
+  showReconnectionNotification(replayedCount) {
+    const message = `Reconnected; replayed ${replayedCount} message${replayedCount !== 1 ? 's' : ''}`;
+    
+    // Create a temporary notification element
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity';
+    notification.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+        </svg>
+        <span class="text-sm font-medium">${message}</span>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Fade out and remove after 4 seconds
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      }, 300);
+    }, 4000);
+    
+    console.log(message);
   }
 
   addEmail(email) {
@@ -559,6 +702,8 @@ export class TempEmailTool extends ToolTemplate {
 
   destroy() {
     this.disconnect();
+    this.lastEventId = null;
+    this.reconnectAttempts = 0;
     super.destroy();
   }
 }
