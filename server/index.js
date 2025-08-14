@@ -8,7 +8,105 @@ const app = new Hono()
 
 // In-memory storage for inboxes and emails
 const inboxes = new Map()
-const connections = new Map()
+
+// Dual-index SSE connection tracking for O(k) broadcasting performance
+const inboxSubs = new Map() // Map<inboxId, Map<connectionId, stream>>
+const connMeta = new Map()  // Map<connectionId, inboxId>
+const connHeartbeats = new Map() // Map<connectionId, lastHeartbeat>
+
+// Helper functions for connection management
+function addConnection(connectionId, inboxId, stream) {
+  // Add to reverse lookup
+  connMeta.set(connectionId, inboxId)
+  
+  // Add to inbox subscribers
+  if (!inboxSubs.has(inboxId)) {
+    inboxSubs.set(inboxId, new Map())
+  }
+  inboxSubs.get(inboxId).set(connectionId, stream)
+  
+  // Initialize heartbeat tracking
+  connHeartbeats.set(connectionId, Date.now())
+  
+  console.log(`Connection added: ${connectionId} for inbox ${inboxId}`)
+}
+
+function removeConnection(connectionId) {
+  const inboxId = connMeta.get(connectionId)
+  if (!inboxId) return
+  
+  // Remove from reverse lookup
+  connMeta.delete(connectionId)
+  
+  // Remove heartbeat tracking
+  connHeartbeats.delete(connectionId)
+  
+  // Remove from inbox subscribers
+  const subscribers = inboxSubs.get(inboxId)
+  if (subscribers) {
+    subscribers.delete(connectionId)
+    
+    // Clean up empty inbox subscription maps
+    if (subscribers.size === 0) {
+      inboxSubs.delete(inboxId)
+    }
+  }
+  
+  console.log(`Connection removed: ${connectionId} from inbox ${inboxId}`)
+}
+
+async function broadcastEmail(inboxId, email) {
+  const subscribers = inboxSubs.get(inboxId)
+  if (!subscribers || subscribers.size === 0) {
+    return
+  }
+  
+  const subscriberCount = subscribers.size
+  console.log(`Broadcasting email to ${subscriberCount} subscribers for inbox ${inboxId}`)
+  
+  // Bounded broadcast: cap max recipients per inbox to prevent hot inbox starvation
+  const MAX_RECIPIENTS = 20
+  const cappedSubscribers = subscriberCount > MAX_RECIPIENTS 
+    ? Array.from(subscribers.entries()).slice(0, MAX_RECIPIENTS)
+    : subscribers.entries()
+  
+  if (subscriberCount > MAX_RECIPIENTS) {
+    console.log(`Capping broadcast to ${MAX_RECIPIENTS} recipients (${subscriberCount} total)`)
+  }
+  
+  // Single stringify per email - don't JSON.stringify for every subscriber
+  const serializedEmail = JSON.stringify({ type: 'email', data: email })
+  
+  // Create array of failed connections to clean up
+  const failedConnections = []
+  let writeCount = 0
+  
+  // Broadcast to subscribers with write scheduling for responsiveness
+  for (const [connectionId, stream] of cappedSubscribers) {
+    try {
+      await stream.writeSSE({
+        data: serializedEmail,
+        event: 'email'
+      })
+      
+      writeCount++
+      
+      // Write scheduling: batch microtasks after every ~100 writes to keep event loop responsive
+      if (writeCount % 100 === 0) {
+        await new Promise(resolve => queueMicrotask(resolve))
+      }
+      
+    } catch (error) {
+      console.log(`Failed to send email to connection ${connectionId}, marking for removal:`, error.message)
+      failedConnections.push(connectionId)
+    }
+  }
+  
+  // Clean up failed connections
+  for (const connectionId of failedConnections) {
+    removeConnection(connectionId)
+  }
+}
 
 // CORS configuration
 app.use('*', cors({
@@ -125,10 +223,9 @@ app.get('/api/emails/:inboxId/stream', (c) => {
   }
   
   return streamSSE(c, async (stream) => {
-    // Store this connection
+    // Store this connection using dual-index system
     const connectionId = uuidv4()
-    connections.set(connectionId, { stream, inboxId })
-    console.log(`New SSE connection established: ${connectionId} for inbox ${inboxId}`)
+    addConnection(connectionId, inboxId, stream)
     
     let pingInterval
     
@@ -136,7 +233,7 @@ app.get('/api/emails/:inboxId/stream', (c) => {
     stream.onAbort(() => {
       console.log(`SSE connection aborted: ${connectionId} for inbox ${inboxId}`)
       if (pingInterval) clearInterval(pingInterval)
-      connections.delete(connectionId)
+      removeConnection(connectionId)
     })
     
     try {
@@ -151,7 +248,7 @@ app.get('/api/emails/:inboxId/stream', (c) => {
           })
         } catch (writeError) {
           console.log('Error writing existing email to stream:', writeError.message)
-          connections.delete(connectionId)
+          removeConnection(connectionId)
           throw writeError
         }
       }
@@ -165,27 +262,45 @@ app.get('/api/emails/:inboxId/stream', (c) => {
       
     } catch (error) {
       console.log('Error setting up SSE stream:', error.message)
-      connections.delete(connectionId)
+      removeConnection(connectionId)
       throw error
     }
     
-    // Send keepalive ping
+    // Send keepalive ping with aggressive timeout management
+    const PING_INTERVAL = 30000 // 30 seconds
+    const HEARTBEAT_TIMEOUT = 60000 // 60 seconds (2 intervals)
+    
     pingInterval = setInterval(async () => {
-      if (connections.has(connectionId)) {
+      if (connMeta.has(connectionId)) {
+        const lastHeartbeat = connHeartbeats.get(connectionId)
+        const now = Date.now()
+        
+        // Check if connection is idle/dead - remove if no heartbeat within 2 intervals
+        if (now - lastHeartbeat > HEARTBEAT_TIMEOUT) {
+          console.log(`Connection ${connectionId} timed out, removing`)
+          clearInterval(pingInterval)
+          removeConnection(connectionId)
+          return
+        }
+        
         try {
           await stream.writeSSE({
             data: JSON.stringify({ type: 'ping', timestamp: new Date().toISOString() }),
             event: 'ping'
           })
+          
+          // Update heartbeat on successful ping
+          connHeartbeats.set(connectionId, now)
+          
         } catch (error) {
           console.log('Ping failed, connection closed:', error.message)
           clearInterval(pingInterval)
-          connections.delete(connectionId)
+          removeConnection(connectionId)
         }
       } else {
         clearInterval(pingInterval)
       }
-    }, 30000)
+    }, PING_INTERVAL)
     
     // Keep the stream alive - this is important for SSE
     await new Promise((resolve) => {
@@ -254,20 +369,8 @@ app.post('/api/emails/:inboxId', async (c) => {
   // Add email to inbox
   inbox.emails.push(email)
   
-  // Broadcast to all connected SSE streams for this inbox
-  for (const [connectionId, connection] of connections.entries()) {
-    if (connection.inboxId === inboxId) {
-      try {
-        await connection.stream.writeSSE({
-          data: JSON.stringify({ type: 'email', data: email }),
-          event: 'email'
-        })
-      } catch (error) {
-        console.log('Failed to send email to connection, removing:', error.message)
-        connections.delete(connectionId)
-      }
-    }
-  }
+  // Broadcast using optimized O(k) dispatch
+  await broadcastEmail(inboxId, email)
   
   return c.json({
     success: true,
@@ -283,10 +386,12 @@ app.delete('/api/inbox/:inboxId', (c) => {
     return c.json({ error: 'Inbox not found' }, 404)
   }
   
-  // Close all connections for this inbox
-  for (const [connectionId, connection] of connections.entries()) {
-    if (connection.inboxId === inboxId) {
-      connections.delete(connectionId)
+  // Close all connections for this inbox using O(k) lookup
+  const subscribers = inboxSubs.get(inboxId)
+  if (subscribers) {
+    // Remove all connections for this inbox
+    for (const connectionId of subscribers.keys()) {
+      removeConnection(connectionId)
     }
   }
   
@@ -305,7 +410,8 @@ app.get('/health', (c) => {
     timestamp: new Date().toISOString(),
     stats: {
       activeInboxes: inboxes.size,
-      activeConnections: connections.size
+      activeConnections: connMeta.size,
+      activeInboxSubscriptions: inboxSubs.size
     }
   })
 })
@@ -320,10 +426,11 @@ setInterval(() => {
     if (now - createdAt > maxAge) {
       console.log(`Cleaning up old inbox: ${inbox.email}`)
       
-      // Close connections
-      for (const [connectionId, connection] of connections.entries()) {
-        if (connection.inboxId === inboxId) {
-          connections.delete(connectionId)
+      // Close connections using O(k) cleanup
+      const subscribers = inboxSubs.get(inboxId)
+      if (subscribers) {
+        for (const connectionId of subscribers.keys()) {
+          removeConnection(connectionId)
         }
       }
       
@@ -331,6 +438,26 @@ setInterval(() => {
     }
   }
 }, 5 * 60 * 1000)
+
+// Global cleanup for dead connections (run every 2 minutes)
+setInterval(() => {
+  const now = Date.now()
+  const GLOBAL_TIMEOUT = 120000 // 2 minutes
+  const deadConnections = []
+  
+  for (const [connectionId, lastHeartbeat] of connHeartbeats.entries()) {
+    if (now - lastHeartbeat > GLOBAL_TIMEOUT) {
+      deadConnections.push(connectionId)
+    }
+  }
+  
+  if (deadConnections.length > 0) {
+    console.log(`Global cleanup: removing ${deadConnections.length} dead connections`)
+    for (const connectionId of deadConnections) {
+      removeConnection(connectionId)
+    }
+  }
+}, 2 * 60 * 1000)
 
 const port = process.env.PORT || 54322
 console.log(`🚀 Temporary Email Server starting on port ${port}`)
