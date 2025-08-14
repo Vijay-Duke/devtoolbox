@@ -33,6 +33,10 @@ export class TempEmailTool extends ToolTemplate {
     this.searchRegexCache = new Map(); // Cache compiled regex patterns
     this.lastRenderHash = null; // Track rendered content to avoid unnecessary rebuilds
     this.maxEmailsPerInbox = 100; // Limit emails per inbox to prevent memory growth
+    
+    // Button removal system
+    this.buttonObserver = null;
+    this.buttonRemovalTimers = [];
   }
 
   render() {
@@ -40,19 +44,8 @@ export class TempEmailTool extends ToolTemplate {
       <div class="temp-email-tool max-w-6xl mx-auto p-6">
         <!-- Header -->
         <div class="tool-header mb-6">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">${this.config.name}</h1>
-              <p class="text-gray-600 dark:text-gray-400">${this.config.description}</p>
-            </div>
-            <button 
-              id="tool-clear-btn"
-              class="px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
-              title="Clear this tool - clear all data and disconnect"
-            >
-              Clear Tool
-            </button>
-          </div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">${this.config.name}</h1>
+          <p class="text-gray-600 dark:text-gray-400">${this.config.description}</p>
         </div>
 
         <!-- Server Status -->
@@ -199,6 +192,9 @@ export class TempEmailTool extends ToolTemplate {
   }
 
   attachEventListeners() {
+    // Set up persistent button removal system
+    this.setupButtonRemovalSystem();
+
     // Start monitoring button
     const startBtn = this.container.querySelector('#start-monitoring-btn');
     startBtn.addEventListener('click', () => this.startMonitoring());
@@ -224,10 +220,6 @@ export class TempEmailTool extends ToolTemplate {
     // Connection toggle button
     const connectionToggleBtn = this.container.querySelector('#connection-toggle-btn');
     connectionToggleBtn.addEventListener('click', () => this.toggleConnection());
-
-    // Tool clear button
-    const toolClearBtn = this.container.querySelector('#tool-clear-btn');
-    toolClearBtn.addEventListener('click', () => this.clearTool());
 
     // Filter inputs
     const searchFilter = this.container.querySelector('#search-filter');
@@ -259,6 +251,103 @@ export class TempEmailTool extends ToolTemplate {
     searchFilter.addEventListener('input', updateFilters);
     inboxFilter.addEventListener('change', updateFilters);
     otpFilter.addEventListener('change', updateFilters);
+  }
+
+  setupButtonRemovalSystem() {
+    // Strategy 1: Immediate removal
+    this.removeInjectedButtons();
+    
+    // Strategy 2: Multiple timeout-based removals to catch different injection times
+    const timeouts = [100, 300, 500, 800, 1200]; // Cover ShareableLinks (100ms) and HistoryPersistence (300ms) plus safety margins
+    timeouts.forEach(delay => {
+      const timer = setTimeout(() => {
+        this.removeInjectedButtons();
+      }, delay);
+      this.buttonRemovalTimers.push(timer);
+    });
+    
+    // Strategy 3: MutationObserver for persistent monitoring
+    this.setupButtonRemovalObserver();
+    
+    // Strategy 4: Listen for navigation events to re-run removal
+    this.setupNavigationListener();
+  }
+
+  removeInjectedButtons() {
+    const toolHeader = this.container.querySelector('.tool-header');
+    if (!toolHeader) return;
+    
+    // Remove share button (injected by ShareableLinks service)
+    const shareButton = toolHeader.querySelector('.share-button');
+    if (shareButton) {
+      shareButton.remove();
+      console.log('Temp-email: Removed share button');
+    }
+    
+    // Remove history button (injected by HistoryPersistence service)  
+    const historyButton = toolHeader.querySelector('.history-button');
+    if (historyButton) {
+      historyButton.remove();
+      console.log('Temp-email: Removed history button');
+    }
+  }
+
+  setupButtonRemovalObserver() {
+    const toolHeader = this.container.querySelector('.tool-header');
+    if (!toolHeader) return;
+    
+    // Create MutationObserver to watch for button injections
+    this.buttonObserver = new MutationObserver((mutations) => {
+      let buttonsFound = false;
+      
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === 1) { // Element node
+              // Check if the added node is a button we want to remove
+              if (node.classList.contains('share-button') || node.classList.contains('history-button')) {
+                buttonsFound = true;
+              }
+              // Or check if it contains buttons we want to remove
+              if (node.querySelector('.share-button, .history-button')) {
+                buttonsFound = true;
+              }
+            }
+          });
+        }
+      });
+      
+      if (buttonsFound) {
+        // Small delay to ensure DOM is stable before removal
+        setTimeout(() => {
+          this.removeInjectedButtons();
+        }, 10);
+      }
+    });
+    
+    // Start observing
+    this.buttonObserver.observe(toolHeader, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  setupNavigationListener() {
+    // Listen for hash changes to detect when user navigates to/from temp-email
+    const handleHashChange = () => {
+      const currentHash = window.location.hash.slice(1);
+      if (currentHash === 'temp-email') {
+        // User navigated to temp-email tool, ensure buttons are removed
+        setTimeout(() => {
+          this.removeInjectedButtons();
+        }, 50);
+      }
+    };
+    
+    window.addEventListener('hashchange', handleHashChange);
+    
+    // Store reference for cleanup
+    this.hashChangeListener = handleHashChange;
   }
 
   startMonitoring() {
@@ -336,59 +425,6 @@ export class TempEmailTool extends ToolTemplate {
       // Disconnect
       this.disconnect();
       this.showNotification('Disconnected from monitoring', 'success');
-    }
-  }
-
-  clearTool() {
-    if (confirm('This will clear all emails, disconnect from monitoring, and clear all stored data for this tool. Continue?')) {
-      // Disconnect from any active connections
-      this.disconnect();
-      
-      // Reset all state
-      this.state = {
-        subscribedEmails: [],
-        emails: [],
-        filters: {
-          search: '',
-          showOTPOnly: false,
-          selectedInboxId: 'all'
-        },
-        serverUrl: 'http://localhost:54322'
-      };
-      
-      // Clear localStorage for this tool
-      const keysToRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith('temp-email-') || key.includes('tempEmail'))) {
-          keysToRemove.push(key);
-        }
-      }
-      keysToRemove.forEach(key => localStorage.removeItem(key));
-      
-      // Reset UI elements
-      const emailsInput = this.container.querySelector('#emails-input');
-      if (emailsInput) emailsInput.value = '';
-      
-      // Clear displayed emails and subscriptions
-      this.renderEmails();
-      this.showSubscribedEmails();
-      this.updateInboxFilter();
-      
-      // Reset connection status
-      this.updateConnectionStatus('Disconnected', 'bg-gray-400');
-      
-      // Reset filters
-      const searchFilter = this.container.querySelector('#search-filter');
-      const inboxFilter = this.container.querySelector('#inbox-filter');
-      if (searchFilter) searchFilter.value = '';
-      if (inboxFilter) inboxFilter.value = 'all';
-      
-      // Hide server errors and notifications
-      this.hideServerError();
-      
-      // Show success notification
-      this.showNotification('Tool cleared successfully - all data removed', 'success');
     }
   }
 
@@ -1156,6 +1192,9 @@ export class TempEmailTool extends ToolTemplate {
   }
 
   async applyState() {
+    // Ensure buttons are removed when applying state
+    this.removeInjectedButtons();
+    
     // Restore multi-inbox mode if enabled
     if (this.state.multiInboxMode) {
       this.toggleMultiInboxMode(); // This will set up the UI
@@ -1206,6 +1245,28 @@ export class TempEmailTool extends ToolTemplate {
     this.disconnect();
     this.lastEventId = null;
     this.reconnectAttempts = 0;
+    
+    // Clean up button removal system
+    this.cleanupButtonRemovalSystem();
+    
     super.destroy();
+  }
+
+  cleanupButtonRemovalSystem() {
+    // Clear all timers
+    this.buttonRemovalTimers.forEach(timer => clearTimeout(timer));
+    this.buttonRemovalTimers = [];
+    
+    // Disconnect MutationObserver
+    if (this.buttonObserver) {
+      this.buttonObserver.disconnect();
+      this.buttonObserver = null;
+    }
+    
+    // Remove navigation listener
+    if (this.hashChangeListener) {
+      window.removeEventListener('hashchange', this.hashChangeListener);
+      this.hashChangeListener = null;
+    }
   }
 }
