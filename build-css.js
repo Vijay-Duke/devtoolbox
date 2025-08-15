@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import postcss from 'postcss'
-import tailwindcssPlugin from '@tailwindcss/postcss'
+import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 import fs from 'fs/promises'
 
@@ -16,7 +16,7 @@ async function buildCSS() {
     
     // Create PostCSS processor with plugins
     const processor = postcss([
-      tailwindcssPlugin(),
+      tailwindcss(),
       autoprefixer()
     ])
     
