@@ -394,9 +394,19 @@ export class CronParser {
     if (minute === '*' && hour === '*') {
       description += 'every minute';
     } else if (minute === '*') {
-      description += `every minute of hour ${this.describeValue(hour, 'hour')}`;
+      const hourDesc = this.describeValue(hour, 'hour');
+      if (hourDesc.startsWith('every')) {
+        description += `every minute during ${hourDesc}`;
+      } else {
+        description += `every minute of ${hourDesc === hour ? 'hour ' + hour : hourDesc}`;
+      }
     } else if (hour === '*') {
-      description += `at minute ${this.describeValue(minute, 'minute')} of every hour`;
+      const minuteDesc = this.describeValue(minute, 'minute');
+      if (minuteDesc.startsWith('every')) {
+        description += `${minuteDesc} of every hour`;
+      } else {
+        description += `at ${minuteDesc === minute ? 'minute ' + minute : minuteDesc} past every hour`;
+      }
     } else {
       description += `at ${this.describeTime(hour, minute)}`;
     }
@@ -423,10 +433,13 @@ export class CronParser {
     
     if (value.includes('/')) {
       const [range, step] = value.split('/');
+      const stepNum = parseInt(step);
+      const pluralType = stepNum === 1 ? type : type + 's';
+      
       if (range === '*') {
-        return `every ${step} ${type}s`;
+        return `every ${step} ${pluralType}`;
       } else {
-        return `every ${step} ${type}s in range ${range}`;
+        return `every ${step} ${pluralType} in range ${range}`;
       }
     }
     
@@ -450,11 +463,11 @@ export class CronParser {
     }
     
     if (h.includes('every')) {
-      return `minute ${minute} of ${h}`;
+      return `minute ${minute} past ${h}`;
     }
     
     if (m.includes('every')) {
-      return `${m} of hour ${hour}`;
+      return `${m} past hour ${hour}`;
     }
     
     // Format as time

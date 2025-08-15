@@ -129,35 +129,103 @@ export class JWTDecoder {
   
   decode() {
     const token = this.inputArea.value.trim();
+    
+    // Clear previous outputs and errors
+    this.clearOutputs();
+    this.clearError();
+    
     if (!token) {
-      this.showError('Please enter a JWT token');
+      this.showError('Please enter a JWT token to decode');
+      return;
+    }
+    
+    // Basic format validation
+    if (!token.includes('.')) {
+      this.showError('Invalid JWT format: Token must contain dots (.) separating header, payload, and signature');
       return;
     }
     
     const parts = token.split('.');
     if (parts.length !== 3) {
-      this.showError('Invalid JWT format. Expected 3 parts separated by dots.');
+      this.showError(`Invalid JWT format: Expected 3 parts (header.payload.signature), but found ${parts.length} parts`);
+      return;
+    }
+    
+    // Check for empty parts
+    if (parts.some(part => !part.trim())) {
+      this.showError('Invalid JWT format: One or more parts are empty');
+      return;
+    }
+    
+    // Validate Base64 URL encoding
+    const base64UrlPattern = /^[A-Za-z0-9_-]+$/;
+    if (!base64UrlPattern.test(parts[0])) {
+      this.showError('Invalid JWT header: Contains invalid Base64URL characters');
+      return;
+    }
+    if (!base64UrlPattern.test(parts[1])) {
+      this.showError('Invalid JWT payload: Contains invalid Base64URL characters');
+      return;
+    }
+    if (!base64UrlPattern.test(parts[2])) {
+      this.showError('Invalid JWT signature: Contains invalid Base64URL characters');
       return;
     }
     
     try {
-      // Decode header
-      const header = this.base64UrlDecode(parts[0]);
-      const headerJson = JSON.parse(header);
-      this.displayJson(this.headerOutput, headerJson);
+      // Decode and validate header
+      let headerJson;
+      try {
+        const header = this.base64UrlDecode(parts[0]);
+        headerJson = JSON.parse(header);
+        this.displayJson(this.headerOutput, headerJson);
+      } catch (error) {
+        this.showError(`Invalid JWT header: ${this.getDecodingErrorMessage(error, 'header')}`);
+        return;
+      }
       
-      // Decode payload
-      const payload = this.base64UrlDecode(parts[1]);
-      const payloadJson = JSON.parse(payload);
-      this.displayJson(this.payloadOutput, payloadJson);
-      this.displayClaims(payloadJson);
+      // Validate header structure
+      if (!headerJson || typeof headerJson !== 'object') {
+        this.showError('Invalid JWT header: Must be a valid JSON object');
+        return;
+      }
       
-      // Display signature
+      if (!headerJson.alg) {
+        this.showError('Invalid JWT header: Missing "alg" (algorithm) field');
+        return;
+      }
+      
+      if (!headerJson.typ || headerJson.typ.toLowerCase() !== 'jwt') {
+        this.showError('Warning: JWT header "typ" field should be "JWT"');
+        // Don't return here, just warn
+      }
+      
+      // Decode and validate payload
+      let payloadJson;
+      try {
+        const payload = this.base64UrlDecode(parts[1]);
+        payloadJson = JSON.parse(payload);
+        this.displayJson(this.payloadOutput, payloadJson);
+        this.displayClaims(payloadJson);
+      } catch (error) {
+        this.showError(`Invalid JWT payload: ${this.getDecodingErrorMessage(error, 'payload')}`);
+        return;
+      }
+      
+      // Validate payload structure
+      if (!payloadJson || typeof payloadJson !== 'object') {
+        this.showError('Invalid JWT payload: Must be a valid JSON object');
+        return;
+      }
+      
+      // Display signature (no decoding needed, it's binary data)
       this.signatureOutput.textContent = parts[2];
       
-      this.clearError();
+      // Show success message
+      this.showSuccess('JWT token decoded successfully');
+      
     } catch (error) {
-      this.showError(`Failed to decode JWT: ${error.message}`);
+      this.showError(`Unexpected error decoding JWT: ${error.message}`);
       this.clearOutputs();
     }
   }
@@ -346,9 +414,52 @@ export class JWTDecoder {
     this.container.querySelector('#jwt-claims').innerHTML = '';
   }
   
+  getDecodingErrorMessage(error, part) {
+    if (error.message.includes('Invalid base64 string') || error.message.includes('Invalid character')) {
+      return `Invalid Base64URL encoding in ${part}`;
+    }
+    if (error.message.includes('Unexpected token') || error.message.includes('JSON')) {
+      return `Invalid JSON structure in ${part} - ${error.message}`;
+    }
+    return error.message;
+  }
+  
   showError(message) {
-    this.errorDisplay.textContent = message;
+    this.errorDisplay.className = 'bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6';
+    this.errorDisplay.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 18.5c-.77.833.192 2.5 1.732 2.5z"/>
+        </svg>
+        <span class="text-red-700 dark:text-red-400 font-medium">Error:</span>
+      </div>
+      <div class="mt-1 text-red-700 dark:text-red-400">${this.escapeHtml(message)}</div>
+    `;
     this.errorDisplay.hidden = false;
+  }
+  
+  showSuccess(message) {
+    this.errorDisplay.className = 'bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 mb-6';
+    this.errorDisplay.innerHTML = `
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span class="text-green-700 dark:text-green-400 font-medium">${this.escapeHtml(message)}</span>
+      </div>
+    `;
+    this.errorDisplay.hidden = false;
+    
+    // Auto-hide success message after 3 seconds
+    setTimeout(() => {
+      this.clearError();
+    }, 3000);
+  }
+  
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
   
   clearError() {
