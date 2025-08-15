@@ -1,7 +1,8 @@
 // Service Worker for offline support and caching  
-const STATIC_CACHE = 'devtoolbox-static-v5';
-const DYNAMIC_CACHE = 'devtoolbox-dynamic-v5';
-const TOOLS_CACHE = 'devtoolbox-tools-v5';
+// Version: 20250115-1 - Force cache refresh
+const STATIC_CACHE = 'devtoolbox-static-v6-20250115';
+const DYNAMIC_CACHE = 'devtoolbox-dynamic-v6-20250115';
+const TOOLS_CACHE = 'devtoolbox-tools-v6-20250115';
 
 // Core files to cache for offline use
 const STATIC_ASSETS = [
@@ -75,6 +76,23 @@ self.addEventListener('fetch', (event) => {
   
   // Skip external requests
   if (url.origin !== location.origin) return;
+  
+  // Check for cache-busting parameters
+  const hasCacheBuster = url.searchParams.has('_cb') || 
+                         url.searchParams.has('_nc') || 
+                         url.searchParams.has('_t');
+  
+  // If cache-busting params present, always fetch from network
+  if (hasCacheBuster) {
+    event.respondWith(fetch(request, { cache: 'reload' }));
+    return;
+  }
+  
+  // HTML pages - always network first to ensure fresh content
+  if (request.destination === 'document' || url.pathname === '/' || url.pathname.endsWith('.html')) {
+    event.respondWith(networkFirst(request));
+    return;
+  }
   
   // Tool modules - use stale-while-revalidate strategy
   if (url.pathname.startsWith('/js/tools/')) {
@@ -201,14 +219,19 @@ self.addEventListener('message', (event) => {
     self.skipWaiting();
   }
   
-  if (event.data && event.data.type === 'CLEAR_CACHE') {
+  if (event.data && event.data.type === 'CLEAR_CACHE' || event.data && event.data.type === 'CLEAR_ALL_CACHES') {
     event.waitUntil(
       caches.keys().then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
+            console.log('Deleting cache:', cacheName);
             return caches.delete(cacheName);
           })
         );
+      }).then(() => {
+        console.log('All service worker caches cleared');
+        // Force the service worker to activate immediately
+        return self.clients.claim();
       })
     );
   }
