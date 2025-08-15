@@ -54,7 +54,7 @@ themeToggle?.addEventListener('click', () => {
 
 // Mobile Menu Toggle
 const menuToggle = document.querySelector('[data-menu-toggle]');
-const sidebar = document.querySelector('#sidebar');
+const sidebar = document.querySelector('#sidebar'); // Shared sidebar reference
 const sidebarOverlay = document.querySelector('[data-sidebar-overlay]');
 
 menuToggle?.addEventListener('click', () => {
@@ -79,6 +79,37 @@ sidebarOverlay?.addEventListener('click', () => {
   menuToggle.setAttribute('aria-expanded', 'false');
 });
 
+// Desktop Sidebar Toggle
+const sidebarToggle = document.querySelector('[data-sidebar-toggle]');
+
+sidebarToggle?.addEventListener('click', () => {
+  const isCollapsed = sidebar.classList.contains('collapsed');
+  
+  if (isCollapsed) {
+    // Expand sidebar
+    sidebar.classList.remove('collapsed');
+    sidebarToggle.setAttribute('aria-expanded', 'true');
+    sidebarToggle.setAttribute('title', 'Collapse sidebar');
+    // Update icon to point left
+    sidebarToggle.innerHTML = `
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18m-9-9l-9 9 9 9"></path>
+      </svg>
+    `;
+  } else {
+    // Collapse sidebar
+    sidebar.classList.add('collapsed');
+    sidebarToggle.setAttribute('aria-expanded', 'false');
+    sidebarToggle.setAttribute('title', 'Expand sidebar');
+    // Update icon to point right
+    sidebarToggle.innerHTML = `
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12H3m18-9l-9 9-9-9"></path>
+      </svg>
+    `;
+  }
+});
+
 // Enable swipe gestures for mobile
 if ('ontouchstart' in window) {
   enableSwipeGestures(sidebar, sidebarOverlay, menuToggle);
@@ -92,38 +123,48 @@ const categoryFilter = document.querySelector('.category-filter');
 
 // Enhanced tools data with keywords for better fuzzy matching
 const tools = [
-  { name: 'JSON Formatter', href: '#json-formatter', category: 'Text & Data', keywords: ['json', 'format', 'validate', 'pretty', 'beautify'] },
-  { name: 'JWT Decoder', href: '#jwt-decoder', category: 'Text & Data', keywords: ['jwt', 'token', 'decode', 'verify', 'auth'] },
-  { name: 'Base64 Encode/Decode', href: '#base64', category: 'Text & Data', keywords: ['base64', 'encode', 'decode', 'binary'] },
-  { name: 'URL Encode/Decode', href: '#url-encode', category: 'Text & Data', keywords: ['url', 'uri', 'encode', 'decode', 'percent'] },
+  // Formatters & Parsers
+  { name: 'JSON Formatter', href: '#json-formatter', category: 'Formatters', keywords: ['json', 'format', 'validate', 'pretty', 'beautify'] },
+  { name: 'SQL Formatter', href: '#sql-formatter', category: 'Formatters', keywords: ['sql', 'format', 'query', 'database', 'beautify', 'minify', 'mysql', 'postgresql'] },
+  { name: 'XML Formatter', href: '#xml-formatter', category: 'Formatters', keywords: ['xml', 'format', 'validate', 'xpath', 'tree', 'beautify', 'minify'] },
+  { name: 'Cron Parser', href: '#cron', category: 'Formatters', keywords: ['cron', 'schedule', 'job', 'time', 'expression'] },
+  { name: 'Markdown Preview', href: '#markdown', category: 'Formatters', keywords: ['markdown', 'md', 'preview', 'render', 'github', 'gfm'] },
+  
+  // Generators
   { name: 'UUID Generator', href: '#uuid', category: 'Generators', keywords: ['uuid', 'guid', 'generate', 'random', 'unique'] },
-  { name: 'Unix Time Converter', href: '#unix-time', category: 'Converters', keywords: ['unix', 'timestamp', 'epoch', 'time', 'date'] },
-  { name: 'Regex Tester', href: '#regex-tester', category: 'Developer Tools', keywords: ['regex', 'regexp', 'pattern', 'match', 'test'] },
-  { name: 'Cron Parser', href: '#cron', category: 'Developer Tools', keywords: ['cron', 'schedule', 'job', 'time', 'expression'] },
-  { name: 'Diff Tool', href: '#diff', category: 'Text & Data', keywords: ['diff', 'compare', 'difference', 'merge', 'text'] },
-  { name: 'CSV ↔ JSON Converter', href: '#csv-json', category: 'Converters', keywords: ['csv', 'json', 'convert', 'table', 'data', 'excel'] },
-  { name: 'YAML ↔ JSON Converter', href: '#yaml-json', category: 'Converters', keywords: ['yaml', 'json', 'convert', 'config', 'configuration'] },
   { name: 'Hash Generator', href: '#hash', category: 'Generators', keywords: ['hash', 'md5', 'sha', 'sha256', 'sha512', 'crypto', 'checksum'] },
-  { name: 'Markdown Preview', href: '#markdown', category: 'Text & Data', keywords: ['markdown', 'md', 'preview', 'render', 'github', 'gfm'] },
-  { name: 'cURL Generator', href: '#curl', category: 'Developer Tools', keywords: ['curl', 'http', 'api', 'request', 'rest', 'command'] },
-  { name: 'API Mock Generator', href: '#api-mock', category: 'Developer Tools', keywords: ['api', 'mock', 'server', 'express', 'json-server', 'postman', 'openapi'] },
-  { name: 'DNS Lookup', href: '#dns-lookup', category: 'Networking & Cloud', keywords: ['dns', 'lookup', 'domain', 'nameserver', 'mx', 'txt', 'a', 'aaaa', 'cname'] },
-  { name: 'GraphQL Tester', href: '#graphql', category: 'Developer Tools', keywords: ['graphql', 'query', 'mutation', 'introspection', 'api', 'test'] },
-  { name: 'Fake Data Generator', href: '#fake-data', category: 'Generators', keywords: ['fake', 'data', 'mock', 'test', 'generator', 'random', 'person', 'address'] },
-  { name: 'SQL Formatter', href: '#sql-formatter', category: 'Developer Tools', keywords: ['sql', 'format', 'query', 'database', 'beautify', 'minify', 'mysql', 'postgresql'] },
-  { name: 'XML Formatter', href: '#xml-formatter', category: 'Text & Data', keywords: ['xml', 'format', 'validate', 'xpath', 'tree', 'beautify', 'minify'] },
   { name: 'Password Generator', href: '#password-generator', category: 'Generators', keywords: ['password', 'secure', 'random', 'passphrase', 'generator', 'strength'] },
-  { name: 'Binary Converter', href: '#binary-converter', category: 'Converters', keywords: ['binary', 'decimal', 'hex', 'hexadecimal', 'octal', 'ascii', 'base64', 'converter'] },
   { name: 'QR Code Generator', href: '#qr-generator', category: 'Generators', keywords: ['qr', 'code', 'barcode', 'generator', 'wifi', 'vcard', 'contact'] },
   { name: 'ASCII Art Generator', href: '#ascii-art', category: 'Generators', keywords: ['ascii', 'art', 'text', 'banner', 'figlet', 'generator'] },
+  { name: 'Fake Data Generator', href: '#fake-data', category: 'Generators', keywords: ['fake', 'data', 'mock', 'test', 'generator', 'random', 'person', 'address'] },
+  { name: 'cURL Generator', href: '#curl', category: 'Generators', keywords: ['curl', 'http', 'api', 'request', 'rest', 'command'] },
+  { name: 'API Mock Generator', href: '#api-mock', category: 'Generators', keywords: ['api', 'mock', 'server', 'express', 'json-server', 'postman', 'openapi'] },
+  { name: 'S3 Pre-signed URL Generator', href: '#s3-presigned-url', category: 'Generators', keywords: ['s3', 'aws', 'presigned', 'url', 'upload', 'download', 'bucket', 'amazon'] },
+  
+  // Converters
+  { name: 'Base64 Encode/Decode', href: '#base64', category: 'Converters', keywords: ['base64', 'encode', 'decode', 'binary'] },
+  { name: 'URL Encode/Decode', href: '#url-encode', category: 'Converters', keywords: ['url', 'uri', 'encode', 'decode', 'percent'] },
+  { name: 'Unix Time Converter', href: '#unix-time', category: 'Converters', keywords: ['unix', 'timestamp', 'epoch', 'time', 'date'] },
+  { name: 'CSV ↔ JSON Converter', href: '#csv-json', category: 'Converters', keywords: ['csv', 'json', 'convert', 'table', 'data', 'excel'] },
+  { name: 'YAML ↔ JSON Converter', href: '#yaml-json', category: 'Converters', keywords: ['yaml', 'json', 'convert', 'config', 'configuration'] },
+  { name: 'Binary Converter', href: '#binary-converter', category: 'Converters', keywords: ['binary', 'decimal', 'hex', 'hexadecimal', 'octal', 'ascii', 'base64', 'converter'] },
   { name: 'Image Converter', href: '#image-converter', category: 'Converters', keywords: ['image', 'convert', 'resize', 'compress', 'jpeg', 'png', 'webp', 'format'] },
+  
+  // Text & Data Tools
+  { name: 'JWT Decoder', href: '#jwt-decoder', category: 'Text & Data', keywords: ['jwt', 'token', 'decode', 'verify', 'auth'] },
+  { name: 'Diff Tool', href: '#diff', category: 'Text & Data', keywords: ['diff', 'compare', 'difference', 'merge', 'text'] },
+  { name: 'Regex Tester', href: '#regex-tester', category: 'Text & Data', keywords: ['regex', 'regexp', 'pattern', 'match', 'test'] },
+  
+  // Developer Tools
+  { name: 'GraphQL Tester', href: '#graphql', category: 'Developer Tools', keywords: ['graphql', 'query', 'mutation', 'introspection', 'api', 'test'] },
   { name: 'Webhook Tester', href: '#webhook-tester', category: 'Developer Tools', keywords: ['webhook', 'test', 'debug', 'http', 'request', 'endpoint', 'api'] },
   { name: 'Temporary Email', href: '#temp-email', category: 'Developer Tools', keywords: ['email', 'temp', 'otp', 'disposable', 'inbox', 'testing', 'throwaway'] },
+  
   // Networking & Cloud Tools
   { name: 'IP Address Lookup', href: '#ip-lookup', category: 'Networking & Cloud', keywords: ['ip', 'address', 'lookup', 'geolocation', 'geo', 'isp', 'location', 'ipv4', 'ipv6'] },
+  { name: 'DNS Lookup', href: '#dns-lookup', category: 'Networking & Cloud', keywords: ['dns', 'lookup', 'domain', 'nameserver', 'mx', 'txt', 'a', 'aaaa', 'cname'] },
   { name: 'CIDR Calculator', href: '#cidr-calculator', category: 'Networking & Cloud', keywords: ['cidr', 'subnet', 'calculator', 'network', 'ip', 'mask', 'range', 'ipv4'] },
   { name: 'WHOIS Lookup', href: '#whois-lookup', category: 'Networking & Cloud', keywords: ['whois', 'domain', 'registration', 'owner', 'registrar', 'expiry'] },
-  { name: 'S3 Pre-signed URL Generator', href: '#s3-presigned-url', category: 'Networking & Cloud', keywords: ['s3', 'aws', 'presigned', 'url', 'upload', 'download', 'bucket', 'amazon'] },
   { name: 'AWS IAM Policy Visualizer', href: '#iam-policy-visualizer', category: 'Networking & Cloud', keywords: ['iam', 'aws', 'policy', 'visualizer', 'permissions', 'security', 'access'] },
 ];
 
@@ -545,6 +586,37 @@ const devToolboxTitle = document.querySelector('header .flex.items-center.space-
 if (devToolboxTitle) {
   devToolboxTitle.style.cursor = 'pointer';
   devToolboxTitle.addEventListener('click', navigateHome);
+}
+
+// Prefetch popular tools on idle
+function prefetchPopularTools() {
+  if ('serviceWorker' in navigator && 'requestIdleCallback' in window) {
+    requestIdleCallback(() => {
+      const popularTools = [
+        '/js/tools/json-formatter.js',
+        '/js/tools/jwt-decoder.js',
+        '/js/tools/base64.js',
+        '/js/tools/url-encode.js',
+        '/js/tools/uuid-generator.js',
+        '/js/tools/hash-generator.js',
+        '/js/tools/password-generator.js',
+        '/js/tools/diff-tool.js'
+      ];
+      
+      // Trigger prefetch by making idle requests
+      popularTools.forEach(tool => {
+        fetch(tool, { priority: 'low' })
+          .catch(() => {}); // Ignore errors, just for prefetching
+      });
+    }, { timeout: 2000 });
+  }
+}
+
+// Initialize prefetching after page load
+if (document.readyState === 'complete') {
+  prefetchPopularTools();
+} else {
+  window.addEventListener('load', prefetchPopularTools);
 }
 
 // Make functions available globally

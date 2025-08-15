@@ -162,14 +162,14 @@ export class QRGeneratorRedesigned {
                     <label class="color-input-label">Foreground Color</label>
                     <div class="color-input-wrapper">
                       <input type="color" id="fg-color" class="color-input" value="#000000" />
-                      <input type="text" class="color-value" value="#000000" readonly />
+                      <input type="text" id="fg-color-value" name="fg-color-value" class="color-value" value="#000000" readonly />
                     </div>
                   </div>
                   <div class="color-input-group">
                     <label class="color-input-label">Background Color</label>
                     <div class="color-input-wrapper">
                       <input type="color" id="bg-color" class="color-input" value="#FFFFFF" />
-                      <input type="text" class="color-value" value="#FFFFFF" readonly />
+                      <input type="text" id="bg-color-value" name="bg-color-value" class="color-value" value="#FFFFFF" readonly />
                     </div>
                   </div>
                 </div>

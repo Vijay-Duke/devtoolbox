@@ -45,6 +45,12 @@ deploy.log
 # Agent OS development files
 .agent-os/
 
+# Claude Code files
+.claude/
+
+# Deployment documentation (keep local only)
+DEPLOYMENT.md
+
 # OS Files
 Thumbs.db
 ._*

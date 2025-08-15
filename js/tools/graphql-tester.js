@@ -107,8 +107,8 @@ query {
                 <div class="tab-pane hidden" data-pane="headers">
                   <div id="headers-list" class="space-y-2 mb-3">
                     <div class="flex gap-2">
-                      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header name" value="Content-Type" />
-                      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header value" value="application/json" />
+                      <input type="text" name="graphql-header-name" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header name" value="Content-Type" />
+                      <input type="text" name="graphql-header-value" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header value" value="application/json" />
                       <button class="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md" data-remove="header">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <line x1="18" y1="6" x2="6" y2="18"/>
@@ -552,8 +552,8 @@ query {
     const headerItem = document.createElement('div');
     headerItem.className = 'flex gap-2';
     headerItem.innerHTML = `
-      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header name" />
-      <input type="text" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header value" />
+      <input type="text" name="graphql-header-name-new" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header name" />
+      <input type="text" name="graphql-header-value-new" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white" placeholder="Header value" />
       <button class="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-md" data-remove="header">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"/>
@@ -641,8 +641,8 @@ query {
     const headersList = this.container.querySelector('#headers-list');
     headersList.innerHTML = `
       <div class="header-item">
-        <input type="text" class="header-key" placeholder="Header name" value="Content-Type" />
-        <input type="text" class="header-value" placeholder="Header value" value="application/json" />
+        <input type="text" name="graphql-header-key" class="header-key" placeholder="Header name" value="Content-Type" />
+        <input type="text" name="graphql-header-value" class="header-value" placeholder="Header value" value="application/json" />
         <button class="btn-icon btn-remove" data-remove="header">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"/>

@@ -404,8 +404,8 @@ export class APIMockGenerator extends ToolTemplate {
     const headerItem = document.createElement('div');
     headerItem.className = 'header-item';
     headerItem.innerHTML = `
-      <input type="text" class="header-input header-key" placeholder="Header name" />
-      <input type="text" class="header-input header-value" placeholder="Header value" />
+      <input type="text" name="header-key" class="header-input header-key" placeholder="Header name" />
+      <input type="text" name="header-value" class="header-input header-value" placeholder="Header value" />
       <button class="btn-icon btn-remove" data-remove="header">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="18" y1="6" x2="6" y2="18"/>

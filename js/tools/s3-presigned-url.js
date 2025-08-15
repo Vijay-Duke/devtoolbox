@@ -189,8 +189,8 @@ export class S3PresignedURL {
                 
                 <div id="custom-headers" class="hidden space-y-2">
                   <div class="grid grid-cols-2 gap-2">
-                    <input type="text" placeholder="Header name" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm" />
-                    <input type="text" placeholder="Header value" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm" />
+                    <input type="text" id="s3-header-name" name="s3-header-name" placeholder="Header name" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm" />
+                    <input type="text" id="s3-header-value" name="s3-header-value" placeholder="Header value" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-sm" />
                   </div>
                   <button class="px-3 py-1 text-sm bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md hover:bg-blue-200 dark:hover:bg-blue-900/30" data-action="add-header">
                     Add Header

@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* System UI fonts base layer */
+@layer base {
+  html {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  code, pre, .font-mono {
+    font-family: SFMono-Regular, Monaco, Inconsolata, 'Liberation Mono', Consolas, 'Courier New', monospace;
+  }
+}

@@ -7,32 +7,45 @@
   <meta name="theme-color" content="#1a1a1a">
   <meta name="color-scheme" content="dark light">
   
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval';
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data: https:;
+    font-src 'self' data:;
+    connect-src 'self' https:;
+    worker-src 'self';
+    manifest-src 'self';
+  ">
+  
   <title>DevToolbox - Fast Developer Utilities</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="/icons/favicon_io/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon_io/favicon-16x16.png">
   
   <!-- PWA Support -->
   <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+  <link rel="apple-touch-icon" href="/icons/favicon_io/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
   
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: '#3b82f6',
-            secondary: '#10b981',
-            danger: '#ef4444',
-            warning: '#f59e0b'
-          }
-        }
-      }
-    }
-  </script>
+  <!-- Optimized Tailwind CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Prefetch popular tools for faster loading -->
+  <link rel="prefetch" href="js/tools/json-formatter.js" as="script">
+  <link rel="prefetch" href="js/tools/jwt-decoder.js" as="script">
+  <link rel="prefetch" href="js/tools/base64.js" as="script">
+  <link rel="prefetch" href="js/tools/url-encode.js" as="script">
+  <link rel="prefetch" href="js/tools/uuid-generator.js" as="script">
+  <link rel="prefetch" href="js/tools/hash-generator.js" as="script">
+  <link rel="prefetch" href="js/tools/password-generator.js" as="script">
+  <link rel="prefetch" href="js/tools/diff-tool.js" as="script">
   
   <!-- Minimal inline styles for critical tool layouts -->
   <style>
@@ -236,10 +249,156 @@
     [data-theme="dark"] #markdown-output .tag { color: #f87171; }
     [data-theme="dark"] #markdown-output .attribute { color: #60a5fa; }
     
+    /* Sidebar collapse functionality */
+    #sidebar.collapsed {
+      width: 4rem !important;
+    }
+    
+    #sidebar.collapsed .sidebar-text {
+      display: none !important;
+    }
+    
+    #sidebar.collapsed .sidebar-category {
+      display: none !important;
+    }
+    
+    #sidebar.collapsed .nav-link {
+      justify-content: center !important;
+      padding: 0.75rem 0.75rem 0.75rem 1.25rem !important;
+      position: relative !important;
+    }
+    
+    #sidebar.collapsed .nav-link:hover::after {
+      content: attr(data-tooltip) !important;
+      position: absolute !important;
+      left: 100% !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      background: rgba(0, 0, 0, 0.9) !important;
+      color: white !important;
+      padding: 0.5rem 0.75rem !important;
+      border-radius: 0.375rem !important;
+      font-size: 0.75rem !important;
+      white-space: nowrap !important;
+      z-index: 50 !important;
+      margin-left: 0.5rem !important;
+      opacity: 0 !important;
+      animation: fadeIn 0.2s ease-in-out forwards !important;
+    }
+    
+    @keyframes fadeIn {
+      to { opacity: 1 !important; }
+    }
+    
+    /* Category color coding */
+    .category-text-data .nav-link {
+      border-left: 3px solid #3b82f6 !important;
+    }
+    
+    .category-generators .nav-link {
+      border-left: 3px solid #10b981 !important;
+    }
+    
+    .category-converters .nav-link {
+      border-left: 3px solid #f59e0b !important;
+    }
+    
+    .category-developer-tools .nav-link {
+      border-left: 3px solid #ef4444 !important;
+    }
+    
+    .category-networking-cloud .nav-link {
+      border-left: 3px solid #8b5cf6 !important;
+    }
+    
+    /* Category indicators when sidebar is collapsed */
+    #sidebar.collapsed .category-text-data .nav-link {
+      border-left: 4px solid #3b82f6 !important;
+      border-radius: 0 0.5rem 0.5rem 0 !important;
+      margin-left: 0.5rem !important;
+    }
+    
+    #sidebar.collapsed .category-generators .nav-link {
+      border-left: 4px solid #10b981 !important;
+      border-radius: 0 0.5rem 0.5rem 0 !important;
+      margin-left: 0.5rem !important;
+    }
+    
+    #sidebar.collapsed .category-converters .nav-link {
+      border-left: 4px solid #f59e0b !important;
+      border-radius: 0 0.5rem 0.5rem 0 !important;
+      margin-left: 0.5rem !important;
+    }
+    
+    #sidebar.collapsed .category-developer-tools .nav-link {
+      border-left: 4px solid #ef4444 !important;
+      border-radius: 0 0.5rem 0.5rem 0 !important;
+      margin-left: 0.5rem !important;
+    }
+    
+    #sidebar.collapsed .category-networking-cloud .nav-link {
+      border-left: 4px solid #8b5cf6 !important;
+      border-radius: 0 0.5rem 0.5rem 0 !important;
+      margin-left: 0.5rem !important;
+    }
+    
+    /* Category headers with matching colors */
+    .category-text-data .sidebar-category {
+      color: #3b82f6 !important;
+      border-bottom: 2px solid #3b82f6 !important;
+      padding-bottom: 0.25rem !important;
+      margin-bottom: 0.75rem !important;
+    }
+    
+    .category-generators .sidebar-category {
+      color: #10b981 !important;
+      border-bottom: 2px solid #10b981 !important;
+      padding-bottom: 0.25rem !important;
+      margin-bottom: 0.75rem !important;
+    }
+    
+    .category-converters .sidebar-category {
+      color: #f59e0b !important;
+      border-bottom: 2px solid #f59e0b !important;
+      padding-bottom: 0.25rem !important;
+      margin-bottom: 0.75rem !important;
+    }
+    
+    .category-developer-tools .sidebar-category {
+      color: #ef4444 !important;
+      border-bottom: 2px solid #ef4444 !important;
+      padding-bottom: 0.25rem !important;
+      margin-bottom: 0.75rem !important;
+    }
+    
+    .category-networking-cloud .sidebar-category {
+      color: #8b5cf6 !important;
+      border-bottom: 2px solid #8b5cf6 !important;
+      padding-bottom: 0.25rem !important;
+      margin-bottom: 0.75rem !important;
+    }
+    
     /* Mobile responsiveness for tools */
     @media (max-width: 768px) {
       #sidebar.open {
         transform: translateX(0) !important;
+      }
+      
+      #sidebar.collapsed {
+        width: 16rem !important;
+      }
+      
+      #sidebar.collapsed .sidebar-text {
+        display: block !important;
+      }
+      
+      #sidebar.collapsed .sidebar-category {
+        display: block !important;
+      }
+      
+      #sidebar.collapsed .nav-link {
+        justify-content: flex-start !important;
+        padding: 0.5rem 0.75rem !important;
       }
       
       .diff-inputs {
@@ -252,8 +411,6 @@
     }
   </style>
   
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
   <script src="js/theme.js"></script>
   <script>
@@ -294,6 +451,20 @@
       </svg>
     </button>
     
+    <!-- Desktop sidebar toggle -->
+    <button 
+      class="hidden lg:block p-3 min-w-[44px] min-h-[44px] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+      data-sidebar-toggle
+      aria-label="Toggle sidebar"
+      aria-expanded="true"
+      aria-controls="sidebar"
+      title="Collapse sidebar (Click to toggle)"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12h18m-9-9l-9 9 9 9"></path>
+      </svg>
+    </button>
+    
     <!-- Logo -->
     <div class="flex items-center space-x-2 text-xl font-bold">
       <span class="text-2xl">⚡</span>
@@ -308,13 +479,14 @@
           class="w-full px-4 py-2 pl-10 pr-4 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           placeholder="Search tools (press /)"
           aria-label="Search tools"
+          title="Press / to focus, Esc to clear, ↑↓ to navigate results"
           autocomplete="off"
           spellcheck="false"
         >
         <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
-        <button class="absolute right-2 top-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 hidden" aria-label="Clear search">
+        <button class="absolute right-2 top-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-600 hidden" aria-label="Clear search" title="Clear search (Esc)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -331,7 +503,7 @@
         class="p-3 min-w-[44px] min-h-[44px] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
         data-theme-toggle
         aria-label="Toggle theme"
-        title="Toggle theme (starts with system default)"
+        title="Toggle theme (Press T)"
       >
         <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
@@ -358,67 +530,276 @@
   <!-- Main layout container -->
   <div class="flex flex-1 overflow-hidden">
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 fixed lg:relative h-full z-40" aria-label="Tools sidebar">
+    <aside id="sidebar" class="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-all duration-300 fixed lg:relative h-full z-40" aria-label="Tools sidebar">
       <nav role="navigation" aria-label="Main navigation" class="p-4">
-        <div class="mb-6">
-          <h2 class="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Text & Data</h2>
+        <div class="mb-6 category-formatters">
+          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Formatters</h2>
           <ul class="space-y-1">
-            <li><a href="#json-formatter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">JSON Formatter</a></li>
-            <li><a href="#jwt-decoder" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">JWT Decoder</a></li>
-            <li><a href="#base64" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Base64 Encode/Decode</a></li>
-            <li><a href="#url-encode" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">URL Encode/Decode</a></li>
-            <li><a href="#diff" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Diff Tool</a></li>
-            <li><a href="#markdown" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Markdown Preview</a></li>
+            <li><a href="#json-formatter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="JSON Formatter">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+              <span class="sidebar-text">JSON Formatter</span>
+            </a></li>
+            <li><a href="#sql-formatter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="SQL Formatter">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+              </svg>
+              <span class="sidebar-text">SQL Formatter</span>
+            </a></li>
+            <li><a href="#xml-formatter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="XML Formatter">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+              <span class="sidebar-text">XML Formatter</span>
+            </a></li>
+            <li><a href="#cron" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Cron Parser">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="sidebar-text">Cron Parser</span>
+            </a></li>
+            <li><a href="#markdown" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Markdown Preview">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+              <span class="sidebar-text">Markdown Preview</span>
+            </a></li>
+          </ul>
+        </div>
+
+        <div class="mb-6 category-text-data">
+          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Text & Data</h2>
+          <ul class="space-y-1">
+            <li><a href="#jwt-decoder" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="JWT Decoder">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+              <span class="sidebar-text">JWT Decoder</span>
+            </a></li>
+            <li><a href="#diff" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Diff Tool">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
+              </svg>
+              <span class="sidebar-text">Diff Tool</span>
+            </a></li>
+            <li><a href="#regex-tester" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Regex Tester">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+              </svg>
+              <span class="sidebar-text">Regex Tester</span>
+            </a></li>
           </ul>
         </div>
         
-        <div class="mb-6">
-          <h2 class="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Generators</h2>
+        <div class="mb-6 category-generators">
+          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Generators</h2>
           <ul class="space-y-1">
-            <li><a href="#uuid" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">UUID Generator</a></li>
-            <li><a href="#hash" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Hash Generator</a></li>
-            <li><a href="#fake-data" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Fake Data Generator</a></li>
-            <li><a href="#password-generator" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Password Generator</a></li>
-            <li><a href="#qr-generator" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">QR Code Generator</a></li>
-            <li><a href="#ascii-art" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">ASCII Art Generator</a></li>
+            <li><a href="#uuid" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="UUID Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4V4h10v2M7 10v8a2 2 0 002 2h6a2 2 0 002-2v-8M7 10H5a2 2 0 00-2 2v6a2 2 0 002 2h2m0-10h10m-10 0V8a2 2 0 012-2h6a2 2 0 012 2v2"></path>
+              </svg>
+              <span class="sidebar-text">UUID Generator</span>
+            </a></li>
+            <li><a href="#hash" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Hash Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+              </svg>
+              <span class="sidebar-text">Hash Generator</span>
+            </a></li>
+            <li><a href="#fake-data" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Fake Data Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+              </svg>
+              <span class="sidebar-text">Fake Data Generator</span>
+            </a></li>
+            <li><a href="#password-generator" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Password Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+              </svg>
+              <span class="sidebar-text">Password Generator</span>
+            </a></li>
+            <li><a href="#qr-generator" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="QR Code Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V4a1 1 0 00-1-1H5a1 1 0 00-1 1v3a1 1 0 001 1zm12 0h2a1 1 0 001-1V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v3a1 1 0 001 1zM5 20h2a1 1 0 001-1v-3a1 1 0 00-1-1H5a1 1 0 00-1 1v3a1 1 0 001 1z"></path>
+              </svg>
+              <span class="sidebar-text">QR Code Generator</span>
+            </a></li>
+            <li><a href="#ascii-art" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="ASCII Art Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+              </svg>
+              <span class="sidebar-text">ASCII Art Generator</span>
+            </a></li>
+            <li><a href="#curl" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="cURL Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span class="sidebar-text">cURL Generator</span>
+            </a></li>
+            <li><a href="#api-mock" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="API Mock Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
+              </svg>
+              <span class="sidebar-text">API Mock Generator</span>
+            </a></li>
+            <li><a href="#s3-presigned-url" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="S3 Pre-signed URL Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+              <span class="sidebar-text">S3 Pre-signed URL Generator</span>
+            </a></li>
           </ul>
         </div>
         
-        <div class="mb-6">
-          <h2 class="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Converters</h2>
+        <div class="mb-6 category-converters">
+          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Converters</h2>
           <ul class="space-y-1">
-            <li><a href="#unix-time" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Unix Time Converter</a></li>
-            <li><a href="#csv-json" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">CSV ↔ JSON</a></li>
-            <li><a href="#yaml-json" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">YAML ↔ JSON</a></li>
-            <li><a href="#binary-converter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Binary Converter</a></li>
-            <li><a href="#image-converter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Image Converter</a></li>
+            <li><a href="#base64" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Base64 Encode/Decode">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span class="sidebar-text">Base64 Encode/Decode</span>
+            </a></li>
+            <li><a href="#url-encode" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="URL Encode/Decode">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+              </svg>
+              <span class="sidebar-text">URL Encode/Decode</span>
+            </a></li>
+            <li><a href="#unix-time" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Unix Time Converter">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="sidebar-text">Unix Time Converter</span>
+            </a></li>
+            <li><a href="#csv-json" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="CSV ↔ JSON">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+              </svg>
+              <span class="sidebar-text">CSV ↔ JSON</span>
+            </a></li>
+            <li><a href="#yaml-json" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="YAML ↔ JSON">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+              </svg>
+              <span class="sidebar-text">YAML ↔ JSON</span>
+            </a></li>
+            <li><a href="#binary-converter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Binary Converter">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+              </svg>
+              <span class="sidebar-text">Binary Converter</span>
+            </a></li>
+            <li><a href="#image-converter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Image Converter">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span class="sidebar-text">Image Converter</span>
+            </a></li>
           </ul>
         </div>
         
-        <div class="mb-6">
-          <h2 class="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Developer Tools</h2>
+        <div class="mb-6 category-developer-tools">
+          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Developer Tools</h2>
           <ul class="space-y-1">
-            <li><a href="#regex-tester" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Regex Tester</a></li>
-            <li><a href="#cron" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Cron Parser</a></li>
-            <li><a href="#curl" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">cURL Generator</a></li>
-            <li><a href="#api-mock" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">API Mock Generator</a></li>
-            <li><a href="#graphql" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">GraphQL Tester</a></li>
-            <li><a href="#sql-formatter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">SQL Formatter</a></li>
-            <li><a href="#xml-formatter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">XML Formatter</a></li>
-            <li><a href="#webhook-tester" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Webhook Tester</a></li>
-            <li><a href="#temp-email" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Temporary Email</a></li>
+            <li><a href="#regex-tester" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Regex Tester">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <span class="sidebar-text">Regex Tester</span>
+            </a></li>
+            <li><a href="#cron" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Cron Parser">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="sidebar-text">Cron Parser</span>
+            </a></li>
+            <li><a href="#curl" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="cURL Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span class="sidebar-text">cURL Generator</span>
+            </a></li>
+            <li><a href="#api-mock" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="API Mock Generator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+              </svg>
+              <span class="sidebar-text">API Mock Generator</span>
+            </a></li>
+            <li><a href="#graphql" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="GraphQL Tester">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              <span class="sidebar-text">GraphQL Tester</span>
+            </a></li>
+            <li><a href="#sql-formatter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="SQL Formatter">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+              </svg>
+              <span class="sidebar-text">SQL Formatter</span>
+            </a></li>
+            <li><a href="#xml-formatter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="XML Formatter">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+              <span class="sidebar-text">XML Formatter</span>
+            </a></li>
+            <li><a href="#webhook-tester" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Webhook Tester">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+              </svg>
+              <span class="sidebar-text">Webhook Tester</span>
+            </a></li>
+            <li><a href="#temp-email" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Temporary Email">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+              <span class="sidebar-text">Temporary Email</span>
+            </a></li>
           </ul>
         </div>
         
-        <div class="mb-6">
-          <h2 class="px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Networking & Cloud</h2>
+        <div class="mb-6 category-networking-cloud">
+          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Networking & Cloud</h2>
           <ul class="space-y-1">
-            <li><a href="#ip-lookup" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">IP Address Lookup</a></li>
-            <li><a href="#cidr-calculator" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">CIDR Calculator</a></li>
-            <li><a href="#dns-lookup" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">DNS Lookup</a></li>
-            <li><a href="#whois-lookup" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">WHOIS Lookup</a></li>
-            <li><a href="#s3-presigned-url" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">S3 Pre-signed URL</a></li>
-            <li><a href="#iam-policy-visualizer" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">IAM Policy Visualizer</a></li>
+            <li><a href="#ip-lookup" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="IP Address Lookup">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9"></path>
+              </svg>
+              <span class="sidebar-text">IP Address Lookup</span>
+            </a></li>
+            <li><a href="#cidr-calculator" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="CIDR Calculator">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+              <span class="sidebar-text">CIDR Calculator</span>
+            </a></li>
+            <li><a href="#dns-lookup" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="DNS Lookup">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <span class="sidebar-text">DNS Lookup</span>
+            </a></li>
+            <li><a href="#whois-lookup" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="WHOIS Lookup">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="sidebar-text">WHOIS Lookup</span>
+            </a></li>
+            <li><a href="#s3-presigned-url" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="S3 Pre-signed URL">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+              <span class="sidebar-text">S3 Pre-signed URL</span>
+            </a></li>
+            <li><a href="#iam-policy-visualizer" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="IAM Policy Visualizer">
+              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+              </svg>
+              <span class="sidebar-text">IAM Policy Visualizer</span>
+            </a></li>
           </ul>
         </div>
       </nav>
@@ -443,10 +824,19 @@
                 <span class="text-gray-600 dark:text-gray-400">Clear search</span>
               </li>
               <li class="flex items-center space-x-2">
+                <kbd class="px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">↑↓</kbd>
+                <span class="text-gray-600 dark:text-gray-400">Navigate search results</span>
+              </li>
+              <li class="flex items-center space-x-2">
+                <kbd class="px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">Enter</kbd>
+                <span class="text-gray-600 dark:text-gray-400">Select search result</span>
+              </li>
+              <li class="flex items-center space-x-2">
                 <kbd class="px-2 py-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono">T</kbd>
                 <span class="text-gray-600 dark:text-gray-400">Toggle theme</span>
               </li>
             </ul>
+            <p class="text-xs text-gray-500 dark:text-gray-500 mt-3">💡 Hover over buttons to see more shortcuts</p>
           </div>
         </div>
       </div>
