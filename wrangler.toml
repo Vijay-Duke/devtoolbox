@@ -1,0 +1,25 @@
+# Cloudflare Pages configuration
+name = "devtoolbox"
+compatibility_date = "2024-08-15"
+
+[env.production]
+# Production environment for encode.click
+vars = { NODE_ENV = "production" }
+
+[env.preview]
+# Preview environment for pull request builds
+vars = { NODE_ENV = "development" }
+
+# Build configuration
+[build]
+command = "npm run build"
+cwd = "."
+
+# Routes for custom domain
+[[route]]
+pattern = "encode.click/*"
+custom_domain = true
+
+[[route]]
+pattern = "www.encode.click/*"
+custom_domain = true

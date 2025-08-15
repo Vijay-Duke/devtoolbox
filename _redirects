@@ -1,0 +1,22 @@
+# Cloudflare Pages redirects and rewrites
+# Handle SPA routing - serve index.html for all routes that don't match static files
+
+# Static files (with extensions) should be served as-is
+/js/* /js/:splat 200
+/css/* /css/:splat 200
+/icons/* /icons/:splat 200
+*.png /icons/:splat 200
+*.ico /icons/:splat 200
+*.svg /icons/:splat 200
+*.js /js/:splat 200
+*.css /css/:splat 200
+*.json /:splat 200
+
+# Service worker
+/sw.js /sw.js 200
+
+# API calls should be proxied to the backend
+/api/* https://api.encode.click/api/:splat 200
+
+# All other routes (tool routes, etc.) should serve the SPA
+/* /index.html 200
