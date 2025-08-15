@@ -762,91 +762,136 @@ function showSystemNotification(message, type = 'info') {
 }
 
 // Clear Everything Function
-function clearEverything() {
+async function clearEverything() {
   if (confirm('This will clear all storage (localStorage, sessionStorage, cache), disconnect from all services, and reload with fresh resources from server. Continue?')) {
     
-    // Clear all localStorage
-    localStorage.clear();
-    
-    // Clear sessionStorage
-    sessionStorage.clear();
-    
-    // Clear any cookies for this domain
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    });
-    
-    // Clear IndexedDB databases
-    if ('indexedDB' in window) {
-      indexedDB.databases().then(databases => {
-        databases.forEach(db => {
-          indexedDB.deleteDatabase(db.name);
-        });
-      }).catch(() => {
-        // Fallback for browsers that don't support indexedDB.databases()
-        console.warn('Could not enumerate IndexedDB databases');
-      });
-    }
-    
-    // Clear all caches using Cache API
-    if ('caches' in window) {
-      caches.keys().then(cacheNames => {
-        return Promise.all(
-          cacheNames.map(cacheName => {
-            return caches.delete(cacheName);
-          })
-        );
-      }).then(() => {
-        console.log('All caches cleared');
-      }).catch(() => {
-        console.warn('Error clearing caches');
-      });
-    }
-    
-    // Unregister service workers
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(registrations => {
-        registrations.forEach(registration => {
-          registration.unregister();
-        });
-      }).catch(() => {
-        console.warn('Error unregistering service workers');
-      });
-    }
-    
-    // Close any open EventSource connections (for tools like temp-email)
-    if (window.tempEmailTool && window.tempEmailTool.disconnect) {
-      window.tempEmailTool.disconnect();
-    }
-    
-    // Close any open WebSocket connections
-    if (window.WebSocket) {
-      // Clear any global WebSocket references if they exist
-      Object.keys(window).forEach(key => {
-        if (window[key] instanceof WebSocket) {
-          window[key].close();
-        }
-      });
-    }
-    
-    // Clear browser cache by forcing a hard reload with cache bypass
-    // Use a timestamp to ensure fresh resources
-    const timestamp = Date.now();
-    const currentUrl = window.location.href.split('?')[0]; // Remove existing query params
-    
-    // Show clearing message
-    showSystemNotification('Clearing all data and cache...', 'info');
-    
-    // Small delay to show the notification, then force reload with cache bypass
-    setTimeout(() => {
-      // Force reload with cache bypass - this will get fresh resources from server
-      window.location.href = `${currentUrl}?_t=${timestamp}`;
+    try {
+      // Show clearing message
+      showSystemNotification('Clearing all data and cache...', 'info');
       
-      // Backup method: if the above doesn't work, use location.reload with force
+      // Clear all localStorage
+      localStorage.clear();
+      
+      // Clear sessionStorage
+      sessionStorage.clear();
+      
+      // Clear any cookies for this domain
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+      
+      // Close any open EventSource connections (for tools like temp-email)
+      if (window.tempEmailTool && window.tempEmailTool.disconnect) {
+        window.tempEmailTool.disconnect();
+      }
+      
+      // Close any open WebSocket connections
+      if (window.WebSocket) {
+        // Clear any global WebSocket references if they exist
+        Object.keys(window).forEach(key => {
+          if (window[key] instanceof WebSocket) {
+            window[key].close();
+          }
+        });
+      }
+      
+      // Wait for all async clearing operations to complete
+      const clearingPromises = [];
+      
+      // Clear IndexedDB databases
+      if ('indexedDB' in window) {
+        try {
+          const databases = await indexedDB.databases();
+          for (const db of databases) {
+            clearingPromises.push(
+              new Promise((resolve) => {
+                const deleteReq = indexedDB.deleteDatabase(db.name);
+                deleteReq.onsuccess = () => resolve();
+                deleteReq.onerror = () => resolve(); // Continue even if one fails
+                deleteReq.onblocked = () => resolve(); // Continue even if blocked
+              })
+            );
+          }
+        } catch (e) {
+          console.warn('Could not enumerate IndexedDB databases');
+        }
+      }
+      
+      // Clear all caches using Cache API
+      if ('caches' in window) {
+        try {
+          const cacheNames = await caches.keys();
+          for (const cacheName of cacheNames) {
+            clearingPromises.push(caches.delete(cacheName));
+          }
+        } catch (e) {
+          console.warn('Error clearing caches');
+        }
+      }
+      
+      // Unregister service workers
+      if ('serviceWorker' in navigator) {
+        try {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (const registration of registrations) {
+            clearingPromises.push(registration.unregister());
+          }
+        } catch (e) {
+          console.warn('Error unregistering service workers');
+        }
+      }
+      
+      // Wait for all clearing operations to complete (with timeout)
+      await Promise.allSettled([
+        ...clearingPromises,
+        new Promise(resolve => setTimeout(resolve, 1000)) // 1 second max wait
+      ]);
+      
+      console.log('All storage cleared, forcing hard reload...');
+      
+      // Force the most aggressive cache bypass possible
+      const timestamp = Date.now();
+      const randomParam = Math.random().toString(36).substring(7);
+      
+      // Clear any hash and search params, add cache busting
+      const baseUrl = window.location.origin + window.location.pathname;
+      const newUrl = `${baseUrl}?_cb=${timestamp}&_r=${randomParam}&_nc=1`;
+      
+      // Force immediate hard reload with multiple fallback methods
+      
+      // Method 1: Replace current location with cache-busting parameters
+      window.location.replace(newUrl);
+      
+      // Method 2: Fallback using href assignment
       setTimeout(() => {
-        window.location.reload(true);
+        window.location.href = newUrl;
       }, 100);
-    }, 500);
+      
+      // Method 3: Fallback using reload with force (deprecated but still works in some browsers)
+      setTimeout(() => {
+        try {
+          window.location.reload(true);
+        } catch (e) {
+          // Method 4: Final fallback using modern reload
+          window.location.reload();
+        }
+      }, 200);
+      
+      // Method 5: Ultimate fallback - manual navigation
+      setTimeout(() => {
+        window.history.go(0);
+      }, 300);
+      
+    } catch (error) {
+      console.error('Error during clear everything:', error);
+      showSystemNotification('Error clearing data, forcing reload...', 'warning');
+      
+      // Force reload even if clearing failed
+      setTimeout(() => {
+        const timestamp = Date.now();
+        window.location.href = `${window.location.origin}${window.location.pathname}?_force=${timestamp}`;
+      }, 500);
+    }
   }
 }
 
