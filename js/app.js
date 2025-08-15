@@ -103,20 +103,38 @@ const menuToggle = document.querySelector('[data-menu-toggle]');
 const sidebar = document.querySelector('#sidebar'); // Shared sidebar reference
 const sidebarOverlay = document.querySelector('[data-sidebar-overlay]');
 
-menuToggle?.addEventListener('click', () => {
+// Handle both click and touch events for mobile compatibility
+function toggleMobileMenu() {
   const isOpen = !sidebar.classList.contains('-translate-x-full');
+  
+  console.log('Menu toggle activated, isOpen:', isOpen);
   
   if (isOpen) {
     // Close sidebar
     sidebar.classList.add('-translate-x-full');
     sidebarOverlay.classList.add('hidden');
     menuToggle.setAttribute('aria-expanded', 'false');
+    console.log('Sidebar closed');
   } else {
     // Open sidebar
     sidebar.classList.remove('-translate-x-full');
     sidebarOverlay.classList.remove('hidden');
     menuToggle.setAttribute('aria-expanded', 'true');
+    console.log('Sidebar opened');
   }
+}
+
+menuToggle?.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  toggleMobileMenu();
+});
+
+// Add touch event handling for better mobile support
+menuToggle?.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  toggleMobileMenu();
 });
 
 sidebarOverlay?.addEventListener('click', () => {
@@ -156,9 +174,26 @@ sidebarToggle?.addEventListener('click', () => {
   }
 });
 
+// Mobile device detection and setup
+const isMobile = 'ontouchstart' in window || window.innerWidth <= 768;
+console.log('Mobile device detected:', isMobile);
+
 // Enable swipe gestures for mobile
-if ('ontouchstart' in window) {
+if (isMobile) {
   enableSwipeGestures(sidebar, sidebarOverlay, menuToggle);
+  
+  // Ensure sidebar starts closed on mobile
+  if (sidebar) {
+    sidebar.classList.add('-translate-x-full');
+  }
+  if (sidebarOverlay) {
+    sidebarOverlay.classList.add('hidden');
+  }
+  if (menuToggle) {
+    menuToggle.setAttribute('aria-expanded', 'false');
+  }
+  
+  console.log('Mobile setup complete - sidebar closed, swipe gestures enabled');
 }
 
 // Search Functionality

@@ -61,21 +61,23 @@ export function enableSwipeGestures(sidebar, overlay, menuToggle) {
   // Swipe on sidebar to close
   new SwipeHandler(sidebar, {
     onSwipeLeft: () => {
-      sidebar.classList.remove('active');
-      overlay.classList.remove('active');
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
       menuToggle.setAttribute('aria-expanded', 'false');
     }
   });
   
   // Swipe on main content to open sidebar
-  const main = document.querySelector('.main');
-  new SwipeHandler(main, {
-    onSwipeRight: () => {
-      if (window.innerWidth <= 768 && !sidebar.classList.contains('active')) {
-        sidebar.classList.add('active');
-        overlay.classList.add('active');
-        menuToggle.setAttribute('aria-expanded', 'true');
+  const main = document.querySelector('#main') || document.querySelector('.main');
+  if (main) {
+    new SwipeHandler(main, {
+      onSwipeRight: () => {
+        if (window.innerWidth <= 768 && sidebar.classList.contains('-translate-x-full')) {
+          sidebar.classList.remove('-translate-x-full');
+          overlay.classList.remove('hidden');
+          menuToggle.setAttribute('aria-expanded', 'true');
+        }
       }
-    }
-  });
+    });
+  }
 }
