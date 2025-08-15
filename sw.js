@@ -1,8 +1,8 @@
 // Service Worker for offline support and caching  
-// Version: 20250115-1 - Force cache refresh
-const STATIC_CACHE = 'devtoolbox-static-v6-20250115';
-const DYNAMIC_CACHE = 'devtoolbox-dynamic-v6-20250115';
-const TOOLS_CACHE = 'devtoolbox-tools-v6-20250115';
+// Version: 20250815-2 - Force cache refresh for custom domain
+const STATIC_CACHE = 'devtoolbox-static-v7-20250815';
+const DYNAMIC_CACHE = 'devtoolbox-dynamic-v7-20250815';
+const TOOLS_CACHE = 'devtoolbox-tools-v7-20250815';
 
 // Core files to cache for offline use
 const STATIC_ASSETS = [
