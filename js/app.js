@@ -13,34 +13,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeToggle = document.querySelector('[data-theme-toggle]');
   
   themeToggle?.addEventListener('click', () => {
-    const currentTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    let newTheme;
-    
-    // Cycle through: system -> light -> dark -> system
-    if (!currentTheme) {
-      // Currently on system, go to opposite of system preference
-      newTheme = systemPrefersDark ? 'light' : 'dark';
-    } else if (currentTheme === 'light') {
-      newTheme = 'dark';
-    } else {
-      // dark -> back to system
-      newTheme = null; // null means system
-    }
+    // Simple toggle: dark <-> light
+    const isDark = document.documentElement.classList.contains('dark');
+    const newTheme = isDark ? 'light' : 'dark';
     
     // Apply the new theme
-    if (newTheme === null) {
-      localStorage.removeItem('theme'); // Remove to follow system
-      // Apply system preference
-      if (systemPrefersDark) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.setAttribute('data-theme', 'light');
-      }
-    } else if (newTheme === 'dark') {
+    if (newTheme === 'dark') {
       document.documentElement.classList.add('dark');
       document.documentElement.setAttribute('data-theme', 'dark');
       localStorage.setItem('theme', 'dark');

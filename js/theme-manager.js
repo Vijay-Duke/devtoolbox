@@ -1,7 +1,8 @@
 // Simple Theme Manager for consistency across tools
 export class ThemeManager {
   constructor() {
-    // Listen for theme changes
+    // Don't override the existing theme on initialization
+    // Just observe for changes
     const observer = new MutationObserver(() => {
       this.notifyListeners();
     });
