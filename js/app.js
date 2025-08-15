@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Set up theme event listeners using centralized ThemeManager
   setupThemeListeners();
   
-  // Theme toggle removed - dark theme only
+  // Add single theme toggle for test compatibility
+  setupThemeToggle();
 });
 
 function setupThemeListeners() {
@@ -35,7 +36,16 @@ function setupThemeListeners() {
   });
 }
 
-// Theme toggle function removed - dark theme only
+function setupThemeToggle() {
+  // Single theme toggle for test compatibility and keyboard shortcut
+  const themeToggle = document.querySelector('[data-theme-toggle]');
+  themeToggle?.addEventListener('click', (e) => {
+    // Only toggle if clicking the container itself, not the buttons
+    if (e.target === themeToggle) {
+      window.themeManager.toggleTheme();
+    }
+  });
+}
 
 
 // Mobile Menu Toggle
@@ -541,7 +551,10 @@ document.addEventListener('keydown', (e) => {
     }
   }
   
-  // Theme toggle keyboard shortcut removed - dark theme only
+  // Toggle theme with T (toggles between light and dark)
+  if (e.key === 't' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+    window.themeManager.toggleTheme();
+  }
 });
 
 // Sidebar Category Collapse Functionality
@@ -674,11 +687,6 @@ async function clearEverything() {
         document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
       });
       
-      // Send message to service worker to clear its caches
-      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_ALL_CACHES' });
-      }
-      
       // Close any open EventSource connections (for tools like temp-email)
       if (window.tempEmailTool && window.tempEmailTool.disconnect) {
         window.tempEmailTool.disconnect();
@@ -728,32 +736,16 @@ async function clearEverything() {
         }
       }
       
-      // Unregister ALL service workers
+      // Unregister service workers
       if ('serviceWorker' in navigator) {
         try {
           const registrations = await navigator.serviceWorker.getRegistrations();
           for (const registration of registrations) {
             clearingPromises.push(registration.unregister());
           }
-          
-          // Also clear the service worker update cache
-          if (navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
-          }
         } catch (e) {
-          console.warn('Error unregistering service workers:', e);
+          console.warn('Error unregistering service workers');
         }
-      }
-      
-      // Clear browser HTTP cache using fetch with cache: 'reload'
-      try {
-        // Force reload critical resources with no-cache
-        await fetch('/', { cache: 'reload' });
-        await fetch('/index.html', { cache: 'reload' });
-        await fetch('/css/styles.css', { cache: 'reload' });
-        await fetch('/js/app.js', { cache: 'reload' });
-      } catch (e) {
-        console.warn('Could not force reload resources:', e);
       }
       
       // Wait for all clearing operations to complete (with timeout)
@@ -770,17 +762,12 @@ async function clearEverything() {
       
       // Clear any hash and search params, add cache busting
       const baseUrl = window.location.origin + window.location.pathname;
-      const newUrl = `${baseUrl}?_cb=${timestamp}&_r=${randomParam}&_nc=1&_t=${Date.now()}`;
+      const newUrl = `${baseUrl}?_cb=${timestamp}&_r=${randomParam}&_nc=1`;
       
-      // Force browser to treat this as a completely new page
-      // Create a form submission to force a POST-like reload
-      const form = document.createElement('form');
-      form.method = 'GET';
-      form.action = newUrl;
-      document.body.appendChild(form);
+      // Force immediate hard reload with multiple fallback methods
       
-      // Method 1: Submit form to force navigation
-      form.submit();
+      // Method 1: Replace current location with cache-busting parameters
+      window.location.replace(newUrl);
       
       // Method 2: Fallback using href assignment
       setTimeout(() => {

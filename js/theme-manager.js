@@ -1,8 +1,8 @@
-// Centralized Theme Management - Dark Theme Only
+// Centralized Theme Management
 export class ThemeManager {
   constructor() {
     this.html = document.documentElement;
-    this.currentTheme = 'dark'; // Always dark
+    this.currentTheme = null;
     this.listeners = [];
     
     // Initialize theme immediately
@@ -10,13 +10,40 @@ export class ThemeManager {
   }
   
   init() {
-    // Always apply dark theme
-    this.applyTheme('dark', false);
+    // Determine initial theme from settings or system preference
+    const initialTheme = this.getInitialTheme();
+    this.applyTheme(initialTheme, false); // Don't save on init
+    
+    // Listen for system theme changes when in auto mode
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      const settings = this.getSettings();
+      if (settings.theme === 'auto') {
+        const newTheme = e.matches ? 'dark' : 'light';
+        this.applyTheme(newTheme, false); // Don't save system changes
+      }
+    });
   }
   
   getInitialTheme() {
-    // Always return dark theme
-    return 'dark';
+    try {
+      // Check settings manager first
+      const settings = this.getSettings();
+      if (settings.theme && settings.theme !== 'auto') {
+        return settings.theme;
+      }
+      
+      // Check legacy localStorage
+      const legacyTheme = localStorage.getItem('theme');
+      if (legacyTheme && legacyTheme !== 'auto') {
+        return legacyTheme;
+      }
+      
+      // Auto mode or no preference - use system
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } catch (e) {
+      // Fallback to system preference
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
   }
   
   getSettings() {
@@ -24,17 +51,15 @@ export class ThemeManager {
       const saved = localStorage.getItem('devtoolbox-settings');
       if (saved) {
         const settings = JSON.parse(saved);
-        // Force dark theme
-        settings.theme = 'dark';
         return settings;
       }
     } catch (e) {
       console.warn('Failed to load theme settings:', e);
     }
     
-    // Default settings with dark theme
+    // Default settings
     return {
-      theme: 'dark', // Always dark
+      theme: 'light',
       autoProcess: true,
       debounceDelay: 300,
       maxHistoryItems: 50,
@@ -55,35 +80,80 @@ export class ThemeManager {
   }
   
   applyTheme(theme, save = true) {
-    // Always force dark theme
-    const effectiveTheme = 'dark';
+    // Handle auto theme
+    let effectiveTheme = theme;
+    if (theme === 'auto') {
+      effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
     
     // Update HTML class and data attribute
-    this.html.classList.add('dark');
-    this.html.setAttribute('data-theme', 'dark');
+    this.html.classList.remove('dark');
+    if (effectiveTheme === 'dark') {
+      this.html.classList.add('dark');
+    }
+    this.html.setAttribute('data-theme', effectiveTheme);
+    
+    // Update button states
+    this.updateThemeButtons(effectiveTheme);
     
     // Store current theme
-    this.currentTheme = 'dark';
+    this.currentTheme = effectiveTheme;
+    
+    // Save to both settings and legacy localStorage if requested
+    if (save) {
+      this.saveTheme(theme); // Save original theme (including 'auto')
+    }
     
     // Notify listeners
-    this.notifyListeners('dark', 'dark');
+    this.notifyListeners(effectiveTheme, theme);
   }
   
   saveTheme(theme) {
-    // No-op - theme is always dark
+    // Update settings manager
+    try {
+      const settings = this.getSettings();
+      settings.theme = theme;
+      localStorage.setItem('devtoolbox-settings', JSON.stringify(settings));
+      
+      // Update settings manager instance if available
+      if (window.settingsManager) {
+        window.settingsManager.settings.theme = theme;
+      }
+    } catch (e) {
+      console.warn('Failed to save theme to settings:', e);
+    }
+    
+    // Update legacy localStorage for compatibility
+    try {
+      localStorage.setItem('theme', theme);
+    } catch (e) {
+      console.warn('Failed to save theme to localStorage:', e);
+    }
   }
   
   updateThemeButtons(effectiveTheme) {
-    // No-op - no theme buttons to update
+    // Update toggle buttons
+    const lightButton = document.querySelector('button[data-theme="light"]');
+    const darkButton = document.querySelector('button[data-theme="dark"]');
+    
+    if (lightButton && darkButton) {
+      // Reset both buttons to inactive state
+      const inactiveClasses = 'px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors rounded-md flex items-center gap-1';
+      const activeClasses = 'px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 transition-colors rounded-md flex items-center gap-1';
+      
+      lightButton.className = effectiveTheme === 'light' ? activeClasses : inactiveClasses;
+      darkButton.className = effectiveTheme === 'dark' ? activeClasses : inactiveClasses;
+    }
   }
   
   toggleTheme() {
-    // No-op - always dark theme
-    return 'dark';
+    const newTheme = this.currentTheme === 'light' ? 'dark' : 'light';
+    this.applyTheme(newTheme);
+    return newTheme;
   }
   
   getCurrentTheme() {
-    return 'dark'; // Always dark
+    return this.currentTheme;
   }
   
   addListener(callback) {
