@@ -34,12 +34,22 @@ function setupThemeListeners() {
   lightButton?.addEventListener('click', () => {
     applyTheme('light');
     localStorage.setItem('theme', 'light');
+    // Update settings manager if available
+    if (window.settingsManager) {
+      window.settingsManager.settings.theme = 'light';
+      window.settingsManager.saveSettings();
+    }
   });
 
   // Dark theme button
   darkButton?.addEventListener('click', () => {
     applyTheme('dark');
     localStorage.setItem('theme', 'dark');
+    // Update settings manager if available
+    if (window.settingsManager) {
+      window.settingsManager.settings.theme = 'dark';
+      window.settingsManager.saveSettings();
+    }
   });
 }
 
@@ -53,6 +63,11 @@ function setupThemeToggle() {
       const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
       applyTheme(newTheme);
       localStorage.setItem('theme', newTheme);
+      // Update settings manager if available
+      if (window.settingsManager) {
+        window.settingsManager.settings.theme = newTheme;
+        window.settingsManager.saveSettings();
+      }
     }
   });
 }
@@ -64,10 +79,16 @@ function getSystemTheme() {
 
 // Apply theme
 function applyTheme(theme) {
+  // Handle auto theme
+  let effectiveTheme = theme;
+  if (theme === 'auto') {
+    effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  
   // Remove all theme classes
   html.classList.remove('dark');
   
-  if (theme === 'dark') {
+  if (effectiveTheme === 'dark') {
     html.classList.add('dark');
     html.setAttribute('data-theme', 'dark');
   } else {
@@ -75,7 +96,7 @@ function applyTheme(theme) {
   }
   
   // Update button states
-  updateThemeButtons(theme);
+  updateThemeButtons(effectiveTheme);
 }
 
 // Update theme button states
@@ -622,6 +643,11 @@ document.addEventListener('keydown', (e) => {
     
     applyTheme(newTheme);
     localStorage.setItem('theme', newTheme);
+    // Update settings manager if available
+    if (window.settingsManager) {
+      window.settingsManager.settings.theme = newTheme;
+      window.settingsManager.saveSettings();
+    }
   }
 });
 
@@ -693,6 +719,7 @@ window.historyPersistence = historyPersistence; // Make available globally for s
 
 // Initialize settings manager
 const settingsManager = new SettingsManager();
+window.settingsManager = settingsManager; // Make available globally for theme sync
 
 // Initialize search aliases
 const searchAliases = new SearchAliases();

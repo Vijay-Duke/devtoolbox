@@ -60,7 +60,23 @@ export class SettingsManager {
   
   applySettings() {
     // Apply theme
-    document.documentElement.setAttribute('data-theme', this.settings.theme);
+    const html = document.documentElement;
+    
+    // Handle theme setting including 'auto' mode
+    let effectiveTheme = this.settings.theme;
+    if (effectiveTheme === 'auto') {
+      effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    
+    // Set data-theme attribute
+    html.setAttribute('data-theme', effectiveTheme);
+    
+    // Toggle dark class for Tailwind CSS
+    if (effectiveTheme === 'dark') {
+      html.classList.add('dark');
+    } else {
+      html.classList.remove('dark');
+    }
     
     // Apply other settings
     if (window.shortcuts) {
