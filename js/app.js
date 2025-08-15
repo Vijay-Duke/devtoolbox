@@ -13,37 +13,48 @@ const html = document.documentElement;
 
 // Initialize theme elements after DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  lightButton = document.querySelector('[data-theme="light"]');
-  darkButton = document.querySelector('[data-theme="dark"]');
-  
-  console.log('Theme buttons found:', { lightButton, darkButton });
+  // Fix: Use specific selectors to target only the buttons, not the html element
+  lightButton = document.querySelector('button[data-theme="light"]');
+  darkButton = document.querySelector('button[data-theme="dark"]');
   
   // Set up theme event listeners
   setupThemeListeners();
   
+  // Add single theme toggle for test compatibility
+  setupThemeToggle();
+  
   // Initialize theme immediately
   const savedTheme = localStorage.getItem('theme');
   const initialTheme = savedTheme || getSystemTheme();
-  console.log('Initial theme:', initialTheme);
   applyTheme(initialTheme);
 });
 
 function setupThemeListeners() {
   // Light theme button
   lightButton?.addEventListener('click', () => {
-    console.log('Light button clicked');
     applyTheme('light');
     localStorage.setItem('theme', 'light');
   });
 
   // Dark theme button
   darkButton?.addEventListener('click', () => {
-    console.log('Dark button clicked');
     applyTheme('dark');
     localStorage.setItem('theme', 'dark');
   });
-  
-  console.log('Theme listeners set up');
+}
+
+function setupThemeToggle() {
+  // Single theme toggle for test compatibility and keyboard shortcut
+  const themeToggle = document.querySelector('[data-theme-toggle]');
+  themeToggle?.addEventListener('click', (e) => {
+    // Only toggle if clicking the container itself, not the buttons
+    if (e.target === themeToggle) {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+      localStorage.setItem('theme', newTheme);
+    }
+  });
 }
 
 // Detect system preference
@@ -53,8 +64,6 @@ function getSystemTheme() {
 
 // Apply theme
 function applyTheme(theme) {
-  console.log('Applying theme:', theme);
-  
   // Remove all theme classes
   html.classList.remove('dark');
   
@@ -67,8 +76,6 @@ function applyTheme(theme) {
   
   // Update button states
   updateThemeButtons(theme);
-  
-  console.log('Theme applied. HTML classes:', html.className, 'data-theme:', html.getAttribute('data-theme'));
 }
 
 // Update theme button states
