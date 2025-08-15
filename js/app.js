@@ -19,18 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let newTheme;
     
     // Cycle through: system -> light -> dark -> system
-    if (!currentTheme || currentTheme === 'system') {
+    if (!currentTheme) {
       // Currently on system, go to opposite of system preference
       newTheme = systemPrefersDark ? 'light' : 'dark';
     } else if (currentTheme === 'light') {
       newTheme = 'dark';
     } else {
       // dark -> back to system
-      newTheme = 'system';
+      newTheme = null; // null means system
     }
     
     // Apply the new theme
-    if (newTheme === 'system') {
+    if (newTheme === null) {
       localStorage.removeItem('theme'); // Remove to follow system
       // Apply system preference
       if (systemPrefersDark) {

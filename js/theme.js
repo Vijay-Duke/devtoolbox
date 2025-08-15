@@ -1,7 +1,13 @@
 (function() {
-  // Get stored theme preference (can be 'light', 'dark', or 'system')
-  const storedTheme = localStorage.getItem('theme');
+  // Get stored theme preference (can be 'light', 'dark', or null for system)
+  let storedTheme = localStorage.getItem('theme');
   const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
+  // Migration: if old 'system' value exists, remove it
+  if (storedTheme === 'system') {
+    localStorage.removeItem('theme');
+    storedTheme = null;
+  }
   
   // Determine which theme to apply
   let shouldUseDark = false;
@@ -13,9 +19,8 @@
     // User explicitly chose light
     shouldUseDark = false;
   } else {
-    // No preference stored or 'system' - use system preference
+    // No preference stored - use system preference
     shouldUseDark = systemPrefersDark;
-    // Don't store anything - keep following system
   }
   
   // Apply the theme
@@ -28,9 +33,10 @@
   }
   
   // Listen for system theme changes when in auto mode
-  if (!storedTheme || storedTheme === 'system') {
+  if (!storedTheme) {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      if (!localStorage.getItem('theme') || localStorage.getItem('theme') === 'system') {
+      // Re-check to make sure we're still in auto mode
+      if (!localStorage.getItem('theme')) {
         if (e.matches) {
           document.documentElement.classList.add('dark');
           document.documentElement.setAttribute('data-theme', 'dark');
@@ -41,4 +47,11 @@
       }
     });
   }
+  
+  // Debug info
+  console.log('Theme initialized:', {
+    stored: storedTheme,
+    systemPrefersDark: systemPrefersDark,
+    appliedDark: shouldUseDark
+  });
 })();
