@@ -6,50 +6,33 @@ import { ShareableLinks } from './shareable-links.js';
 import { HistoryPersistence } from './history-persistence.js';
 import { SettingsManager } from './settings-manager.js';
 import { SearchAliases } from './search-aliases.js';
+import './theme-manager.js';
 
-// Theme Management with System Default
+// Theme Management - now handled by centralized ThemeManager
 let lightButton, darkButton;
-const html = document.documentElement;
 
 // Initialize theme elements after DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Fix: Use specific selectors to target only the buttons, not the html element
-  lightButton = document.querySelector('button[data-theme="light"]');
-  darkButton = document.querySelector('button[data-theme="dark"]');
-  
-  // Set up theme event listeners
+  // Set up theme event listeners using centralized ThemeManager
   setupThemeListeners();
   
   // Add single theme toggle for test compatibility
   setupThemeToggle();
-  
-  // Initialize theme immediately
-  const savedTheme = localStorage.getItem('theme');
-  const initialTheme = savedTheme || getSystemTheme();
-  applyTheme(initialTheme);
 });
 
 function setupThemeListeners() {
+  // Find theme buttons
+  lightButton = document.querySelector('button[data-theme="light"]');
+  darkButton = document.querySelector('button[data-theme="dark"]');
+  
   // Light theme button
   lightButton?.addEventListener('click', () => {
-    applyTheme('light');
-    localStorage.setItem('theme', 'light');
-    // Update settings manager if available
-    if (window.settingsManager) {
-      window.settingsManager.settings.theme = 'light';
-      window.settingsManager.saveSettings();
-    }
+    window.themeManager.applyTheme('light');
   });
 
   // Dark theme button
   darkButton?.addEventListener('click', () => {
-    applyTheme('dark');
-    localStorage.setItem('theme', 'dark');
-    // Update settings manager if available
-    if (window.settingsManager) {
-      window.settingsManager.settings.theme = 'dark';
-      window.settingsManager.saveSettings();
-    }
+    window.themeManager.applyTheme('dark');
   });
 }
 
@@ -59,71 +42,10 @@ function setupThemeToggle() {
   themeToggle?.addEventListener('click', (e) => {
     // Only toggle if clicking the container itself, not the buttons
     if (e.target === themeToggle) {
-      const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      applyTheme(newTheme);
-      localStorage.setItem('theme', newTheme);
-      // Update settings manager if available
-      if (window.settingsManager) {
-        window.settingsManager.settings.theme = newTheme;
-        window.settingsManager.saveSettings();
-      }
+      window.themeManager.toggleTheme();
     }
   });
 }
-
-// Detect system preference
-function getSystemTheme() {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
-// Apply theme
-function applyTheme(theme) {
-  // Handle auto theme
-  let effectiveTheme = theme;
-  if (theme === 'auto') {
-    effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  }
-  
-  // Remove all theme classes
-  html.classList.remove('dark');
-  
-  if (effectiveTheme === 'dark') {
-    html.classList.add('dark');
-    html.setAttribute('data-theme', 'dark');
-  } else {
-    html.setAttribute('data-theme', 'light');
-  }
-  
-  // Update button states
-  updateThemeButtons(effectiveTheme);
-}
-
-// Update theme button states
-function updateThemeButtons(theme) {
-  if (lightButton && darkButton) {
-    // Reset both buttons to inactive state
-    lightButton.className = 'px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors rounded-md flex items-center gap-1';
-    darkButton.className = 'px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors rounded-md flex items-center gap-1';
-    
-    // Activate the current theme button
-    if (theme === 'light') {
-      lightButton.className = 'px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 transition-colors rounded-md flex items-center gap-1';
-    } else if (theme === 'dark') {
-      darkButton.className = 'px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 transition-colors rounded-md flex items-center gap-1';
-    }
-  }
-}
-
-
-// Only listen for system changes if no manual preference is saved
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-  // Only update if user hasn't manually set a preference
-  if (!localStorage.getItem('theme')) {
-    const newTheme = e.matches ? 'dark' : 'light';
-    applyTheme(newTheme);
-  }
-});
 
 
 // Mobile Menu Toggle
@@ -135,20 +57,16 @@ const sidebarOverlay = document.querySelector('[data-sidebar-overlay]');
 function toggleMobileMenu() {
   const isOpen = !sidebar.classList.contains('-translate-x-full');
   
-  console.log('Menu toggle activated, isOpen:', isOpen);
-  
   if (isOpen) {
     // Close sidebar
     sidebar.classList.add('-translate-x-full');
     sidebarOverlay.classList.add('hidden');
     menuToggle.setAttribute('aria-expanded', 'false');
-    console.log('Sidebar closed');
   } else {
     // Open sidebar
     sidebar.classList.remove('-translate-x-full');
     sidebarOverlay.classList.remove('hidden');
     menuToggle.setAttribute('aria-expanded', 'true');
-    console.log('Sidebar opened');
   }
 }
 
@@ -204,7 +122,6 @@ sidebarToggle?.addEventListener('click', () => {
 
 // Mobile device detection and setup
 const isMobile = 'ontouchstart' in window || window.innerWidth <= 768;
-console.log('Mobile device detected:', isMobile);
 
 // Enable swipe gestures for mobile
 if (isMobile) {
@@ -220,8 +137,6 @@ if (isMobile) {
   if (menuToggle) {
     menuToggle.setAttribute('aria-expanded', 'false');
   }
-  
-  console.log('Mobile setup complete - sidebar closed, swipe gestures enabled');
 }
 
 // Search Functionality
@@ -638,16 +553,7 @@ document.addEventListener('keydown', (e) => {
   
   // Toggle theme with T (toggles between light and dark)
   if (e.key === 't' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
-    const currentTheme = html.getAttribute('data-theme');
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    
-    applyTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
-    // Update settings manager if available
-    if (window.settingsManager) {
-      window.settingsManager.settings.theme = newTheme;
-      window.settingsManager.saveSettings();
-    }
+    window.themeManager.toggleTheme();
   }
 });
 
@@ -745,6 +651,7 @@ function showSystemNotification(message, type = 'info') {
   const closeButton = document.createElement('button');
   closeButton.className = 'ml-3 text-current opacity-70 hover:opacity-100';
   closeButton.textContent = '×';
+  closeButton.setAttribute('aria-label', 'Close notification');
   closeButton.addEventListener('click', () => notification.remove());
   
   container.appendChild(messageSpan);
@@ -911,8 +818,8 @@ function navigateHome() {
 
 // Prefetch popular tools on idle
 function prefetchPopularTools() {
-  if ('serviceWorker' in navigator && 'requestIdleCallback' in window) {
-    requestIdleCallback(() => {
+  if ('serviceWorker' in navigator) {
+    const doPrefetch = () => {
       const popularTools = [
         '/js/tools/json-formatter.js',
         '/js/tools/jwt-decoder.js',
@@ -929,7 +836,14 @@ function prefetchPopularTools() {
         fetch(tool, { priority: 'low' })
           .catch(() => {}); // Ignore errors, just for prefetching
       });
-    }, { timeout: 2000 });
+    };
+    
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(doPrefetch, { timeout: 2000 });
+    } else {
+      // Fallback to setTimeout for browsers without requestIdleCallback
+      setTimeout(doPrefetch, 1000);
+    }
   }
 }
 

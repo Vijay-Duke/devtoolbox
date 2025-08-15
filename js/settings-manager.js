@@ -59,23 +59,9 @@ export class SettingsManager {
   }
   
   applySettings() {
-    // Apply theme
-    const html = document.documentElement;
-    
-    // Handle theme setting including 'auto' mode
-    let effectiveTheme = this.settings.theme;
-    if (effectiveTheme === 'auto') {
-      effectiveTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    
-    // Set data-theme attribute
-    html.setAttribute('data-theme', effectiveTheme);
-    
-    // Toggle dark class for Tailwind CSS
-    if (effectiveTheme === 'dark') {
-      html.classList.add('dark');
-    } else {
-      html.classList.remove('dark');
+    // Apply theme using centralized ThemeManager
+    if (window.themeManager) {
+      window.themeManager.applyTheme(this.settings.theme, false); // Don't save when applying from settings
     }
     
     // Apply other settings
@@ -109,6 +95,7 @@ export class SettingsManager {
       </svg>
     `;
     button.title = 'Settings';
+    button.setAttribute('aria-label', 'Open settings');
     
     // Add to header
     const header = document.querySelector('.header');
@@ -409,7 +396,10 @@ export class SettingsManager {
   
   saveFromModal() {
     // Collect settings from modal
-    this.settings.theme = this.modal.querySelector('#setting-theme').value;
+    const newTheme = this.modal.querySelector('#setting-theme').value;
+    const themeChanged = this.settings.theme !== newTheme;
+    
+    this.settings.theme = newTheme;
     this.settings.autoProcess = this.modal.querySelector('#setting-auto-process').checked;
     this.settings.debounceDelay = parseInt(this.modal.querySelector('#setting-debounce').value);
     this.settings.maxHistoryItems = parseInt(this.modal.querySelector('#setting-history-items').value);
@@ -424,6 +414,11 @@ export class SettingsManager {
     
     // Save and apply
     if (this.saveSettings()) {
+      // If theme changed, apply it through ThemeManager
+      if (themeChanged && window.themeManager) {
+        window.themeManager.applyTheme(newTheme);
+      }
+      
       this.showNotification('Settings saved successfully');
       this.hideSettings();
     } else {

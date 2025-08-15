@@ -24,6 +24,7 @@ export class ShareableLinks {
       <span>Share</span>
     `;
     button.title = 'Share tool with current settings';
+    button.setAttribute('aria-label', 'Share tool with current settings');
     button.hidden = true;
     
     this.shareButton = button;

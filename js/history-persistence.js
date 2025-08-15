@@ -198,6 +198,7 @@ export class HistoryPersistence {
       <span>History</span>
     `;
     button.title = 'View history for this tool';
+    button.setAttribute('aria-label', 'View history for this tool');
     
     button.addEventListener('click', () => this.showHistory());
     

@@ -1,14 +1,14 @@
 // Service Worker for offline support and caching  
-const STATIC_CACHE = 'devtoolbox-static-v4';
-const DYNAMIC_CACHE = 'devtoolbox-dynamic-v4';
-const TOOLS_CACHE = 'devtoolbox-tools-v4';
+const STATIC_CACHE = 'devtoolbox-static-v5';
+const DYNAMIC_CACHE = 'devtoolbox-dynamic-v5';
+const TOOLS_CACHE = 'devtoolbox-tools-v5';
 
 // Core files to cache for offline use
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/css/styles.css',
-  '/js/theme.js',
+  '/js/theme-manager.js',
   '/js/app.js',
   '/js/router-lazy.js',
   '/js/fuzzy-search.js',
@@ -29,17 +29,14 @@ const POPULAR_TOOLS = [
 
 // Install event - cache static assets and popular tools
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Installing...');
   event.waitUntil(
     Promise.all([
       // Cache static assets
       caches.open(STATIC_CACHE).then((cache) => {
-        console.log('[Service Worker] Caching static assets');
         return cache.addAll(STATIC_ASSETS);
       }),
       // Pre-cache popular tools
       caches.open(TOOLS_CACHE).then((cache) => {
-        console.log('[Service Worker] Pre-caching popular tools');
         return cache.addAll(POPULAR_TOOLS);
       })
     ])
@@ -49,7 +46,6 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activating...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -61,7 +57,6 @@ self.addEventListener('activate', (event) => {
                    cacheName !== TOOLS_CACHE;
           })
           .map((cacheName) => {
-            console.log('[Service Worker] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           })
       );

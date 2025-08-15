@@ -344,9 +344,9 @@ export class Router {
     // Prefetch up to 2 related tools
     const toolsToPrefetch = relatedTools.slice(0, 2);
     
-    // Use requestIdleCallback for non-blocking prefetch
-    if ('requestIdleCallback' in window && toolsToPrefetch.length > 0) {
-      requestIdleCallback(() => {
+    // Use requestIdleCallback for non-blocking prefetch with fallback
+    if (toolsToPrefetch.length > 0) {
+      const prefetchTools = () => {
         toolsToPrefetch.forEach(route => {
           import(route.module).then(module => {
             if (module[route.className]) {
@@ -355,7 +355,14 @@ export class Router {
             }
           }).catch(() => {}); // Silent fail for prefetch
         });
-      });
+      };
+      
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(prefetchTools, { timeout: 2000 });
+      } else {
+        // Fallback to setTimeout for browsers without requestIdleCallback
+        setTimeout(prefetchTools, 100);
+      }
     }
   }
   
