@@ -291,6 +291,10 @@
     }
     
     /* Category color coding */
+    .category-formatters .nav-link {
+      border-left: 3px solid #8b5cf6 !important;
+    }
+    
     .category-text-data .nav-link {
       border-left: 3px solid #3b82f6 !important;
     }
@@ -312,6 +316,12 @@
     }
     
     /* Category indicators when sidebar is collapsed */
+    #sidebar.collapsed .category-formatters .nav-link {
+      border-left: 4px solid #8b5cf6 !important;
+      border-radius: 0 0.5rem 0.5rem 0 !important;
+      margin-left: 0.5rem !important;
+    }
+    
     #sidebar.collapsed .category-text-data .nav-link {
       border-left: 4px solid #3b82f6 !important;
       border-radius: 0 0.5rem 0.5rem 0 !important;
@@ -343,6 +353,13 @@
     }
     
     /* Category headers with matching colors */
+    .category-formatters .sidebar-category {
+      color: #8b5cf6 !important;
+      border-bottom: 2px solid #8b5cf6 !important;
+      padding-bottom: 0.25rem !important;
+      margin-bottom: 0.75rem !important;
+    }
+    
     .category-text-data .sidebar-category {
       color: #3b82f6 !important;
       border-bottom: 2px solid #3b82f6 !important;
