@@ -54,80 +54,6 @@
       color-scheme: dark;
     }
     
-    [data-theme="high-contrast"] {
-      color-scheme: dark;
-    }
-    
-    /* High contrast theme styles - WCAG AAA compliance */
-    .high-contrast {
-      /* Background and text colors with 21:1 contrast ratio */
-      --bg-primary: #ffffff;
-      --bg-secondary: #f5f5f5;
-      --text-primary: #000000;
-      --text-secondary: #333333;
-      --border-color: #000000;
-      --focus-color: #0000ff;
-      --error-color: #cc0000;
-      --success-color: #006600;
-      --link-color: #0000ee;
-    }
-    
-    .high-contrast,
-    .high-contrast * {
-      background-color: var(--bg-primary) !important;
-      color: var(--text-primary) !important;
-      border-color: var(--border-color) !important;
-    }
-    
-    .high-contrast input,
-    .high-contrast textarea,
-    .high-contrast select,
-    .high-contrast button {
-      background-color: var(--bg-primary) !important;
-      color: var(--text-primary) !important;
-      border: 2px solid var(--border-color) !important;
-      outline: none !important;
-    }
-    
-    .high-contrast button:hover,
-    .high-contrast button:focus {
-      background-color: var(--bg-secondary) !important;
-      border: 3px solid var(--focus-color) !important;
-    }
-    
-    .high-contrast input:focus,
-    .high-contrast textarea:focus,
-    .high-contrast select:focus {
-      border: 3px solid var(--focus-color) !important;
-      box-shadow: 0 0 0 2px var(--focus-color) !important;
-    }
-    
-    .high-contrast a {
-      color: var(--link-color) !important;
-      text-decoration: underline !important;
-      font-weight: bold !important;
-    }
-    
-    .high-contrast .error,
-    .high-contrast [class*="error"],
-    .high-contrast [class*="red"] {
-      color: var(--error-color) !important;
-      border-color: var(--error-color) !important;
-    }
-    
-    .high-contrast .success,
-    .high-contrast [class*="success"],
-    .high-contrast [class*="green"] {
-      color: var(--success-color) !important;
-      border-color: var(--success-color) !important;
-    }
-    
-    /* Remove gradients and shadows in high contrast */
-    .high-contrast * {
-      background-image: none !important;
-      box-shadow: none !important;
-      text-shadow: none !important;
-    }
     
     /* Enhanced focus outlines for accessibility */
     button:focus,
@@ -139,14 +65,6 @@
       outline-offset: 2px !important;
     }
     
-    .high-contrast button:focus,
-    .high-contrast input:focus,
-    .high-contrast textarea:focus,
-    .high-contrast select:focus,
-    .high-contrast a:focus {
-      outline: 3px solid var(--focus-color) !important;
-      outline-offset: 2px !important;
-    }
     
     /* Mobile touch targets - minimum 44px per WCAG */
     @media (max-width: 768px) {
@@ -670,53 +588,30 @@
     
     <!-- Header actions -->
     <div class="flex items-center space-x-1">
-      <!-- Theme toggle dropdown -->
-      <div class="relative">
+      <!-- Theme toggle buttons -->
+      <div class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
         <button 
-          class="p-3 min-w-[44px] min-h-[44px] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
-          data-theme-toggle
-          aria-label="Change theme"
-          aria-expanded="false"
-          aria-haspopup="true"
-          title="Change theme (Press T)"
+          data-theme="light"
+          class="px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 transition-colors rounded-md flex items-center gap-1"
+          aria-label="Light mode"
+          title="Switch to light mode"
         >
-          <svg class="w-5 h-5 theme-icon theme-icon-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
           </svg>
-          <svg class="w-5 h-5 theme-icon theme-icon-dark hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          Light
+        </button>
+        <button 
+          data-theme="dark"
+          class="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors rounded-md flex items-center gap-1"
+          aria-label="Dark mode"
+          title="Switch to dark mode"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
           </svg>
-          <svg class="w-5 h-5 theme-icon theme-icon-contrast hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1a11 11 0 1 1 0 22 11 11 0 0 1 0-22zm0 2a9 9 0 0 0 0 18V3z"></path>
-          </svg>
+          Dark
         </button>
-        
-        <!-- Theme dropdown -->
-        <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50" data-theme-dropdown>
-          <div class="py-1" role="menu" aria-orientation="vertical">
-            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center" 
-                    data-theme="light" role="menuitem">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-              </svg>
-              Light
-            </button>
-            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center" 
-                    data-theme="dark" role="menuitem">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-              </svg>
-              Dark
-            </button>
-            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center" 
-                    data-theme="high-contrast" role="menuitem">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1a11 11 0 1 1 0 22 11 11 0 0 1 0-22zm0 2a9 9 0 0 0 0 18V3z"></path>
-              </svg>
-              High Contrast
-            </button>
-          </div>
-        </div>
       </div>
       
       <!-- Clear button -->

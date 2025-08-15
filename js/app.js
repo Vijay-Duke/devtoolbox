@@ -8,13 +8,15 @@ import { SettingsManager } from './settings-manager.js';
 import { SearchAliases } from './search-aliases.js';
 
 // Theme Management with System Default
-let themeToggle, themeDropdown;
+let lightButton, darkButton;
 const html = document.documentElement;
 
 // Initialize theme elements after DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  themeToggle = document.querySelector('[data-theme-toggle]');
-  themeDropdown = document.querySelector('[data-theme-dropdown]');
+  lightButton = document.querySelector('[data-theme="light"]');
+  darkButton = document.querySelector('[data-theme="dark"]');
+  
+  console.log('Theme buttons found:', { lightButton, darkButton });
   
   // Set up theme event listeners
   setupThemeListeners();
@@ -22,45 +24,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize theme immediately
   const savedTheme = localStorage.getItem('theme');
   const initialTheme = savedTheme || getSystemTheme();
+  console.log('Initial theme:', initialTheme);
   applyTheme(initialTheme);
 });
 
 function setupThemeListeners() {
-  // Theme dropdown functionality
-  themeToggle?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = !themeDropdown.classList.contains('hidden');
-    
-    if (isOpen) {
-      themeDropdown.classList.add('hidden');
-      themeToggle.setAttribute('aria-expanded', 'false');
-    } else {
-      themeDropdown.classList.remove('hidden');
-      themeToggle.setAttribute('aria-expanded', 'true');
-    }
+  // Light theme button
+  lightButton?.addEventListener('click', () => {
+    console.log('Light button clicked');
+    applyTheme('light');
+    localStorage.setItem('theme', 'light');
   });
 
-  // Close dropdown when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!themeToggle?.contains(e.target) && !themeDropdown?.contains(e.target)) {
-      themeDropdown?.classList.add('hidden');
-      themeToggle?.setAttribute('aria-expanded', 'false');
-    }
+  // Dark theme button
+  darkButton?.addEventListener('click', () => {
+    console.log('Dark button clicked');
+    applyTheme('dark');
+    localStorage.setItem('theme', 'dark');
   });
-
-  // Theme selection
-  themeDropdown?.addEventListener('click', (e) => {
-    const themeButton = e.target.closest('[data-theme]');
-    if (themeButton) {
-      const newTheme = themeButton.dataset.theme;
-      applyTheme(newTheme);
-      localStorage.setItem('theme', newTheme);
-      
-      // Close dropdown
-      themeDropdown.classList.add('hidden');
-      themeToggle.setAttribute('aria-expanded', 'false');
-    }
-  });
+  
+  console.log('Theme listeners set up');
 }
 
 // Detect system preference
@@ -70,41 +53,37 @@ function getSystemTheme() {
 
 // Apply theme
 function applyTheme(theme) {
+  console.log('Applying theme:', theme);
+  
   // Remove all theme classes
-  html.classList.remove('dark', 'high-contrast');
+  html.classList.remove('dark');
   
   if (theme === 'dark') {
     html.classList.add('dark');
     html.setAttribute('data-theme', 'dark');
-  } else if (theme === 'high-contrast') {
-    html.classList.add('high-contrast');
-    html.setAttribute('data-theme', 'high-contrast');
   } else {
     html.setAttribute('data-theme', 'light');
   }
   
-  // Update theme icon
-  updateThemeIcon(theme);
+  // Update button states
+  updateThemeButtons(theme);
+  
+  console.log('Theme applied. HTML classes:', html.className, 'data-theme:', html.getAttribute('data-theme'));
 }
 
-// Update theme icon display
-function updateThemeIcon(theme) {
-  const lightIcon = document.querySelector('.theme-icon-light');
-  const darkIcon = document.querySelector('.theme-icon-dark');
-  const contrastIcon = document.querySelector('.theme-icon-contrast');
-  
-  // Hide all icons first
-  lightIcon?.classList.add('hidden');
-  darkIcon?.classList.add('hidden');
-  contrastIcon?.classList.add('hidden');
-  
-  // Show the appropriate icon
-  if (theme === 'light') {
-    lightIcon?.classList.remove('hidden');
-  } else if (theme === 'dark') {
-    darkIcon?.classList.remove('hidden');
-  } else if (theme === 'high-contrast') {
-    contrastIcon?.classList.remove('hidden');
+// Update theme button states
+function updateThemeButtons(theme) {
+  if (lightButton && darkButton) {
+    // Reset both buttons to inactive state
+    lightButton.className = 'px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors rounded-md flex items-center gap-1';
+    darkButton.className = 'px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors rounded-md flex items-center gap-1';
+    
+    // Activate the current theme button
+    if (theme === 'light') {
+      lightButton.className = 'px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 transition-colors rounded-md flex items-center gap-1';
+    } else if (theme === 'dark') {
+      darkButton.className = 'px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 transition-colors rounded-md flex items-center gap-1';
+    }
   }
 }
 
@@ -594,18 +573,10 @@ document.addEventListener('keydown', (e) => {
     }
   }
   
-  // Toggle theme with T (cycles through themes)
+  // Toggle theme with T (toggles between light and dark)
   if (e.key === 't' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
     const currentTheme = html.getAttribute('data-theme');
-    let newTheme;
-    
-    if (currentTheme === 'light') {
-      newTheme = 'dark';
-    } else if (currentTheme === 'dark') {
-      newTheme = 'high-contrast';
-    } else {
-      newTheme = 'light';
-    }
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
     
     applyTheme(newTheme);
     localStorage.setItem('theme', newTheme);
@@ -723,7 +694,8 @@ function showSystemNotification(message, type = 'info') {
 
 // Clear Everything Function
 function clearEverything() {
-  if (confirm('This will clear all storage (localStorage, sessionStorage), disconnect from all services, and return to the home page. Continue?')) {
+  if (confirm('This will clear all storage (localStorage, sessionStorage, cache), disconnect from all services, and reload with fresh resources from server. Continue?')) {
+    
     // Clear all localStorage
     localStorage.clear();
     
@@ -735,20 +707,77 @@ function clearEverything() {
       document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
     });
     
+    // Clear IndexedDB databases
+    if ('indexedDB' in window) {
+      indexedDB.databases().then(databases => {
+        databases.forEach(db => {
+          indexedDB.deleteDatabase(db.name);
+        });
+      }).catch(() => {
+        // Fallback for browsers that don't support indexedDB.databases()
+        console.warn('Could not enumerate IndexedDB databases');
+      });
+    }
+    
+    // Clear all caches using Cache API
+    if ('caches' in window) {
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.map(cacheName => {
+            return caches.delete(cacheName);
+          })
+        );
+      }).then(() => {
+        console.log('All caches cleared');
+      }).catch(() => {
+        console.warn('Error clearing caches');
+      });
+    }
+    
+    // Unregister service workers
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        registrations.forEach(registration => {
+          registration.unregister();
+        });
+      }).catch(() => {
+        console.warn('Error unregistering service workers');
+      });
+    }
+    
     // Close any open EventSource connections (for tools like temp-email)
     if (window.tempEmailTool && window.tempEmailTool.disconnect) {
       window.tempEmailTool.disconnect();
     }
     
-    // Reset to system theme
-    const systemTheme = getSystemTheme();
-    applyTheme(systemTheme);
-    localStorage.removeItem('theme');
+    // Close any open WebSocket connections
+    if (window.WebSocket) {
+      // Clear any global WebSocket references if they exist
+      Object.keys(window).forEach(key => {
+        if (window[key] instanceof WebSocket) {
+          window[key].close();
+        }
+      });
+    }
     
-    // Navigate to home
-    window.location.href = '/';
+    // Clear browser cache by forcing a hard reload with cache bypass
+    // Use a timestamp to ensure fresh resources
+    const timestamp = Date.now();
+    const currentUrl = window.location.href.split('?')[0]; // Remove existing query params
     
-    showSystemNotification('All storage cleared successfully', 'success');
+    // Show clearing message
+    showSystemNotification('Clearing all data and cache...', 'info');
+    
+    // Small delay to show the notification, then force reload with cache bypass
+    setTimeout(() => {
+      // Force reload with cache bypass - this will get fresh resources from server
+      window.location.href = `${currentUrl}?_t=${timestamp}`;
+      
+      // Backup method: if the above doesn't work, use location.reload with force
+      setTimeout(() => {
+        window.location.reload(true);
+      }, 100);
+    }, 500);
   }
 }
 
