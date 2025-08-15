@@ -1,5 +1,6 @@
 import { feedback } from '../utils/feedback.js';
 import { formatBytes, sanitizeInput } from '../utils/common.js';
+import { ToolEnhancements } from '../utils/tool-enhancements.js';
 
 export class Base64Tool {
   constructor() {
@@ -46,8 +47,9 @@ export class Base64Tool {
                 <rect x="9" y="9" width="13" height="13" rx="2"/>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg>
-              Copy
+              Copy Result
             </button>
+            <div id="download-button-container" class="inline-flex"></div>
             <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="clear">Clear</button>
           </div>
         </div>
@@ -127,10 +129,42 @@ export class Base64Tool {
       this.process();
     });
     
+    // Initialize enhancements
+    this.initializeEnhancements();
+    
     // Process initial input
     if (this.inputArea.value.trim()) {
       this.process();
     }
+  }
+  
+  initializeEnhancements() {
+    // Add tooltip to URL Safe checkbox
+    const urlSafeCheckbox = this.container.querySelector('#url-safe');
+    const commonTooltips = ToolEnhancements.getCommonTooltips();
+    ToolEnhancements.enhanceCheckbox(
+      urlSafeCheckbox,
+      commonTooltips.urlSafe.description,
+      commonTooltips.urlSafe.link
+    );
+    
+    // Enhance copy button
+    const copyButton = this.container.querySelector('[data-action="copy"]');
+    ToolEnhancements.enhanceCopyButton(copyButton, this.outputArea, 'Copy Result');
+    
+    // Add download functionality
+    const downloadContainer = this.container.querySelector('#download-button-container');
+    const downloadButton = ToolEnhancements.createDownloadButton(
+      () => this.getOutputContent(),
+      () => this.getDownloadFilename(),
+      'text/plain',
+      'Download'
+    );
+    downloadContainer.appendChild(downloadButton);
+    
+    // Add tooltip to ratio statistic
+    const ratioElement = this.container.querySelector('[data-stat="ratio"]');
+    ToolEnhancements.addRatioTooltip(ratioElement, "Shows the size change when encoding/decoding - Base64 encoding typically increases size by ~33%");
   }
   
   setMode(mode) {
@@ -275,5 +309,18 @@ export class Base64Tool {
   clearError() {
     this.errorDisplay.querySelector('p').textContent = '';
     this.errorDisplay.classList.add('hidden');
+  }
+  
+  getOutputContent() {
+    const output = this.outputArea.value;
+    if (!output.trim()) {
+      throw new Error('No content to download');
+    }
+    return output;
+  }
+  
+  getDownloadFilename() {
+    const extension = this.mode === 'encode' ? '.base64' : '.txt';
+    return `${this.mode}d_data${extension}`;
   }
 }

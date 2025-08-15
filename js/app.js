@@ -8,8 +8,77 @@ import { SettingsManager } from './settings-manager.js';
 import { SearchAliases } from './search-aliases.js';
 
 // Theme Management with System Default
-const themeToggle = document.querySelector('[data-theme-toggle]');
+let themeToggle, themeDropdown;
 const html = document.documentElement;
+
+// Initialize theme elements after DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  themeToggle = document.querySelector('[data-theme-toggle]');
+  themeDropdown = document.querySelector('[data-theme-dropdown]');
+  
+  console.log('Theme elements found after DOM load:', {
+    themeToggle: !!themeToggle,
+    themeDropdown: !!themeDropdown,
+    html: !!html
+  });
+  
+  // Set up theme event listeners
+  setupThemeListeners();
+  
+  // Initialize theme immediately
+  const savedTheme = localStorage.getItem('theme');
+  const initialTheme = savedTheme || getSystemTheme();
+  console.log('Initializing with theme:', initialTheme);
+  applyTheme(initialTheme);
+  
+  // Add global function for testing
+  window.testTheme = (theme) => {
+    console.log('Testing theme:', theme);
+    applyTheme(theme);
+    localStorage.setItem('theme', theme);
+  };
+});
+
+function setupThemeListeners() {
+  // Theme dropdown functionality
+  themeToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = !themeDropdown.classList.contains('hidden');
+    
+    if (isOpen) {
+      themeDropdown.classList.add('hidden');
+      themeToggle.setAttribute('aria-expanded', 'false');
+    } else {
+      themeDropdown.classList.remove('hidden');
+      themeToggle.setAttribute('aria-expanded', 'true');
+    }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!themeToggle?.contains(e.target) && !themeDropdown?.contains(e.target)) {
+      themeDropdown?.classList.add('hidden');
+      themeToggle?.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Theme selection
+  themeDropdown?.addEventListener('click', (e) => {
+    console.log('Theme dropdown clicked', e.target);
+    const themeButton = e.target.closest('[data-theme]');
+    console.log('Theme button found:', themeButton);
+    if (themeButton) {
+      const newTheme = themeButton.dataset.theme;
+      console.log('Selected theme:', newTheme);
+      applyTheme(newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      // Close dropdown
+      themeDropdown.classList.add('hidden');
+      themeToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
 
 // Detect system preference
 function getSystemTheme() {
@@ -18,39 +87,59 @@ function getSystemTheme() {
 
 // Apply theme
 function applyTheme(theme) {
+  console.log('applyTheme called with:', theme);
+  
+  // Remove all theme classes
+  html.classList.remove('dark', 'high-contrast');
+  
   if (theme === 'dark') {
     html.classList.add('dark');
     html.setAttribute('data-theme', 'dark');
+  } else if (theme === 'high-contrast') {
+    html.classList.add('high-contrast');
+    html.setAttribute('data-theme', 'high-contrast');
   } else {
-    html.classList.remove('dark');
     html.setAttribute('data-theme', 'light');
+  }
+  
+  console.log('HTML class after theme apply:', html.className);
+  console.log('data-theme attribute:', html.getAttribute('data-theme'));
+  
+  // Update theme icon
+  updateThemeIcon(theme);
+}
+
+// Update theme icon display
+function updateThemeIcon(theme) {
+  const lightIcon = document.querySelector('.theme-icon-light');
+  const darkIcon = document.querySelector('.theme-icon-dark');
+  const contrastIcon = document.querySelector('.theme-icon-contrast');
+  
+  // Hide all icons first
+  lightIcon?.classList.add('hidden');
+  darkIcon?.classList.add('hidden');
+  contrastIcon?.classList.add('hidden');
+  
+  // Show the appropriate icon
+  if (theme === 'light') {
+    lightIcon?.classList.remove('hidden');
+  } else if (theme === 'dark') {
+    darkIcon?.classList.remove('hidden');
+  } else if (theme === 'high-contrast') {
+    contrastIcon?.classList.remove('hidden');
   }
 }
 
-// Initialize theme: use saved preference or fall back to system default
-const savedTheme = localStorage.getItem('theme');
-const initialTheme = savedTheme || getSystemTheme();
-applyTheme(initialTheme);
 
 // Only listen for system changes if no manual preference is saved
-if (!savedTheme) {
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    // Only update if user hasn't manually set a preference
-    if (!localStorage.getItem('theme')) {
-      const newTheme = e.matches ? 'dark' : 'light';
-      applyTheme(newTheme);
-    }
-  });
-}
-
-// Manual theme toggle functionality
-themeToggle?.addEventListener('click', () => {
-  const isDark = html.classList.contains('dark');
-  const newTheme = isDark ? 'light' : 'dark';
-  
-  applyTheme(newTheme);
-  localStorage.setItem('theme', newTheme);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+  // Only update if user hasn't manually set a preference
+  if (!localStorage.getItem('theme')) {
+    const newTheme = e.matches ? 'dark' : 'light';
+    applyTheme(newTheme);
+  }
 });
+
 
 // Mobile Menu Toggle
 const menuToggle = document.querySelector('[data-menu-toggle]');
@@ -220,10 +309,8 @@ function performSearch(query) {
     // Smart abbreviation matching first
     const smartMatch = findSmartMatch(query, filtered);
     if (smartMatch) {
-      window.location.hash = smartMatch.href;
-      searchResults.hidden = true;
-      searchInput.value = '';
-      searchClear.hidden = true;
+      navigateToTool(smartMatch.href);
+      clearSearchUI();
       return;
     }
     
@@ -231,10 +318,8 @@ function performSearch(query) {
     
     // Auto-navigate if exactly one match
     if (filtered.length === 1) {
-      window.location.hash = filtered[0].href;
-      searchResults.hidden = true;
-      searchInput.value = '';
-      searchClear.hidden = true;
+      navigateToTool(filtered[0].href);
+      clearSearchUI();
       return;
     }
   }
@@ -246,6 +331,64 @@ function performSearch(query) {
     searchResults.hidden = false;
   }
   selectedResultIndex = -1;
+}
+
+function navigateToTool(href) {
+  // Navigate to the tool
+  window.location.hash = href;
+  
+  // Focus the tool content after navigation with a small delay to ensure DOM is ready
+  setTimeout(() => {
+    focusToolContent();
+  }, 200);
+}
+
+function focusToolContent() {
+  // Focus the main tool content area after successful navigation
+  const toolRoot = document.getElementById('tool-root');
+  const mainContent = document.getElementById('main');
+  
+  if (toolRoot) {
+    // Look for the first focusable element in the tool
+    const focusableElements = toolRoot.querySelectorAll(
+      'input:not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    
+    if (focusableElements.length > 0) {
+      // Focus the first input/textarea if available, otherwise the first focusable element
+      const firstInput = toolRoot.querySelector('input:not([disabled]), textarea:not([disabled])');
+      const elementToFocus = firstInput || focusableElements[0];
+      elementToFocus.focus();
+    } else if (toolRoot.hasAttribute('tabindex') || toolRoot.tabIndex >= 0) {
+      // Focus the tool root itself if it's focusable
+      toolRoot.focus();
+    } else {
+      // Make tool root focusable and focus it
+      toolRoot.setAttribute('tabindex', '-1');
+      toolRoot.focus();
+      // Optionally remove tabindex after focus for clean DOM
+      setTimeout(() => {
+        if (toolRoot.getAttribute('tabindex') === '-1') {
+          toolRoot.removeAttribute('tabindex');
+        }
+      }, 100);
+    }
+  } else if (mainContent) {
+    // Fallback: focus the main content area
+    mainContent.setAttribute('tabindex', '-1');
+    mainContent.focus();
+    setTimeout(() => {
+      if (mainContent.getAttribute('tabindex') === '-1') {
+        mainContent.removeAttribute('tabindex');
+      }
+    }, 100);
+  }
+}
+
+function clearSearchUI() {
+  searchResults.hidden = true;
+  searchInput.value = '';
+  searchClear.hidden = true;
 }
 
 function findSmartMatch(query, toolsList) {
@@ -370,17 +513,18 @@ function fuzzyMatch(query, text) {
 
 function displaySearchResults(results, query) {
   searchResults.innerHTML = results.map((tool, index) => `
-    <a href="${tool.href}" 
-       class="search-result-item" 
+    <button type="button"
+       class="search-result-item w-full text-left" 
        data-index="${index}"
-       style="display: block; padding: 12px 16px; color: var(--color-text); transition: background-color 150ms; outline: none;">
+       data-href="${tool.href}"
+       style="display: block; padding: 12px 16px; color: var(--color-text); transition: background-color 150ms; outline: none; border: none; background: transparent;">
       <div style="font-weight: 500;">${highlightMatch(tool.name, query)}</div>
       <div style="font-size: 0.875rem; color: var(--color-text-secondary);">${tool.category}</div>
-    </a>
+    </button>
   `).join('');
   searchResults.hidden = false;
   
-  // Add hover and focus effects
+  // Add hover, focus, and click effects
   const resultItems = searchResults.querySelectorAll('.search-result-item');
   resultItems.forEach(item => {
     item.addEventListener('mouseenter', () => {
@@ -395,6 +539,14 @@ function displaySearchResults(results, query) {
       clearSelectedResult();
       item.style.backgroundColor = 'var(--color-bg-secondary)';
       selectedResultIndex = parseInt(item.dataset.index);
+    });
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const href = item.getAttribute('data-href');
+      if (href) {
+        navigateToTool(href);
+        clearSearchUI();
+      }
     });
   });
 }
@@ -453,14 +605,56 @@ document.addEventListener('keydown', (e) => {
       selectResult(selectedResultIndex);
     } else if (e.key === 'Enter' && selectedResultIndex >= 0) {
       e.preventDefault();
-      results[selectedResultIndex]?.click();
+      const selectedResult = results[selectedResultIndex];
+      if (selectedResult) {
+        const href = selectedResult.getAttribute('data-href');
+        if (href) {
+          navigateToTool(href);
+          clearSearchUI();
+        }
+      }
     }
   }
   
-  // Toggle theme with T
+  // Toggle theme with T (cycles through themes)
   if (e.key === 't' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
-    themeToggle?.click();
+    const currentTheme = html.getAttribute('data-theme');
+    let newTheme;
+    
+    if (currentTheme === 'light') {
+      newTheme = 'dark';
+    } else if (currentTheme === 'dark') {
+      newTheme = 'high-contrast';
+    } else {
+      newTheme = 'light';
+    }
+    
+    applyTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
   }
+});
+
+// Sidebar Category Collapse Functionality
+const categoryHeaders = document.querySelectorAll('.sidebar-category-header');
+categoryHeaders.forEach(header => {
+  header.addEventListener('click', () => {
+    const categoryId = header.getAttribute('data-category');
+    const targetList = document.getElementById(categoryId + '-list');
+    const arrow = header.querySelector('svg');
+    const isExpanded = header.getAttribute('aria-expanded') === 'true';
+    
+    if (isExpanded) {
+      // Collapse
+      targetList.classList.add('hidden');
+      header.setAttribute('aria-expanded', 'false');
+      arrow.style.transform = 'rotate(0deg)';
+    } else {
+      // Expand
+      targetList.classList.remove('hidden');
+      header.setAttribute('aria-expanded', 'true');
+      arrow.style.transform = 'rotate(90deg)';
+    }
+  });
 });
 
 // Active link highlighting
@@ -560,6 +754,7 @@ function clearEverything() {
     // Reset to system theme
     const systemTheme = getSystemTheme();
     applyTheme(systemTheme);
+    localStorage.removeItem('theme');
     
     // Navigate to home
     window.location.href = '/';
@@ -581,12 +776,6 @@ function navigateHome() {
   window.location.href = '/';
 }
 
-// Add DevToolbox click handler
-const devToolboxTitle = document.querySelector('header .flex.items-center.space-x-2');
-if (devToolboxTitle) {
-  devToolboxTitle.style.cursor = 'pointer';
-  devToolboxTitle.addEventListener('click', navigateHome);
-}
 
 // Prefetch popular tools on idle
 function prefetchPopularTools() {

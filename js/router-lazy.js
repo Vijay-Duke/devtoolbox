@@ -158,6 +158,9 @@ export class Router {
       // Track tool usage for favorites
       this.trackToolUsage(route.name);
       
+      // Focus tool content after initialization
+      this.focusToolContent();
+      
       // Prefetch related tools for better performance
       this.prefetchRelatedTools(route);
     } catch (error) {
@@ -310,6 +313,32 @@ export class Router {
         });
       });
     }
+  }
+  
+  focusToolContent() {
+    // Small delay to ensure tool DOM is fully rendered
+    setTimeout(() => {
+      const toolRoot = document.getElementById('tool-root');
+      
+      if (toolRoot) {
+        // Look for the first focusable element in the tool
+        const focusableElements = toolRoot.querySelectorAll(
+          'input:not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        
+        if (focusableElements.length > 0) {
+          // Focus the first input/textarea if available, otherwise the first focusable element
+          const firstInput = toolRoot.querySelector('input:not([disabled]), textarea:not([disabled])');
+          const elementToFocus = firstInput || focusableElements[0];
+          elementToFocus.focus();
+        } else {
+          // Make tool root focusable and focus it for keyboard navigation
+          toolRoot.setAttribute('tabindex', '-1');
+          toolRoot.style.outline = 'none'; // Remove focus outline for better UX
+          toolRoot.focus();
+        }
+      }
+    }, 100);
   }
   
   updateActiveNav(hash) {

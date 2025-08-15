@@ -1,5 +1,6 @@
 import { feedback } from '../utils/feedback.js';
 import { formatBytes } from '../utils/common.js';
+import { ToolEnhancements } from '../utils/tool-enhancements.js';
 
 export class JSONFormatter {
   constructor() {
@@ -37,7 +38,7 @@ export class JSONFormatter {
               <line x1="9" y1="12" x2="15" y2="12"/>
               <line x1="9" y1="15" x2="15" y2="15"/>
             </svg>
-            Format
+            Format & Validate
           </button>
           <button class="inline-flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="minify">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
@@ -48,20 +49,36 @@ export class JSONFormatter {
             </svg>
             Minify
           </button>
-          <button class="inline-flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy">
+          <button class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="copy">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
               <rect x="9" y="9" width="13" height="13" rx="2"/>
               <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
             </svg>
-            Copy
+            Copy Result
           </button>
+          <div id="download-button-container" class="inline-flex"></div>
           <button class="inline-flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500" data-action="clear">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
-            Clear
+            Clear All
           </button>
+        </div>
+        
+        <div class="flex flex-wrap gap-4 mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="pretty-print" checked class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2" />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Pretty Print JSON</span>
+          </label>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="validate-only" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2" />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Validation Only</span>
+          </label>
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="sort-keys" class="rounded border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-blue-600 focus:ring-blue-500 focus:ring-2" />
+            <span class="text-sm text-gray-700 dark:text-gray-300">Sort Keys Alphabetically</span>
+          </label>
         </div>
         
         <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6 hidden" data-error></div>
@@ -112,6 +129,9 @@ export class JSONFormatter {
   }
   
   attachEventListeners() {
+    // Initialize tool enhancements
+    this.initializeEnhancements();
+    
     this.formatBtn.addEventListener('click', () => this.format());
     this.minifyBtn.addEventListener('click', () => this.minify());
     this.copyBtn.addEventListener('click', () => this.copy());
@@ -199,6 +219,48 @@ export class JSONFormatter {
     }
   }
   
+  initializeEnhancements() {
+    // Add tooltips to checkboxes
+    const prettyPrintCheckbox = this.container.querySelector('#pretty-print');
+    const validationOnlyCheckbox = this.container.querySelector('#validate-only');
+    const sortKeysCheckbox = this.container.querySelector('#sort-keys');
+    
+    ToolEnhancements.enhanceCheckbox(
+      prettyPrintCheckbox,
+      "Format output with proper indentation and line breaks for better readability"
+    );
+    
+    ToolEnhancements.enhanceCheckbox(
+      validationOnlyCheckbox,
+      "Only validate JSON structure without formatting - useful for checking syntax without changing layout"
+    );
+    
+    ToolEnhancements.enhanceCheckbox(
+      sortKeysCheckbox,
+      "Sort object keys alphabetically for consistent output and easier comparison",
+      "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys"
+    );
+    
+    // Enhance copy button
+    ToolEnhancements.enhanceCopyButton(this.copyBtn, () => {
+      return this.outputArea.textContent || this.inputArea.value;
+    }, 'Copy Result');
+    
+    // Add download functionality
+    const downloadContainer = this.container.querySelector('#download-button-container');
+    const downloadButton = ToolEnhancements.createDownloadButton(
+      () => this.getFormattedOutput(),
+      'formatted.json',
+      'application/json',
+      'Download JSON'
+    );
+    downloadContainer.appendChild(downloadButton);
+    
+    // Add tooltip to ratio statistic
+    const ratioElement = this.container.querySelector('[data-stat="ratio"]');
+    ToolEnhancements.addRatioTooltip(ratioElement, "Shows the size change when formatting JSON - formatted JSON is typically larger due to added whitespace");
+  }
+  
   format() {
     const input = this.inputArea.value.trim();
     if (!input) {
@@ -206,8 +268,23 @@ export class JSONFormatter {
       return;
     }
     
+    const validationOnly = this.container.querySelector('#validation-only').checked;
+    const sortKeys = this.container.querySelector('#sort-keys').checked;
+    
     try {
-      const parsed = JSON.parse(input);
+      let parsed = JSON.parse(input);
+      
+      // Sort keys if requested
+      if (sortKeys) {
+        parsed = this.sortObjectKeys(parsed);
+      }
+      
+      if (validationOnly) {
+        this.clearError();
+        feedback.showToast('JSON is valid!', 'success');
+        return;
+      }
+      
       const formatted = JSON.stringify(parsed, null, 2);
       this.displayOutput(formatted);
       // When Format button is clicked, also update the input to formatted version
@@ -390,5 +467,26 @@ export class JSONFormatter {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+  
+  sortObjectKeys(obj) {
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.sortObjectKeys(item));
+    } else if (obj !== null && typeof obj === 'object') {
+      const sorted = {};
+      Object.keys(obj).sort().forEach(key => {
+        sorted[key] = this.sortObjectKeys(obj[key]);
+      });
+      return sorted;
+    }
+    return obj;
+  }
+  
+  getFormattedOutput() {
+    const output = this.outputArea.textContent || this.inputArea.value;
+    if (!output.trim()) {
+      throw new Error('No content to download');
+    }
+    return output;
   }
 }

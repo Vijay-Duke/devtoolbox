@@ -49,9 +49,161 @@
   
   <!-- Minimal inline styles for critical tool layouts -->
   <style>
-    /* Dark mode support */
+    /* Theme support */
     [data-theme="dark"] {
       color-scheme: dark;
+    }
+    
+    [data-theme="high-contrast"] {
+      color-scheme: dark;
+    }
+    
+    /* High contrast theme styles - WCAG AAA compliance */
+    .high-contrast {
+      /* Background and text colors with 21:1 contrast ratio */
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #000000;
+      --text-secondary: #333333;
+      --border-color: #000000;
+      --focus-color: #0000ff;
+      --error-color: #cc0000;
+      --success-color: #006600;
+      --link-color: #0000ee;
+    }
+    
+    .high-contrast,
+    .high-contrast * {
+      background-color: var(--bg-primary) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--border-color) !important;
+    }
+    
+    .high-contrast input,
+    .high-contrast textarea,
+    .high-contrast select,
+    .high-contrast button {
+      background-color: var(--bg-primary) !important;
+      color: var(--text-primary) !important;
+      border: 2px solid var(--border-color) !important;
+      outline: none !important;
+    }
+    
+    .high-contrast button:hover,
+    .high-contrast button:focus {
+      background-color: var(--bg-secondary) !important;
+      border: 3px solid var(--focus-color) !important;
+    }
+    
+    .high-contrast input:focus,
+    .high-contrast textarea:focus,
+    .high-contrast select:focus {
+      border: 3px solid var(--focus-color) !important;
+      box-shadow: 0 0 0 2px var(--focus-color) !important;
+    }
+    
+    .high-contrast a {
+      color: var(--link-color) !important;
+      text-decoration: underline !important;
+      font-weight: bold !important;
+    }
+    
+    .high-contrast .error,
+    .high-contrast [class*="error"],
+    .high-contrast [class*="red"] {
+      color: var(--error-color) !important;
+      border-color: var(--error-color) !important;
+    }
+    
+    .high-contrast .success,
+    .high-contrast [class*="success"],
+    .high-contrast [class*="green"] {
+      color: var(--success-color) !important;
+      border-color: var(--success-color) !important;
+    }
+    
+    /* Remove gradients and shadows in high contrast */
+    .high-contrast * {
+      background-image: none !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+    
+    /* Enhanced focus outlines for accessibility */
+    button:focus,
+    input:focus,
+    textarea:focus,
+    select:focus,
+    a:focus {
+      outline: 2px solid #3b82f6 !important;
+      outline-offset: 2px !important;
+    }
+    
+    .high-contrast button:focus,
+    .high-contrast input:focus,
+    .high-contrast textarea:focus,
+    .high-contrast select:focus,
+    .high-contrast a:focus {
+      outline: 3px solid var(--focus-color) !important;
+      outline-offset: 2px !important;
+    }
+    
+    /* Mobile touch targets - minimum 44px per WCAG */
+    @media (max-width: 768px) {
+      button,
+      input[type="submit"],
+      input[type="button"],
+      input[type="reset"],
+      .touch-target {
+        min-height: 44px !important;
+        min-width: 44px !important;
+        padding: 12px 16px !important;
+      }
+      
+      input[type="checkbox"],
+      input[type="radio"] {
+        min-height: 44px !important;
+        min-width: 44px !important;
+        transform: scale(1.5);
+        margin: 8px;
+      }
+      
+      /* Larger search input on mobile */
+      input[type="search"] {
+        min-height: 44px !important;
+        padding: 12px 16px !important;
+        font-size: 16px !important; /* Prevents zoom on iOS */
+      }
+      
+      /* Larger sidebar links */
+      .sidebar-link {
+        min-height: 44px !important;
+        padding: 12px 16px !important;
+      }
+    }
+    
+    /* Skip link for screen readers */
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+    
+    .sr-only:focus {
+      position: static !important;
+      width: auto !important;
+      height: auto !important;
+      padding: 0.5rem 1rem !important;
+      margin: 0 !important;
+      overflow: visible !important;
+      clip: auto !important;
+      white-space: normal !important;
     }
     
     /* Fix checkbox styling */
@@ -258,7 +410,7 @@
       display: none !important;
     }
     
-    #sidebar.collapsed .sidebar-category {
+    #sidebar.collapsed .sidebar-category-header {
       display: none !important;
     }
     
@@ -409,8 +561,8 @@
         display: block !important;
       }
       
-      #sidebar.collapsed .sidebar-category {
-        display: block !important;
+      #sidebar.collapsed .sidebar-category-header {
+        display: flex !important;
       }
       
       #sidebar.collapsed .nav-link {
@@ -482,11 +634,14 @@
       </svg>
     </button>
     
-    <!-- Logo -->
-    <div class="flex items-center space-x-2 text-xl font-bold">
+    <!-- Logo / Home Button -->
+    <button class="flex items-center space-x-2 text-xl font-bold hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded-lg px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-700" 
+            onclick="navigateHome()" 
+            aria-label="Go to home page"
+            title="DevToolbox - Go to home">
       <span class="text-2xl">⚡</span>
       <span class="hidden sm:inline">DevToolbox</span>
-    </div>
+    </button>
       
     <!-- Search bar -->
     <div class="flex-1 max-w-2xl mx-4">
@@ -515,20 +670,54 @@
     
     <!-- Header actions -->
     <div class="flex items-center space-x-1">
-      <!-- Theme toggle -->
-      <button 
-        class="p-3 min-w-[44px] min-h-[44px] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
-        data-theme-toggle
-        aria-label="Toggle theme"
-        title="Toggle theme (Press T)"
-      >
-        <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
-        </svg>
-        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
-        </svg>
-      </button>
+      <!-- Theme toggle dropdown -->
+      <div class="relative">
+        <button 
+          class="p-3 min-w-[44px] min-h-[44px] rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center"
+          data-theme-toggle
+          aria-label="Change theme"
+          aria-expanded="false"
+          aria-haspopup="true"
+          title="Change theme (Press T)"
+        >
+          <svg class="w-5 h-5 theme-icon theme-icon-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+          <svg class="w-5 h-5 theme-icon theme-icon-dark hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+          </svg>
+          <svg class="w-5 h-5 theme-icon theme-icon-contrast hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1a11 11 0 1 1 0 22 11 11 0 0 1 0-22zm0 2a9 9 0 0 0 0 18V3z"></path>
+          </svg>
+        </button>
+        
+        <!-- Theme dropdown -->
+        <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50" data-theme-dropdown>
+          <div class="py-1" role="menu" aria-orientation="vertical">
+            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center" 
+                    data-theme="light" role="menuitem">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+              </svg>
+              Light
+            </button>
+            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center" 
+                    data-theme="dark" role="menuitem">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+              </svg>
+              Dark
+            </button>
+            <button class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center" 
+                    data-theme="high-contrast" role="menuitem">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1a11 11 0 1 1 0 22 11 11 0 0 1 0-22zm0 2a9 9 0 0 0 0 18V3z"></path>
+              </svg>
+              High Contrast
+            </button>
+          </div>
+        </div>
+      </div>
       
       <!-- Clear button -->
       <button 
@@ -547,11 +736,20 @@
   <!-- Main layout container -->
   <div class="flex flex-1 overflow-hidden">
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-all duration-300 fixed lg:relative h-full z-40" aria-label="Tools sidebar">
+    <aside id="sidebar" class="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-all duration-300 fixed lg:relative h-full z-40" role="navigation" aria-label="Tools navigation sidebar">
       <nav role="navigation" aria-label="Main navigation" class="p-4">
         <div class="mb-6 category-formatters">
-          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Formatters</h2>
-          <ul class="space-y-1">
+          <button id="formatters-header" class="sidebar-category-header w-full text-left px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between hover:text-gray-700 dark:hover:text-gray-300 transition-colors" 
+                  data-category="formatters" 
+                  aria-expanded="true"
+                  aria-controls="formatters-list"
+                  aria-label="Toggle Formatters category">
+            <span>Formatters</span>
+            <svg class="w-3 h-3 transform rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <ul id="formatters-list" class="space-y-1" role="group" aria-labelledby="formatters-header">
             <li><a href="#json-formatter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="JSON Formatter">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
@@ -587,8 +785,17 @@
         </div>
 
         <div class="mb-6 category-text-data">
-          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Text & Data</h2>
-          <ul class="space-y-1">
+          <button id="text-data-header" class="sidebar-category-header w-full text-left px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between hover:text-gray-700 dark:hover:text-gray-300 transition-colors" 
+                  data-category="text-data" 
+                  aria-expanded="true"
+                  aria-controls="text-data-list"
+                  aria-label="Toggle Text and Data category">
+            <span>Text & Data</span>
+            <svg class="w-3 h-3 transform rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <ul id="text-data-list" class="space-y-1" role="group" aria-labelledby="text-data-header">
             <li><a href="#jwt-decoder" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="JWT Decoder">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
@@ -611,8 +818,17 @@
         </div>
         
         <div class="mb-6 category-generators">
-          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Generators</h2>
-          <ul class="space-y-1">
+          <button id="generators-header" class="sidebar-category-header w-full text-left px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between hover:text-gray-700 dark:hover:text-gray-300 transition-colors" 
+                  data-category="generators" 
+                  aria-expanded="true"
+                  aria-controls="generators-list"
+                  aria-label="Toggle Generators category">
+            <span>Generators</span>
+            <svg class="w-3 h-3 transform rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <ul id="generators-list" class="space-y-1" role="group" aria-labelledby="generators-header">
             <li><a href="#uuid" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="UUID Generator">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4V4h10v2M7 10v8a2 2 0 002 2h6a2 2 0 002-2v-8M7 10H5a2 2 0 00-2 2v6a2 2 0 002 2h2m0-10h10m-10 0V8a2 2 0 012-2h6a2 2 0 012 2v2"></path>
@@ -671,8 +887,17 @@
         </div>
         
         <div class="mb-6 category-converters">
-          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Converters</h2>
-          <ul class="space-y-1">
+          <button id="converters-header" class="sidebar-category-header w-full text-left px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between hover:text-gray-700 dark:hover:text-gray-300 transition-colors" 
+                  data-category="converters" 
+                  aria-expanded="true"
+                  aria-controls="converters-list"
+                  aria-label="Toggle Converters category">
+            <span>Converters</span>
+            <svg class="w-3 h-3 transform rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <ul id="converters-list" class="space-y-1" role="group" aria-labelledby="converters-header">
             <li><a href="#base64" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Base64 Encode/Decode">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -719,49 +944,22 @@
         </div>
         
         <div class="mb-6 category-developer-tools">
-          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Developer Tools</h2>
-          <ul class="space-y-1">
-            <li><a href="#regex-tester" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Regex Tester">
-              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-              <span class="sidebar-text">Regex Tester</span>
-            </a></li>
-            <li><a href="#cron" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Cron Parser">
-              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <span class="sidebar-text">Cron Parser</span>
-            </a></li>
-            <li><a href="#curl" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="cURL Generator">
-              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-              <span class="sidebar-text">cURL Generator</span>
-            </a></li>
-            <li><a href="#api-mock" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="API Mock Generator">
-              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-              </svg>
-              <span class="sidebar-text">API Mock Generator</span>
-            </a></li>
+          <button id="developer-tools-header" class="sidebar-category-header w-full text-left px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between hover:text-gray-700 dark:hover:text-gray-300 transition-colors" 
+                  data-category="developer-tools" 
+                  aria-expanded="true"
+                  aria-controls="developer-tools-list"
+                  aria-label="Toggle Developer Tools category">
+            <span>Developer Tools</span>
+            <svg class="w-3 h-3 transform rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <ul id="developer-tools-list" class="space-y-1" role="group" aria-labelledby="developer-tools-header">
             <li><a href="#graphql" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="GraphQL Tester">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
               </svg>
               <span class="sidebar-text">GraphQL Tester</span>
-            </a></li>
-            <li><a href="#sql-formatter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="SQL Formatter">
-              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
-              </svg>
-              <span class="sidebar-text">SQL Formatter</span>
-            </a></li>
-            <li><a href="#xml-formatter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="XML Formatter">
-              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-              </svg>
-              <span class="sidebar-text">XML Formatter</span>
             </a></li>
             <li><a href="#webhook-tester" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Webhook Tester">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -779,8 +977,17 @@
         </div>
         
         <div class="mb-6 category-networking-cloud">
-          <h2 class="sidebar-category px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Networking & Cloud</h2>
-          <ul class="space-y-1">
+          <button id="networking-cloud-header" class="sidebar-category-header w-full text-left px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between hover:text-gray-700 dark:hover:text-gray-300 transition-colors" 
+                  data-category="networking-cloud" 
+                  aria-expanded="true"
+                  aria-controls="networking-cloud-list"
+                  aria-label="Toggle Networking and Cloud category">
+            <span>Networking & Cloud</span>
+            <svg class="w-3 h-3 transform rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <ul id="networking-cloud-list" class="space-y-1" role="group" aria-labelledby="networking-cloud-header">
             <li><a href="#ip-lookup" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="IP Address Lookup">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9"></path>
@@ -805,12 +1012,6 @@
               </svg>
               <span class="sidebar-text">WHOIS Lookup</span>
             </a></li>
-            <li><a href="#s3-presigned-url" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="S3 Pre-signed URL">
-              <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-              </svg>
-              <span class="sidebar-text">S3 Pre-signed URL</span>
-            </a></li>
             <li><a href="#iam-policy-visualizer" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="IAM Policy Visualizer">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
@@ -823,11 +1024,89 @@
     </aside>
     
     <!-- Main content -->
-    <main id="main" role="main" class="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
+    <main id="main" role="main" aria-label="Main content area" class="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
       <div class="max-w-4xl mx-auto px-6 py-12">
         <div class="text-center">
           <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Welcome to DevToolbox</h1>
           <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">Select a tool from the sidebar or use search to get started.</p>
+          
+          <!-- Frequently Used Tools Section -->
+          <div class="mb-12">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Frequently Used Tools</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-3xl mx-auto">
+              <button onclick="navigateToTool('#json-formatter')" class="group bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-200 text-center w-full min-h-[80px] touch-target" aria-label="Open JSON Formatter tool">
+                <div class="text-blue-600 dark:text-blue-400 mb-2">
+                  <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">JSON Formatter</span>
+              </button>
+              
+              <button onclick="navigateToTool('#jwt-decoder')" class="group bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-200 text-center w-full min-h-[80px] touch-target" aria-label="Open JWT Decoder tool">
+                <div class="text-blue-600 dark:text-blue-400 mb-2">
+                  <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">JWT Decoder</span>
+              </button>
+              
+              <button onclick="navigateToTool('#base64')" class="group bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-200 text-center w-full min-h-[80px] touch-target" aria-label="Open Base64 Encode/Decode tool">
+                <div class="text-blue-600 dark:text-blue-400 mb-2">
+                  <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">Base64</span>
+              </button>
+              
+              <button onclick="navigateToTool('#url-encode')" class="group bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-200 text-center w-full min-h-[80px] touch-target" aria-label="Open URL Encode/Decode tool">
+                <div class="text-blue-600 dark:text-blue-400 mb-2">
+                  <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">URL Encode</span>
+              </button>
+              
+              <button onclick="navigateToTool('#uuid')" class="group bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-200 text-center w-full min-h-[80px] touch-target" aria-label="Open UUID Generator tool">
+                <div class="text-blue-600 dark:text-blue-400 mb-2">
+                  <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4V4h10v2M7 10v8a2 2 0 002 2h6a2 2 0 002-2v-8M7 10H5a2 2 0 00-2 2v6a2 2 0 002 2h2m0-10h10m-10 0V8a2 2 0 012-2h6a2 2 0 012 2v2"></path>
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">UUID Generator</span>
+              </button>
+              
+              <button onclick="navigateToTool('#hash')" class="group bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-200 text-center w-full min-h-[80px] touch-target" aria-label="Open Hash Generator tool">
+                <div class="text-blue-600 dark:text-blue-400 mb-2">
+                  <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">Hash Generator</span>
+              </button>
+              
+              <button onclick="navigateToTool('#password-generator')" class="group bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-200 text-center w-full min-h-[80px] touch-target" aria-label="Open Password Generator tool">
+                <div class="text-blue-600 dark:text-blue-400 mb-2">
+                  <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">Password Generator</span>
+              </button>
+              
+              <button onclick="navigateToTool('#diff')" class="group bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-md transition-all duration-200 text-center w-full min-h-[80px] touch-target" aria-label="Open Diff Tool">
+                <div class="text-blue-600 dark:text-blue-400 mb-2">
+                  <svg class="w-8 h-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
+                  </svg>
+                </div>
+                <span class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">Diff Tool</span>
+              </button>
+            </div>
+          </div>
           
           <div class="inline-block text-left bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
             <p class="font-semibold text-gray-900 dark:text-white mb-3">Keyboard shortcuts:</p>
