@@ -50,6 +50,10 @@
   <!-- Minimal inline styles for critical tool layouts -->
   <style>
     /* Theme support */
+    [data-theme="light"] {
+      color-scheme: light;
+    }
+    
     [data-theme="dark"] {
       color-scheme: dark;
     }
@@ -125,7 +129,7 @@
     }
     
     /* Fix checkbox styling */
-    input[type="checkbox"] {
+    [data-theme="light"] input[type="checkbox"] {
       background-color: white !important;
       border: 1px solid #d1d5db !important;
     }
@@ -691,7 +695,7 @@
   <!-- Main layout container -->
   <div class="flex flex-1 overflow-hidden">
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-64 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-all duration-300 fixed lg:relative h-full z-40" role="navigation" aria-label="Tools navigation sidebar">
+    <aside id="sidebar" class="w-72 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-all duration-300 fixed lg:relative h-full z-40" role="navigation" aria-label="Tools navigation sidebar">
       <nav role="navigation" aria-label="Main navigation" class="p-4">
         <div class="mb-6 category-formatters">
           <button id="formatters-header" class="sidebar-category-header w-full text-left px-3 mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider flex items-center justify-between hover:text-gray-700 dark:hover:text-gray-300 transition-colors" 
@@ -709,32 +713,32 @@
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
               </svg>
-              <span class="sidebar-text">JSON Formatter</span>
+              <span class="sidebar-text whitespace-nowrap">JSON Formatter</span>
             </a></li>
             <li><a href="#sql-formatter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="SQL Formatter">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
               </svg>
-              <span class="sidebar-text">SQL Formatter</span>
+              <span class="sidebar-text whitespace-nowrap">SQL Formatter</span>
             </a></li>
             <li><a href="#xml-formatter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="XML Formatter">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
               </svg>
-              <span class="sidebar-text">XML Formatter</span>
+              <span class="sidebar-text whitespace-nowrap">XML Formatter</span>
             </a></li>
             <li><a href="#cron" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Cron Parser">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span class="sidebar-text">Cron Parser</span>
+              <span class="sidebar-text whitespace-nowrap">Cron Parser</span>
             </a></li>
             <li><a href="#markdown" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Markdown Preview">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
               </svg>
-              <span class="sidebar-text">Markdown Preview</span>
+              <span class="sidebar-text whitespace-nowrap">Markdown Preview</span>
             </a></li>
           </ul>
         </div>
@@ -755,19 +759,19 @@
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
               </svg>
-              <span class="sidebar-text">JWT Decoder</span>
+              <span class="sidebar-text whitespace-nowrap">JWT Decoder</span>
             </a></li>
             <li><a href="#diff" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Diff Tool">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
               </svg>
-              <span class="sidebar-text">Diff Tool</span>
+              <span class="sidebar-text whitespace-nowrap">Diff Tool</span>
             </a></li>
             <li><a href="#regex-tester" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Regex Tester">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
               </svg>
-              <span class="sidebar-text">Regex Tester</span>
+              <span class="sidebar-text whitespace-nowrap">Regex Tester</span>
             </a></li>
           </ul>
         </div>
@@ -788,55 +792,55 @@
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 4V4h10v2M7 10v8a2 2 0 002 2h6a2 2 0 002-2v-8M7 10H5a2 2 0 00-2 2v6a2 2 0 002 2h2m0-10h10m-10 0V8a2 2 0 012-2h6a2 2 0 012 2v2"></path>
               </svg>
-              <span class="sidebar-text">UUID Generator</span>
+              <span class="sidebar-text whitespace-nowrap">UUID Generator</span>
             </a></li>
             <li><a href="#hash" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Hash Generator">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path>
               </svg>
-              <span class="sidebar-text">Hash Generator</span>
+              <span class="sidebar-text whitespace-nowrap">Hash Generator</span>
             </a></li>
             <li><a href="#fake-data" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Fake Data Generator">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
               </svg>
-              <span class="sidebar-text">Fake Data Generator</span>
+              <span class="sidebar-text whitespace-nowrap">Fake Data Generator</span>
             </a></li>
             <li><a href="#password-generator" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Password Generator">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
               </svg>
-              <span class="sidebar-text">Password Generator</span>
+              <span class="sidebar-text whitespace-nowrap">Password Generator</span>
             </a></li>
             <li><a href="#qr-generator" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="QR Code Generator">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V4a1 1 0 00-1-1H5a1 1 0 00-1 1v3a1 1 0 001 1zm12 0h2a1 1 0 001-1V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v3a1 1 0 001 1zM5 20h2a1 1 0 001-1v-3a1 1 0 00-1-1H5a1 1 0 00-1 1v3a1 1 0 001 1z"></path>
               </svg>
-              <span class="sidebar-text">QR Code Generator</span>
+              <span class="sidebar-text whitespace-nowrap">QR Code Generator</span>
             </a></li>
             <li><a href="#ascii-art" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="ASCII Art Generator">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
               </svg>
-              <span class="sidebar-text">ASCII Art Generator</span>
+              <span class="sidebar-text whitespace-nowrap">ASCII Art Generator</span>
             </a></li>
             <li><a href="#curl" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="cURL Generator">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
-              <span class="sidebar-text">cURL Generator</span>
+              <span class="sidebar-text whitespace-nowrap">cURL Generator</span>
             </a></li>
             <li><a href="#api-mock" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="API Mock Generator">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path>
               </svg>
-              <span class="sidebar-text">API Mock Generator</span>
+              <span class="sidebar-text whitespace-nowrap">API Mock Generator</span>
             </a></li>
             <li><a href="#s3-presigned-url" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="S3 Pre-signed URL Generator">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
               </svg>
-              <span class="sidebar-text">S3 Pre-signed URL Generator</span>
+              <span class="sidebar-text whitespace-nowrap">S3 Pre-signed URL Generator</span>
             </a></li>
           </ul>
         </div>
@@ -857,43 +861,43 @@
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
-              <span class="sidebar-text">Base64 Encode/Decode</span>
+              <span class="sidebar-text whitespace-nowrap">Base64 Encode/Decode</span>
             </a></li>
             <li><a href="#url-encode" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="URL Encode/Decode">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
               </svg>
-              <span class="sidebar-text">URL Encode/Decode</span>
+              <span class="sidebar-text whitespace-nowrap">URL Encode/Decode</span>
             </a></li>
             <li><a href="#unix-time" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Unix Time Converter">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span class="sidebar-text">Unix Time Converter</span>
+              <span class="sidebar-text whitespace-nowrap">Unix Time Converter</span>
             </a></li>
             <li><a href="#csv-json" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="CSV ↔ JSON">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
               </svg>
-              <span class="sidebar-text">CSV ↔ JSON</span>
+              <span class="sidebar-text whitespace-nowrap">CSV ↔ JSON</span>
             </a></li>
             <li><a href="#yaml-json" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="YAML ↔ JSON">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
               </svg>
-              <span class="sidebar-text">YAML ↔ JSON</span>
+              <span class="sidebar-text whitespace-nowrap">YAML ↔ JSON</span>
             </a></li>
             <li><a href="#binary-converter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Binary Converter">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
               </svg>
-              <span class="sidebar-text">Binary Converter</span>
+              <span class="sidebar-text whitespace-nowrap">Binary Converter</span>
             </a></li>
             <li><a href="#image-converter" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Image Converter">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
               </svg>
-              <span class="sidebar-text">Image Converter</span>
+              <span class="sidebar-text whitespace-nowrap">Image Converter</span>
             </a></li>
           </ul>
         </div>
@@ -914,19 +918,19 @@
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
               </svg>
-              <span class="sidebar-text">GraphQL Tester</span>
+              <span class="sidebar-text whitespace-nowrap">GraphQL Tester</span>
             </a></li>
             <li><a href="#webhook-tester" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Webhook Tester">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
               </svg>
-              <span class="sidebar-text">Webhook Tester</span>
+              <span class="sidebar-text whitespace-nowrap">Webhook Tester</span>
             </a></li>
             <li><a href="#temp-email" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="Temporary Email">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
               </svg>
-              <span class="sidebar-text">Temporary Email</span>
+              <span class="sidebar-text whitespace-nowrap">Temporary Email</span>
             </a></li>
           </ul>
         </div>
@@ -947,31 +951,31 @@
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9v-9m0-9v9m0 9c-5 0-9-4-9-9s4-9 9-9"></path>
               </svg>
-              <span class="sidebar-text">IP Address Lookup</span>
+              <span class="sidebar-text whitespace-nowrap">IP Address Lookup</span>
             </a></li>
             <li><a href="#cidr-calculator" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="CIDR Calculator">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
               </svg>
-              <span class="sidebar-text">CIDR Calculator</span>
+              <span class="sidebar-text whitespace-nowrap">CIDR Calculator</span>
             </a></li>
             <li><a href="#dns-lookup" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="DNS Lookup">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
-              <span class="sidebar-text">DNS Lookup</span>
+              <span class="sidebar-text whitespace-nowrap">DNS Lookup</span>
             </a></li>
             <li><a href="#whois-lookup" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="WHOIS Lookup">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
-              <span class="sidebar-text">WHOIS Lookup</span>
+              <span class="sidebar-text whitespace-nowrap">WHOIS Lookup</span>
             </a></li>
             <li><a href="#iam-policy-visualizer" class="nav-link flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" data-tooltip="IAM Policy Visualizer">
               <svg class="w-5 h-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
               </svg>
-              <span class="sidebar-text">IAM Policy Visualizer</span>
+              <span class="sidebar-text whitespace-nowrap">IAM Policy Visualizer</span>
             </a></li>
           </ul>
         </div>

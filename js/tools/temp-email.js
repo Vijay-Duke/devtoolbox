@@ -23,7 +23,7 @@ export class TempEmailTool extends ToolTemplate {
       },
       audioSettings: {
         enabled: true,
-        soundType: 'chime',
+        soundType: 'notification',
         volume: 0.5, // 0.0 to 1.0
         differentSoundForOTP: false
       },
@@ -88,7 +88,7 @@ export class TempEmailTool extends ToolTemplate {
     if (!this.state.audioSettings) {
       this.state.audioSettings = {
         enabled: true,
-        soundType: 'chime',
+        soundType: 'notification',
         volume: 0.5,
         differentSoundForOTP: false
       };
@@ -176,75 +176,6 @@ export class TempEmailTool extends ToolTemplate {
           </div>
         </div>
 
-        <!-- Audio Notification Settings -->
-        <div class="audio-settings-section mb-6">
-          <div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg border border-blue-200 dark:border-blue-700">
-            <h3 class="text-sm font-medium text-blue-900 dark:text-blue-100 mb-3">🔊 Audio Notifications</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Enable Audio Toggle -->
-              <div class="flex items-center">
-                <label class="flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
-                    id="audio-enabled-toggle"
-                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
-                  />
-                  <span class="text-sm font-medium text-blue-800 dark:text-blue-200">Enable email notification sounds</span>
-                </label>
-              </div>
-              
-              <!-- Sound Type and Test -->
-              <div class="flex items-center gap-2" id="audio-controls">
-                <label class="text-sm text-blue-700 dark:text-blue-300">Sound:</label>
-                <select 
-                  id="sound-type-select"
-                  class="text-xs px-2 py-1 border border-blue-300 dark:border-blue-600 rounded bg-white dark:bg-blue-800 text-blue-900 dark:text-blue-100"
-                >
-                  <option value="beep">Beep</option>
-                  <option value="chime">Chime</option>
-                  <option value="bell">Bell</option>
-                  <option value="notification">Notification</option>
-                </select>
-                <button 
-                  id="test-sound-btn"
-                  class="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                  title="Test sound"
-                >
-                  🔊 Test
-                </button>
-              </div>
-            </div>
-            
-            <!-- Volume Control -->
-            <div class="mt-3" id="volume-control">
-              <div class="flex items-center gap-3">
-                <label class="text-sm text-blue-700 dark:text-blue-300 min-w-0">Volume:</label>
-                <input 
-                  type="range" 
-                  id="volume-slider"
-                  min="0" 
-                  max="100" 
-                  value="50"
-                  class="flex-1 h-2 bg-blue-200 dark:bg-blue-700 rounded-lg appearance-none cursor-pointer"
-                />
-                <span id="volume-display" class="text-xs text-blue-600 dark:text-blue-400 min-w-0">50%</span>
-              </div>
-            </div>
-            
-            <!-- Different Sound for OTP -->
-            <div class="mt-3">
-              <label class="flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  id="otp-different-sound-toggle"
-                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
-                />
-                <span class="text-sm text-blue-700 dark:text-blue-300">Different sound for OTP emails</span>
-              </label>
-            </div>
-          </div>
-        </div>
 
         <!-- Filters Section -->
         <div id="filters-section" class="hidden mb-6">
@@ -490,86 +421,14 @@ export class TempEmailTool extends ToolTemplate {
   // Audio Notification Methods
   
   setupAudioControls() {
-    const audioEnabledToggle = this.container.querySelector('#audio-enabled-toggle');
-    const soundTypeSelect = this.container.querySelector('#sound-type-select');
-    const testSoundBtn = this.container.querySelector('#test-sound-btn');
-    const volumeSlider = this.container.querySelector('#volume-slider');
-    const volumeDisplay = this.container.querySelector('#volume-display');
-    const otpDifferentSoundToggle = this.container.querySelector('#otp-different-sound-toggle');
-    
-    // Set current values from state
-    if (audioEnabledToggle) audioEnabledToggle.checked = this.state.audioSettings.enabled;
-    if (soundTypeSelect) soundTypeSelect.value = this.state.audioSettings.soundType;
-    if (volumeSlider) volumeSlider.value = Math.round(this.state.audioSettings.volume * 100);
-    if (volumeDisplay) volumeDisplay.textContent = `${Math.round(this.state.audioSettings.volume * 100)}%`;
-    if (otpDifferentSoundToggle) otpDifferentSoundToggle.checked = this.state.audioSettings.differentSoundForOTP;
-    
-    // Update UI based on current settings
-    this.updateAudioControlsVisibility();
-    
-    // Audio enabled toggle
-    audioEnabledToggle?.addEventListener('change', (e) => {
-      this.state.audioSettings.enabled = e.target.checked;
-      this.updateAudioControlsVisibility();
-      this.saveState();
-      
-      if (e.target.checked) {
-        // Request audio permission on first enable
-        this.requestAudioPermission();
-      }
-    });
-    
-    // Sound type selection
-    soundTypeSelect?.addEventListener('change', (e) => {
-      this.state.audioSettings.soundType = e.target.value;
-      this.saveState();
-    });
-    
-    // Test sound button
-    testSoundBtn?.addEventListener('click', () => {
-      this.playEmailNotificationSound(false); // false = not OTP
-    });
-    
-    // Volume slider
-    volumeSlider?.addEventListener('input', (e) => {
-      const volume = parseInt(e.target.value) / 100;
-      this.state.audioSettings.volume = volume;
-      volumeDisplay.textContent = `${e.target.value}%`;
-      this.saveState();
-    });
-    
-    // Different sound for OTP toggle
-    otpDifferentSoundToggle?.addEventListener('change', (e) => {
-      this.state.audioSettings.differentSoundForOTP = e.target.checked;
-      this.saveState();
-    });
+    // Audio is always enabled with notification sound at 50% volume
+    // No UI controls needed - using defaults
+    // Request audio permission on init
+    this.requestAudioPermission();
   }
   
   updateAudioControlsVisibility() {
-    const audioControls = this.container.querySelector('#audio-controls');
-    const volumeControl = this.container.querySelector('#volume-control');
-    const otpToggle = this.container.querySelector('#otp-different-sound-toggle').parentElement;
-    
-    const isEnabled = this.state.audioSettings.enabled;
-    
-    if (audioControls) audioControls.style.opacity = isEnabled ? '1' : '0.5';
-    if (volumeControl) volumeControl.style.opacity = isEnabled ? '1' : '0.5';
-    if (otpToggle) otpToggle.style.opacity = isEnabled ? '1' : '0.5';
-    
-    // Disable/enable controls
-    const controls = [
-      '#sound-type-select',
-      '#test-sound-btn', 
-      '#volume-slider',
-      '#otp-different-sound-toggle'
-    ];
-    
-    controls.forEach(selector => {
-      const element = this.container.querySelector(selector);
-      if (element) {
-        element.disabled = !isEnabled;
-      }
-    });
+    // No longer needed since audio controls are removed
   }
   
   async requestAudioPermission() {
