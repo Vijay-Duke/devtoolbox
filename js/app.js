@@ -9,24 +9,27 @@ import { SearchAliases } from './search-aliases.js';
 import './theme-manager.js';
 
 // Theme Management
-const themeToggle = document.querySelector('[data-theme-toggle]');
-
-themeToggle?.addEventListener('click', () => {
-  const isDark = document.documentElement.classList.contains('dark');
+document.addEventListener('DOMContentLoaded', () => {
+  const themeToggle = document.querySelector('[data-theme-toggle]');
   
-  if (isDark) {
-    document.documentElement.classList.remove('dark');
-    document.documentElement.setAttribute('data-theme', 'light');
-    localStorage.setItem('theme', 'light');
-  } else {
-    document.documentElement.classList.add('dark');
-    document.documentElement.setAttribute('data-theme', 'dark');
-    localStorage.setItem('theme', 'dark');
-  }
+  themeToggle?.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    
+    if (isDark) {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+    } else {
+      document.documentElement.classList.add('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('theme', 'dark');
+    }
+  });
 });
 
 // Theme toggle function for keyboard shortcut
 function toggleTheme() {
+  const themeToggle = document.querySelector('[data-theme-toggle]');
   themeToggle?.click();
 }
 
