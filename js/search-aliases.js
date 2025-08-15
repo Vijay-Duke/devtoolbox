@@ -158,7 +158,7 @@ export class SearchAliases {
           }
           searchInput.value = '';
           searchInput.blur();
-          return;
+
         }
       }
     });
@@ -255,15 +255,7 @@ export class SearchAliases {
     this.saveAliases();
     this.showNotification(`Alias created: "${alias}" → ${tool}`);
   }
-  
-  removeAlias(alias) {
-    if (this.aliases[alias]) {
-      delete this.aliases[alias];
-      this.saveAliases();
-      this.showNotification(`Alias removed: "${alias}"`);
-    }
-  }
-  
+
   resetAliases() {
     this.aliases = this.getDefaultAliases();
     localStorage.removeItem('search-aliases');
