@@ -24,10 +24,78 @@ export class JSONFormatter {
   
   render() {
     this.container.innerHTML = `
+      <style>
+        .error-diff-line {
+          font-family: 'Courier New', monospace;
+          padding: 8px 12px;
+          border-left: 3px solid transparent;
+          white-space: pre-wrap;
+          font-size: 14px;
+          line-height: 1.4;
+        }
+        .error-diff-line-number {
+          display: inline-block;
+          width: 40px;
+          text-align: right;
+          margin-right: 12px;
+          color: #6b7280;
+          font-weight: 500;
+          user-select: none;
+        }
+        .error-diff-line.error {
+          background-color: #fef2f2;
+          border-left-color: #ef4444;
+        }
+        .dark .error-diff-line.error {
+          background-color: #450a0a;
+          border-left-color: #ef4444;
+        }
+        .error-diff-line.context {
+          background-color: #f9fafb;
+        }
+        .dark .error-diff-line.context {
+          background-color: #111827;
+        }
+        .error-indicator {
+          display: inline-block;
+          color: #ef4444;
+          font-weight: bold;
+          margin-left: 4px;
+        }
+        .error-char-highlight {
+          background-color: #fca5a5;
+          border-radius: 2px;
+          padding: 1px 2px;
+        }
+        .dark .error-char-highlight {
+          background-color: #dc2626;
+          color: white;
+        }
+        .error-suggestion {
+          background-color: #ecfdf5;
+          border: 1px solid #d1fae5;
+          border-radius: 6px;
+          padding: 12px;
+          margin-top: 12px;
+          font-size: 13px;
+        }
+        .dark .error-suggestion {
+          background-color: #064e3b;
+          border-color: #065f46;
+        }
+        .error-suggestion-title {
+          font-weight: 600;
+          color: #065f46;
+          margin-bottom: 4px;
+        }
+        .dark .error-suggestion-title {
+          color: #34d399;
+        }
+      </style>
       <div class="max-w-7xl mx-auto p-6">
         <div class="mb-8">
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">JSON Formatter & Validator</h1>
-          <p class="text-gray-600 dark:text-gray-400">Format, validate, and minify JSON data with syntax highlighting</p>
+          <p class="text-gray-600 dark:text-gray-400">Format, validate, and minify JSON data with syntax highlighting and detailed error analysis</p>
         </div>
         
         <div class="flex flex-wrap gap-2 mb-6">
@@ -83,6 +151,23 @@ export class JSONFormatter {
         
         <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 mb-6 hidden" data-error></div>
         
+        <!-- Line-by-line error diff view -->
+        <div id="error-diff-view" class="hidden mb-6">
+          <div class="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-750 rounded-t-lg">
+              <h3 class="text-sm font-medium text-gray-900 dark:text-white flex items-center">
+                <svg class="w-4 h-4 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 18.5c-.77.833.192 2.5 1.732 2.5z"/>
+                </svg>
+                JSON Syntax Error Analysis
+              </h3>
+            </div>
+            <div id="error-diff-content" class="p-0">
+              <!-- Error diff content will be inserted here -->
+            </div>
+          </div>
+        </div>
+        
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <label for="json-input" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Input JSON</label>
@@ -122,6 +207,8 @@ export class JSONFormatter {
     this.outputArea = this.container.querySelector('#json-output');
     this.errorDisplay = this.container.querySelector('[data-error]');
     this.errorOverlay = this.container.querySelector('#error-overlay');
+    this.errorDiffView = this.container.querySelector('#error-diff-view');
+    this.errorDiffContent = this.container.querySelector('#error-diff-content');
     this.formatBtn = this.container.querySelector('[data-action="format"]');
     this.minifyBtn = this.container.querySelector('[data-action="minify"]');
     this.copyBtn = this.container.querySelector('[data-action="copy"]');
@@ -175,6 +262,7 @@ export class JSONFormatter {
             // Parse error message to get line/column info
             const errorLocation = this.getErrorLocation(error.message, input);
             this.showInlineError(errorLocation, input);
+            this.showErrorDiffView(errorLocation, input);
             this.outputArea.textContent = '';
           }
         } else {
@@ -199,6 +287,7 @@ export class JSONFormatter {
           } catch (error) {
             const errorLocation = this.getErrorLocation(error.message, input);
             this.showInlineError(errorLocation, input);
+            this.showErrorDiffView(errorLocation, input);
             this.outputArea.textContent = '';
           }
         }
@@ -295,6 +384,7 @@ export class JSONFormatter {
     } catch (error) {
       const errorLocation = this.getErrorLocation(error.message, input);
       this.showInlineError(errorLocation, input);
+      this.showErrorDiffView(errorLocation, input);
       this.outputArea.textContent = '';
       feedback.showToast(`JSON formatting failed: ${error.message}`, 'error');
     }
@@ -370,6 +460,8 @@ export class JSONFormatter {
     this.errorDisplay.hidden = true;
     this.errorOverlay.hidden = true;
     this.errorOverlay.innerHTML = '';
+    this.errorDiffView.classList.add('hidden');
+    this.errorDiffContent.innerHTML = '';
   }
   
   updateStats() {
@@ -482,6 +574,123 @@ export class JSONFormatter {
     return obj;
   }
   
+  showErrorDiffView(errorLocation, jsonString) {
+    const { line, column, message, position } = errorLocation;
+    const lines = jsonString.split('\n');
+    
+    // Show context around the error (3 lines before and after)
+    const contextBefore = 3;
+    const contextAfter = 3;
+    const startLine = Math.max(0, line - 1 - contextBefore);
+    const endLine = Math.min(lines.length - 1, line - 1 + contextAfter);
+    
+    let diffHtml = '';
+    
+    for (let i = startLine; i <= endLine; i++) {
+      const lineNumber = i + 1;
+      const lineContent = lines[i] || '';
+      const isErrorLine = lineNumber === line;
+      const lineClass = isErrorLine ? 'error' : 'context';
+      
+      let displayContent = this.escapeHtml(lineContent);
+      
+      if (isErrorLine && column > 0) {
+        // Highlight the specific character where the error occurred
+        const beforeError = this.escapeHtml(lineContent.substring(0, column - 1));
+        const errorChar = this.escapeHtml(lineContent.charAt(column - 1) || ' ');
+        const afterError = this.escapeHtml(lineContent.substring(column));
+        
+        displayContent = `${beforeError}<span class="error-char-highlight">${errorChar}</span>${afterError}`;
+        
+        // Add error indicator
+        if (column <= lineContent.length) {
+          displayContent += '<span class="error-indicator"> ← Error here</span>';
+        }
+      }
+      
+      diffHtml += `
+        <div class="error-diff-line ${lineClass}">
+          <span class="error-diff-line-number">${lineNumber}</span>${displayContent}
+        </div>
+      `;
+    }
+    
+    // Add error analysis and suggestions
+    const suggestions = this.getErrorSuggestions(message, lines[line - 1], column);
+    if (suggestions.length > 0) {
+      diffHtml += `
+        <div class="error-suggestion">
+          <div class="error-suggestion-title">💡 Possible fixes:</div>
+          ${suggestions.map(suggestion => `<div>• ${suggestion}</div>`).join('')}
+        </div>
+      `;
+    }
+    
+    this.errorDiffContent.innerHTML = diffHtml;
+    this.errorDiffView.classList.remove('hidden');
+  }
+  
+  getErrorSuggestions(errorMessage, errorLine, column) {
+    const suggestions = [];
+    const message = errorMessage.toLowerCase();
+    
+    if (message.includes('unexpected token')) {
+      if (message.includes("'")) {
+        suggestions.push("Replace single quotes with double quotes - JSON requires double quotes for strings");
+      }
+      if (message.includes(',')) {
+        suggestions.push("Remove trailing comma - JSON doesn't allow trailing commas in objects or arrays");
+      }
+      if (message.includes('}') || message.includes(']')) {
+        suggestions.push("Check for missing comma before this closing bracket");
+      }
+      if (errorLine && column > 0) {
+        const char = errorLine.charAt(column - 1);
+        if (char === "'" || char === "'") {
+          suggestions.push(`Change '${char}' to double quotes (") for JSON string values`);
+        }
+      }
+    }
+    
+    if (message.includes('unexpected end')) {
+      suggestions.push("Check for missing closing brackets: }, ], or )");
+      suggestions.push("Ensure all opened objects and arrays are properly closed");
+    }
+    
+    if (message.includes('expected') && message.includes('property name')) {
+      suggestions.push("Object property names must be in double quotes");
+      suggestions.push("Example: {\"propertyName\": \"value\"} not {propertyName: \"value\"}");
+    }
+    
+    if (message.includes('duplicate') && message.includes('key')) {
+      suggestions.push("Remove duplicate property names in the object");
+      suggestions.push("Each property name can only appear once per object level");
+    }
+    
+    if (errorLine) {
+      // Check for common patterns in the error line
+      if (errorLine.includes('undefined') || errorLine.includes('null')) {
+        suggestions.push("Wrap undefined values in quotes if they should be strings, or use null for JSON null values");
+      }
+      
+      if (/[a-zA-Z_$][a-zA-Z0-9_$]*\s*:/.test(errorLine)) {
+        suggestions.push("Add double quotes around property names");
+      }
+      
+      if (errorLine.includes('//') || errorLine.includes('/*')) {
+        suggestions.push("Remove comments - JSON doesn't support comments");
+      }
+    }
+    
+    // Generic suggestions
+    if (suggestions.length === 0) {
+      suggestions.push("Validate JSON structure: check brackets, quotes, and commas");
+      suggestions.push("Use a JSON validator to identify all syntax issues");
+    }
+    
+    return suggestions;
+  }
+
   getFormattedOutput() {
     const output = this.outputArea.textContent || this.inputArea.value;
     if (!output.trim()) {
