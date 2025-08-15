@@ -8,36 +8,26 @@ import { SettingsManager } from './settings-manager.js';
 import { SearchAliases } from './search-aliases.js';
 import './theme-manager.js';
 
-// Theme Management - now handled by centralized ThemeManager
-let lightButton, darkButton;
+// Theme Management
+const themeToggle = document.querySelector('[data-theme-toggle]');
 
-// Initialize theme elements after DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  // Set up theme event listeners using centralized ThemeManager
-  setupThemeListeners();
+themeToggle?.addEventListener('click', () => {
+  const isDark = document.documentElement.classList.contains('dark');
+  
+  if (isDark) {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('theme', 'light');
+  } else {
+    document.documentElement.classList.add('dark');
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('theme', 'dark');
+  }
 });
 
-function setupThemeListeners() {
-  // Find theme buttons
-  lightButton = document.querySelector('button[data-theme="light"]');
-  darkButton = document.querySelector('button[data-theme="dark"]');
-  
-  // Light theme button
-  lightButton?.addEventListener('click', () => {
-    window.themeManager.applyTheme('light');
-  });
-
-  // Dark theme button
-  darkButton?.addEventListener('click', () => {
-    window.themeManager.applyTheme('dark');
-  });
-}
-
-// Theme toggle function
+// Theme toggle function for keyboard shortcut
 function toggleTheme() {
-  if (window.themeManager) {
-    window.themeManager.toggleTheme();
-  }
+  themeToggle?.click();
 }
 
 
