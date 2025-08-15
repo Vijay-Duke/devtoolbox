@@ -13,16 +13,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeToggle = document.querySelector('[data-theme-toggle]');
   
   themeToggle?.addEventListener('click', () => {
-    const isDark = document.documentElement.classList.contains('dark');
+    const currentTheme = localStorage.getItem('theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    if (isDark) {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
+    let newTheme;
+    
+    // Cycle through: system -> light -> dark -> system
+    if (!currentTheme || currentTheme === 'system') {
+      // Currently on system, go to opposite of system preference
+      newTheme = systemPrefersDark ? 'light' : 'dark';
+    } else if (currentTheme === 'light') {
+      newTheme = 'dark';
     } else {
+      // dark -> back to system
+      newTheme = 'system';
+    }
+    
+    // Apply the new theme
+    if (newTheme === 'system') {
+      localStorage.removeItem('theme'); // Remove to follow system
+      // Apply system preference
+      if (systemPrefersDark) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    } else if (newTheme === 'dark') {
       document.documentElement.classList.add('dark');
       document.documentElement.setAttribute('data-theme', 'dark');
       localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
     }
   });
 });
@@ -663,8 +688,13 @@ async function clearEverything() {
       // Show clearing message
       showSystemNotification('Clearing all data and cache...', 'info');
       
-      // Clear all localStorage
+      // Clear all localStorage except theme preference if explicitly set
+      const themePreference = localStorage.getItem('theme');
       localStorage.clear();
+      // Restore theme preference if it was explicitly set (not system)
+      if (themePreference && themePreference !== 'system') {
+        localStorage.setItem('theme', themePreference);
+      }
       
       // Clear sessionStorage
       sessionStorage.clear();
