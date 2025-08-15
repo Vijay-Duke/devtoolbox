@@ -21,6 +21,12 @@ export class TempEmailTool extends ToolTemplate {
         showOTPOnly: false,
         selectedInboxId: 'all' // Filter by specific inbox or 'all'
       },
+      audioSettings: {
+        enabled: true,
+        soundType: 'chime',
+        volume: 0.5, // 0.0 to 1.0
+        differentSoundForOTP: false
+      },
       serverUrl: window.location.hostname === 'localhost' 
         ? 'http://localhost:8443' 
         : 'https://api.encode.click'
@@ -40,6 +46,10 @@ export class TempEmailTool extends ToolTemplate {
     // Button removal system
     this.buttonObserver = null;
     this.buttonRemovalTimers = [];
+    
+    // Audio notification system
+    this.audioContext = null;
+    this.audioPermissionGranted = false;
   }
   
   init(containerId) {
@@ -73,6 +83,14 @@ export class TempEmailTool extends ToolTemplate {
         search: '',
         showOTPOnly: false,
         selectedInboxId: 'all'
+      };
+    }
+    if (!this.state.audioSettings) {
+      this.state.audioSettings = {
+        enabled: true,
+        soundType: 'chime',
+        volume: 0.5,
+        differentSoundForOTP: false
       };
     }
   }
@@ -154,6 +172,76 @@ export class TempEmailTool extends ToolTemplate {
             <div id="subscribed-emails" class="hidden mt-4">
               <div class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Monitoring:</div>
               <div id="subscribed-emails-list" class="flex flex-wrap gap-2"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audio Notification Settings -->
+        <div class="audio-settings-section mb-6">
+          <div class="p-4 bg-blue-50 dark:bg-blue-900 rounded-lg border border-blue-200 dark:border-blue-700">
+            <h3 class="text-sm font-medium text-blue-900 dark:text-blue-100 mb-3">🔊 Audio Notifications</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Enable Audio Toggle -->
+              <div class="flex items-center">
+                <label class="flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    id="audio-enabled-toggle"
+                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
+                  />
+                  <span class="text-sm font-medium text-blue-800 dark:text-blue-200">Enable email notification sounds</span>
+                </label>
+              </div>
+              
+              <!-- Sound Type and Test -->
+              <div class="flex items-center gap-2" id="audio-controls">
+                <label class="text-sm text-blue-700 dark:text-blue-300">Sound:</label>
+                <select 
+                  id="sound-type-select"
+                  class="text-xs px-2 py-1 border border-blue-300 dark:border-blue-600 rounded bg-white dark:bg-blue-800 text-blue-900 dark:text-blue-100"
+                >
+                  <option value="beep">Beep</option>
+                  <option value="chime">Chime</option>
+                  <option value="bell">Bell</option>
+                  <option value="notification">Notification</option>
+                </select>
+                <button 
+                  id="test-sound-btn"
+                  class="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                  title="Test sound"
+                >
+                  🔊 Test
+                </button>
+              </div>
+            </div>
+            
+            <!-- Volume Control -->
+            <div class="mt-3" id="volume-control">
+              <div class="flex items-center gap-3">
+                <label class="text-sm text-blue-700 dark:text-blue-300 min-w-0">Volume:</label>
+                <input 
+                  type="range" 
+                  id="volume-slider"
+                  min="0" 
+                  max="100" 
+                  value="50"
+                  class="flex-1 h-2 bg-blue-200 dark:bg-blue-700 rounded-lg appearance-none cursor-pointer"
+                />
+                <span id="volume-display" class="text-xs text-blue-600 dark:text-blue-400 min-w-0">50%</span>
+              </div>
+            </div>
+            
+            <!-- Different Sound for OTP -->
+            <div class="mt-3">
+              <label class="flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  id="otp-different-sound-toggle"
+                  class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 mr-2"
+                />
+                <span class="text-sm text-blue-700 dark:text-blue-300">Different sound for OTP emails</span>
+              </label>
             </div>
           </div>
         </div>
@@ -268,6 +356,9 @@ export class TempEmailTool extends ToolTemplate {
     // Connection toggle button
     const connectionToggleBtn = this.container.querySelector('#connection-toggle-btn');
     connectionToggleBtn.addEventListener('click', () => this.toggleConnection());
+
+    // Audio notification controls
+    this.setupAudioControls();
 
     // Filter inputs
     const searchFilter = this.container.querySelector('#search-filter');
@@ -394,6 +485,259 @@ export class TempEmailTool extends ToolTemplate {
     
     // Store reference for cleanup
     this.hashChangeListener = handleHashChange;
+  }
+
+  // Audio Notification Methods
+  
+  setupAudioControls() {
+    const audioEnabledToggle = this.container.querySelector('#audio-enabled-toggle');
+    const soundTypeSelect = this.container.querySelector('#sound-type-select');
+    const testSoundBtn = this.container.querySelector('#test-sound-btn');
+    const volumeSlider = this.container.querySelector('#volume-slider');
+    const volumeDisplay = this.container.querySelector('#volume-display');
+    const otpDifferentSoundToggle = this.container.querySelector('#otp-different-sound-toggle');
+    
+    // Set current values from state
+    if (audioEnabledToggle) audioEnabledToggle.checked = this.state.audioSettings.enabled;
+    if (soundTypeSelect) soundTypeSelect.value = this.state.audioSettings.soundType;
+    if (volumeSlider) volumeSlider.value = Math.round(this.state.audioSettings.volume * 100);
+    if (volumeDisplay) volumeDisplay.textContent = `${Math.round(this.state.audioSettings.volume * 100)}%`;
+    if (otpDifferentSoundToggle) otpDifferentSoundToggle.checked = this.state.audioSettings.differentSoundForOTP;
+    
+    // Update UI based on current settings
+    this.updateAudioControlsVisibility();
+    
+    // Audio enabled toggle
+    audioEnabledToggle?.addEventListener('change', (e) => {
+      this.state.audioSettings.enabled = e.target.checked;
+      this.updateAudioControlsVisibility();
+      this.saveState();
+      
+      if (e.target.checked) {
+        // Request audio permission on first enable
+        this.requestAudioPermission();
+      }
+    });
+    
+    // Sound type selection
+    soundTypeSelect?.addEventListener('change', (e) => {
+      this.state.audioSettings.soundType = e.target.value;
+      this.saveState();
+    });
+    
+    // Test sound button
+    testSoundBtn?.addEventListener('click', () => {
+      this.playEmailNotificationSound(false); // false = not OTP
+    });
+    
+    // Volume slider
+    volumeSlider?.addEventListener('input', (e) => {
+      const volume = parseInt(e.target.value) / 100;
+      this.state.audioSettings.volume = volume;
+      volumeDisplay.textContent = `${e.target.value}%`;
+      this.saveState();
+    });
+    
+    // Different sound for OTP toggle
+    otpDifferentSoundToggle?.addEventListener('change', (e) => {
+      this.state.audioSettings.differentSoundForOTP = e.target.checked;
+      this.saveState();
+    });
+  }
+  
+  updateAudioControlsVisibility() {
+    const audioControls = this.container.querySelector('#audio-controls');
+    const volumeControl = this.container.querySelector('#volume-control');
+    const otpToggle = this.container.querySelector('#otp-different-sound-toggle').parentElement;
+    
+    const isEnabled = this.state.audioSettings.enabled;
+    
+    if (audioControls) audioControls.style.opacity = isEnabled ? '1' : '0.5';
+    if (volumeControl) volumeControl.style.opacity = isEnabled ? '1' : '0.5';
+    if (otpToggle) otpToggle.style.opacity = isEnabled ? '1' : '0.5';
+    
+    // Disable/enable controls
+    const controls = [
+      '#sound-type-select',
+      '#test-sound-btn', 
+      '#volume-slider',
+      '#otp-different-sound-toggle'
+    ];
+    
+    controls.forEach(selector => {
+      const element = this.container.querySelector(selector);
+      if (element) {
+        element.disabled = !isEnabled;
+      }
+    });
+  }
+  
+  async requestAudioPermission() {
+    if (this.audioPermissionGranted) return;
+    
+    try {
+      // Create audio context on user interaction
+      if (!this.audioContext) {
+        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      
+      // Resume context if suspended (Chrome autoplay policy)
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume();
+      }
+      
+      this.audioPermissionGranted = true;
+    } catch (error) {
+      console.warn('Audio permission denied or not supported:', error);
+      this.showNotification('Audio notifications may not work in this browser', 'warning');
+    }
+  }
+  
+  async playEmailNotificationSound(isOTPEmail = false) {
+    if (!this.state.audioSettings.enabled) return;
+    
+    try {
+      // Ensure audio permission
+      await this.requestAudioPermission();
+      
+      if (!this.audioContext || !this.audioPermissionGranted) return;
+      
+      // Determine which sound to play
+      let soundType = this.state.audioSettings.soundType;
+      if (isOTPEmail && this.state.audioSettings.differentSoundForOTP) {
+        // Use a more prominent sound for OTP emails
+        soundType = this.getOTPSoundType(soundType);
+      }
+      
+      // Generate and play the sound
+      await this.generateAndPlaySound(soundType);
+      
+    } catch (error) {
+      console.warn('Failed to play notification sound:', error);
+    }
+  }
+  
+  getOTPSoundType(baseSoundType) {
+    // Map regular sounds to more prominent OTP sounds
+    const otpSoundMap = {
+      'beep': 'notification',
+      'chime': 'bell',
+      'bell': 'notification',
+      'notification': 'bell'
+    };
+    
+    return otpSoundMap[baseSoundType] || 'notification';
+  }
+  
+  async generateAndPlaySound(soundType) {
+    if (!this.audioContext) return;
+    
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    
+    // Connect oscillator to gain to destination
+    oscillator.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+    
+    // Set volume
+    gainNode.gain.value = this.state.audioSettings.volume;
+    
+    // Configure sound based on type
+    const soundConfig = this.getSoundConfig(soundType);
+    
+    // Generate the sound
+    oscillator.type = soundConfig.waveType;
+    oscillator.frequency.setValueAtTime(soundConfig.frequency, this.audioContext.currentTime);
+    
+    // Create envelope for the sound
+    const now = this.audioContext.currentTime;
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(this.state.audioSettings.volume, now + soundConfig.attack);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + soundConfig.duration);
+    
+    // Play the sound
+    oscillator.start(now);
+    oscillator.stop(now + soundConfig.duration);
+    
+    // Handle multiple tones for complex sounds
+    if (soundConfig.secondTone) {
+      setTimeout(() => {
+        this.playSecondTone(soundConfig.secondTone);
+      }, soundConfig.secondTone.delay * 1000);
+    }
+  }
+  
+  async playSecondTone(toneConfig) {
+    if (!this.audioContext) return;
+    
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+    
+    oscillator.type = toneConfig.waveType;
+    oscillator.frequency.setValueAtTime(toneConfig.frequency, this.audioContext.currentTime);
+    
+    const now = this.audioContext.currentTime;
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(this.state.audioSettings.volume, now + toneConfig.attack);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + toneConfig.duration);
+    
+    oscillator.start(now);
+    oscillator.stop(now + toneConfig.duration);
+  }
+  
+  getSoundConfig(soundType) {
+    const configs = {
+      beep: {
+        waveType: 'square',
+        frequency: 800,
+        attack: 0.01,
+        duration: 0.1
+      },
+      chime: {
+        waveType: 'sine',
+        frequency: 800,
+        attack: 0.02,
+        duration: 0.4,
+        secondTone: {
+          waveType: 'sine',
+          frequency: 600,
+          attack: 0.02,
+          duration: 0.3,
+          delay: 0.1
+        }
+      },
+      bell: {
+        waveType: 'sine',
+        frequency: 1000,
+        attack: 0.01,
+        duration: 0.6,
+        secondTone: {
+          waveType: 'sine',
+          frequency: 1200,
+          attack: 0.01,
+          duration: 0.4,
+          delay: 0.15
+        }
+      },
+      notification: {
+        waveType: 'triangle',
+        frequency: 660,
+        attack: 0.02,
+        duration: 0.2,
+        secondTone: {
+          waveType: 'triangle',
+          frequency: 880,
+          attack: 0.02,
+          duration: 0.2,
+          delay: 0.25
+        }
+      }
+    };
+    
+    return configs[soundType] || configs.chime;
   }
 
   startMonitoring() {
@@ -917,8 +1261,12 @@ export class TempEmailTool extends ToolTemplate {
     this.renderEmails();
     this.saveState();
     
+    // Play audio notification for new email
+    const isOTPEmail = email.otpCodes && email.otpCodes.length > 0;
+    this.playEmailNotificationSound(isOTPEmail);
+    
     // Show notification for new emails with OTPs
-    if (email.otpCodes && email.otpCodes.length > 0) {
+    if (isOTPEmail) {
       const inboxInfo = this.getInboxEmailFromId(email.inboxId);
       const inboxDisplay = inboxInfo ? ` to ${inboxInfo}` : '';
       this.showNotification(`New email with OTP${inboxDisplay}: ${email.otpCodes.join(', ')}`, 'success');
@@ -1326,6 +1674,13 @@ export class TempEmailTool extends ToolTemplate {
     this.disconnect();
     this.lastEventId = null;
     this.reconnectAttempts = 0;
+    
+    // Clean up audio context
+    if (this.audioContext) {
+      this.audioContext.close().catch(() => {});
+      this.audioContext = null;
+    }
+    this.audioPermissionGranted = false;
     
     // Clean up button removal system
     this.cleanupButtonRemovalSystem();
