@@ -374,12 +374,14 @@ export class Router {
           // Focus the first input/textarea if available, otherwise the first focusable element
           const firstInput = toolRoot.querySelector('input:not([disabled]), textarea:not([disabled])');
           const elementToFocus = firstInput || focusableElements[0];
-          elementToFocus.focus();
+          
+          // Focus without scrolling to prevent page jumping
+          elementToFocus.focus({ preventScroll: true });
         } else {
           // Make tool root focusable and focus it for keyboard navigation
           toolRoot.setAttribute('tabindex', '-1');
           toolRoot.style.outline = 'none'; // Remove focus outline for better UX
-          toolRoot.focus();
+          toolRoot.focus({ preventScroll: true });
         }
       }
     }, 100);
