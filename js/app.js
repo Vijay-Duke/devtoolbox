@@ -16,27 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
   themeToggle = document.querySelector('[data-theme-toggle]');
   themeDropdown = document.querySelector('[data-theme-dropdown]');
   
-  console.log('Theme elements found after DOM load:', {
-    themeToggle: !!themeToggle,
-    themeDropdown: !!themeDropdown,
-    html: !!html
-  });
-  
   // Set up theme event listeners
   setupThemeListeners();
   
   // Initialize theme immediately
   const savedTheme = localStorage.getItem('theme');
   const initialTheme = savedTheme || getSystemTheme();
-  console.log('Initializing with theme:', initialTheme);
   applyTheme(initialTheme);
-  
-  // Add global function for testing
-  window.testTheme = (theme) => {
-    console.log('Testing theme:', theme);
-    applyTheme(theme);
-    localStorage.setItem('theme', theme);
-  };
 });
 
 function setupThemeListeners() {
@@ -64,12 +50,9 @@ function setupThemeListeners() {
 
   // Theme selection
   themeDropdown?.addEventListener('click', (e) => {
-    console.log('Theme dropdown clicked', e.target);
     const themeButton = e.target.closest('[data-theme]');
-    console.log('Theme button found:', themeButton);
     if (themeButton) {
       const newTheme = themeButton.dataset.theme;
-      console.log('Selected theme:', newTheme);
       applyTheme(newTheme);
       localStorage.setItem('theme', newTheme);
       
@@ -87,8 +70,6 @@ function getSystemTheme() {
 
 // Apply theme
 function applyTheme(theme) {
-  console.log('applyTheme called with:', theme);
-  
   // Remove all theme classes
   html.classList.remove('dark', 'high-contrast');
   
@@ -101,9 +82,6 @@ function applyTheme(theme) {
   } else {
     html.setAttribute('data-theme', 'light');
   }
-  
-  console.log('HTML class after theme apply:', html.className);
-  console.log('data-theme attribute:', html.getAttribute('data-theme'));
   
   // Update theme icon
   updateThemeIcon(theme);
@@ -715,12 +693,23 @@ function showSystemNotification(message, type = 'info') {
                    'bg-blue-100 dark:bg-blue-900 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200';
   
   notification.className = `fixed top-4 right-4 max-w-sm p-4 rounded-lg border shadow-lg z-50 transition-all duration-300 ${bgColor}`;
-  notification.innerHTML = `
-    <div class="flex items-center">
-      <span class="flex-1">${message}</span>
-      <button class="ml-3 text-current opacity-70 hover:opacity-100" onclick="this.parentElement.parentElement.remove()">×</button>
-    </div>
-  `;
+  
+  // Create elements safely to prevent XSS
+  const container = document.createElement('div');
+  container.className = 'flex items-center';
+  
+  const messageSpan = document.createElement('span');
+  messageSpan.className = 'flex-1';
+  messageSpan.textContent = message; // Safe text assignment prevents XSS
+  
+  const closeButton = document.createElement('button');
+  closeButton.className = 'ml-3 text-current opacity-70 hover:opacity-100';
+  closeButton.textContent = '×';
+  closeButton.addEventListener('click', () => notification.remove());
+  
+  container.appendChild(messageSpan);
+  container.appendChild(closeButton);
+  notification.appendChild(container);
   
   document.body.appendChild(notification);
   

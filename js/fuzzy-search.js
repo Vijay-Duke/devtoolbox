@@ -81,6 +81,8 @@ export function searchTools(query, tools) {
 export function highlightMatch(text, query) {
   if (!query) return text;
   
-  const regex = new RegExp(`(${query.split('').join('.*?')})`, 'gi');
+  // Escape special regex characters to prevent regex injection
+  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escapedQuery.split('').join('.*?')})`, 'gi');
   return text.replace(regex, '<mark>$1</mark>');
 }

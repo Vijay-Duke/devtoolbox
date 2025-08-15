@@ -2,9 +2,9 @@
   "name": "devtools",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js",
   "scripts": {
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:run": "vitest run",
     "dev": "http-server -p 52474 -c-1",
     "serve": "npx serve --cors -p 52474 .",

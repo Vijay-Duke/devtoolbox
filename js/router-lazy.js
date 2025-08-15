@@ -20,39 +20,49 @@ export class Router {
   initRoutes() {
     // Register tools with lazy loading
     const toolConfigs = [
-      { path: 'json-formatter', name: 'JSON Formatter', module: './tools/json-formatter.js', className: 'JSONFormatter' },
-      { path: 'jwt-decoder', name: 'JWT Decoder', module: './tools/jwt-decoder.js', className: 'JWTDecoder' },
-      { path: 'base64', name: 'Base64 Encode/Decode', module: './tools/base64.js', className: 'Base64Tool' },
-      { path: 'url-encode', name: 'URL Encode/Decode', module: './tools/url-encode.js', className: 'URLEncodeTool' },
-      { path: 'uuid', name: 'UUID Generator', module: './tools/uuid-generator.js', className: 'UUIDGenerator' },
-      { path: 'unix-time', name: 'Unix Time Converter', module: './tools/unix-time.js', className: 'UnixTimeConverter' },
-      { path: 'regex-tester', name: 'Regex Tester', module: './tools/regex-tester.js', className: 'RegexTester' },
-      { path: 'cron', name: 'Cron Parser', module: './tools/cron-parser.js', className: 'CronParser' },
-      { path: 'diff', name: 'Diff Tool', module: './tools/diff-tool.js', className: 'DiffTool' },
-      { path: 'csv-json', name: 'CSV ↔ JSON Converter', module: './tools/csv-json.js', className: 'CSVJSONConverter' },
-      { path: 'yaml-json', name: 'YAML ↔ JSON Converter', module: './tools/yaml-json.js', className: 'YAMLJSONConverter' },
-      { path: 'hash', name: 'Hash Generator', module: './tools/hash-generator.js', className: 'HashGenerator' },
-      { path: 'markdown', name: 'Markdown Preview', module: './tools/markdown-preview.js', className: 'MarkdownPreview' },
-      { path: 'curl', name: 'cURL Generator', module: './tools/curl-generator.js', className: 'CurlGenerator' },
-      { path: 'api-mock', name: 'API Mock Generator', module: './tools/api-mock.js', className: 'APIMockGenerator' },
-      { path: 'dns-lookup', name: 'DNS Lookup', module: './tools/dns-lookup.js', className: 'DNSLookup' },
-      { path: 'graphql', name: 'GraphQL Tester', module: './tools/graphql-tester.js', className: 'GraphQLTester' },
-      { path: 'fake-data', name: 'Fake Data Generator', module: './tools/fake-data.js', className: 'FakeDataGenerator' },
-      { path: 'sql-formatter', name: 'SQL Formatter', module: './tools/sql-formatter.js', className: 'SQLFormatter' },
-      { path: 'xml-formatter', name: 'XML Formatter', module: './tools/xml-formatter.js', className: 'XMLFormatter' },
-      { path: 'password-generator', name: 'Password Generator', module: './tools/password-generator.js', className: 'PasswordGenerator' },
-      { path: 'binary-converter', name: 'Binary Converter', module: './tools/binary-converter.js', className: 'BinaryConverter' },
-      { path: 'qr-generator', name: 'QR Code Generator', module: './tools/qr-generator.js', className: 'QRGenerator' },
-      { path: 'ascii-art', name: 'ASCII Art Generator', module: './tools/ascii-art.js', className: 'ASCIIArtGenerator' },
-      { path: 'image-converter', name: 'Image Converter', module: './tools/image-converter.js', className: 'ImageConverter' },
-      { path: 'webhook-tester', name: 'Webhook Tester', module: './tools/webhook-tester.js', className: 'WebhookTester' },
-      { path: 'temp-email', name: 'Temporary Email', module: './tools/temp-email.js', className: 'TempEmailTool' },
+      // Formatters & Parsers
+      { path: 'json-formatter', name: 'JSON Formatter', module: './tools/json-formatter.js', className: 'JSONFormatter', category: 'Formatters' },
+      { path: 'sql-formatter', name: 'SQL Formatter', module: './tools/sql-formatter.js', className: 'SQLFormatter', category: 'Formatters' },
+      { path: 'xml-formatter', name: 'XML Formatter', module: './tools/xml-formatter.js', className: 'XMLFormatter', category: 'Formatters' },
+      { path: 'cron', name: 'Cron Parser', module: './tools/cron-parser.js', className: 'CronParser', category: 'Formatters' },
+      { path: 'markdown', name: 'Markdown Preview', module: './tools/markdown-preview.js', className: 'MarkdownPreview', category: 'Formatters' },
+      
+      // Generators
+      { path: 'uuid', name: 'UUID Generator', module: './tools/uuid-generator.js', className: 'UUIDGenerator', category: 'Generators' },
+      { path: 'hash', name: 'Hash Generator', module: './tools/hash-generator.js', className: 'HashGenerator', category: 'Generators' },
+      { path: 'password-generator', name: 'Password Generator', module: './tools/password-generator.js', className: 'PasswordGenerator', category: 'Generators' },
+      { path: 'qr-generator', name: 'QR Code Generator', module: './tools/qr-generator.js', className: 'QRGenerator', category: 'Generators' },
+      { path: 'ascii-art', name: 'ASCII Art Generator', module: './tools/ascii-art.js', className: 'ASCIIArtGenerator', category: 'Generators' },
+      { path: 'fake-data', name: 'Fake Data Generator', module: './tools/fake-data.js', className: 'FakeDataGenerator', category: 'Generators' },
+      { path: 'curl', name: 'cURL Generator', module: './tools/curl-generator.js', className: 'CurlGenerator', category: 'Generators' },
+      { path: 'api-mock', name: 'API Mock Generator', module: './tools/api-mock.js', className: 'APIMockGenerator', category: 'Generators' },
+      { path: 's3-presigned-url', name: 'S3 Pre-signed URL Generator', module: './tools/s3-presigned-url.js', className: 'S3PresignedURL', category: 'Generators' },
+      
+      // Converters
+      { path: 'base64', name: 'Base64 Encode/Decode', module: './tools/base64.js', className: 'Base64Tool', category: 'Converters' },
+      { path: 'url-encode', name: 'URL Encode/Decode', module: './tools/url-encode.js', className: 'URLEncodeTool', category: 'Converters' },
+      { path: 'unix-time', name: 'Unix Time Converter', module: './tools/unix-time.js', className: 'UnixTimeConverter', category: 'Converters' },
+      { path: 'csv-json', name: 'CSV ↔ JSON Converter', module: './tools/csv-json.js', className: 'CSVJSONConverter', category: 'Converters' },
+      { path: 'yaml-json', name: 'YAML ↔ JSON Converter', module: './tools/yaml-json.js', className: 'YAMLJSONConverter', category: 'Converters' },
+      { path: 'binary-converter', name: 'Binary Converter', module: './tools/binary-converter.js', className: 'BinaryConverter', category: 'Converters' },
+      { path: 'image-converter', name: 'Image Converter', module: './tools/image-converter.js', className: 'ImageConverter', category: 'Converters' },
+      
+      // Text & Data Tools
+      { path: 'jwt-decoder', name: 'JWT Decoder', module: './tools/jwt-decoder.js', className: 'JWTDecoder', category: 'Text & Data' },
+      { path: 'diff', name: 'Diff Tool', module: './tools/diff-tool.js', className: 'DiffTool', category: 'Text & Data' },
+      { path: 'regex-tester', name: 'Regex Tester', module: './tools/regex-tester.js', className: 'RegexTester', category: 'Text & Data' },
+      
+      // Developer Tools
+      { path: 'graphql', name: 'GraphQL Tester', module: './tools/graphql-tester.js', className: 'GraphQLTester', category: 'Developer Tools' },
+      { path: 'webhook-tester', name: 'Webhook Tester', module: './tools/webhook-tester.js', className: 'WebhookTester', category: 'Developer Tools' },
+      { path: 'temp-email', name: 'Temporary Email', module: './tools/temp-email.js', className: 'TempEmailTool', category: 'Developer Tools' },
+      
       // Networking & Cloud Tools
-      { path: 'ip-lookup', name: 'IP Address Lookup', module: './tools/ip-lookup.js', className: 'IPLookup' },
-      { path: 'cidr-calculator', name: 'CIDR Calculator', module: './tools/cidr-calculator.js', className: 'CIDRCalculator' },
-      { path: 'whois-lookup', name: 'WHOIS Lookup', module: './tools/whois-lookup.js', className: 'WHOISLookup' },
-      { path: 's3-presigned-url', name: 'S3 Pre-signed URL Generator', module: './tools/s3-presigned-url.js', className: 'S3PresignedURL' },
-      { path: 'iam-policy-visualizer', name: 'AWS IAM Policy Visualizer', module: './tools/iam-policy-visualizer.js', className: 'IAMPolicyVisualizer' }
+      { path: 'ip-lookup', name: 'IP Address Lookup', module: './tools/ip-lookup.js', className: 'IPLookup', category: 'Networking & Cloud' },
+      { path: 'dns-lookup', name: 'DNS Lookup', module: './tools/dns-lookup.js', className: 'DNSLookup', category: 'Networking & Cloud' },
+      { path: 'cidr-calculator', name: 'CIDR Calculator', module: './tools/cidr-calculator.js', className: 'CIDRCalculator', category: 'Networking & Cloud' },
+      { path: 'whois-lookup', name: 'WHOIS Lookup', module: './tools/whois-lookup.js', className: 'WHOISLookup', category: 'Networking & Cloud' },
+      { path: 'iam-policy-visualizer', name: 'AWS IAM Policy Visualizer', module: './tools/iam-policy-visualizer.js', className: 'IAMPolicyVisualizer', category: 'Networking & Cloud' }
     ];
     
     toolConfigs.forEach(config => {
@@ -60,6 +70,7 @@ export class Router {
         name: config.name,
         module: config.module,
         className: config.className,
+        category: config.category,
         instance: null,
         loaded: false
       });
@@ -269,20 +280,53 @@ export class Router {
   }
   
   showError(toolName, errorMessage = '') {
-    const errorDetails = errorMessage ? `<p class="text-sm text-gray-500 dark:text-gray-500 mt-2">${errorMessage}</p>` : '';
-    this.mainContent.innerHTML = `
-      <div class="flex items-center justify-center h-64">
-        <div class="text-center">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Failed to Load Tool</h1>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">Sorry, we couldn't load ${toolName}. Please try again.</p>
-          ${errorDetails}
-          <div class="space-x-4">
-            <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" onclick="location.reload()">Reload Page</button>
-            <a href="#" class="inline-block px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">Go Home</a>
-          </div>
-        </div>
-      </div>
-    `;
+    // Create error page safely to prevent XSS
+    const container = document.createElement('div');
+    container.className = 'flex items-center justify-center h-64';
+    
+    const content = document.createElement('div');
+    content.className = 'text-center';
+    
+    const title = document.createElement('h1');
+    title.className = 'text-3xl font-bold text-gray-900 dark:text-white mb-4';
+    title.textContent = 'Failed to Load Tool';
+    
+    const description = document.createElement('p');
+    description.className = 'text-gray-600 dark:text-gray-400 mb-6';
+    description.textContent = `Sorry, we couldn't load ${toolName}. Please try again.`;
+    
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'space-x-4';
+    
+    const reloadButton = document.createElement('button');
+    reloadButton.className = 'px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors';
+    reloadButton.textContent = 'Reload Page';
+    reloadButton.addEventListener('click', () => location.reload());
+    
+    const homeLink = document.createElement('a');
+    homeLink.href = '#';
+    homeLink.className = 'inline-block px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors';
+    homeLink.textContent = 'Go Home';
+    
+    buttonContainer.appendChild(reloadButton);
+    buttonContainer.appendChild(homeLink);
+    
+    content.appendChild(title);
+    content.appendChild(description);
+    
+    // Add error details if provided
+    if (errorMessage) {
+      const errorDetails = document.createElement('p');
+      errorDetails.className = 'text-sm text-gray-500 dark:text-gray-500 mt-2';
+      errorDetails.textContent = errorMessage; // Safe text assignment
+      content.appendChild(errorDetails);
+    }
+    
+    content.appendChild(buttonContainer);
+    container.appendChild(content);
+    
+    this.mainContent.innerHTML = '';
+    this.mainContent.appendChild(container);
   }
   
   // Prefetch related tools for better performance

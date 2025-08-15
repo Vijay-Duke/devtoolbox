@@ -1,5 +1,4 @@
 // Service Worker for offline support and caching  
-const CACHE_NAME = 'devtoolbox-v4';
 const STATIC_CACHE = 'devtoolbox-static-v4';
 const DYNAMIC_CACHE = 'devtoolbox-dynamic-v4';
 const TOOLS_CACHE = 'devtoolbox-tools-v4';
