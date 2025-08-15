@@ -1,26 +1,20 @@
 (function() {
-  // Get stored theme preference (can be 'light', 'dark', or null for system)
-  let storedTheme = localStorage.getItem('theme');
-  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // Get stored theme preference (can be 'light' or 'dark')
+  const storedTheme = localStorage.getItem('theme');
   
-  // Migration: if old 'system' value exists, remove it
-  if (storedTheme === 'system') {
-    localStorage.removeItem('theme');
-    storedTheme = null;
-  }
+  // Default to dark theme
+  let shouldUseDark = true;
   
-  // Determine which theme to apply
-  let shouldUseDark = false;
-  
-  if (storedTheme === 'dark') {
-    // User explicitly chose dark
-    shouldUseDark = true;
-  } else if (storedTheme === 'light') {
+  if (storedTheme === 'light') {
     // User explicitly chose light
     shouldUseDark = false;
   } else {
-    // No preference stored - use system preference
-    shouldUseDark = systemPrefersDark;
+    // Default to dark (including when storedTheme is null or 'dark')
+    shouldUseDark = true;
+    // Store dark as default if nothing was stored
+    if (!storedTheme) {
+      localStorage.setItem('theme', 'dark');
+    }
   }
   
   // Apply the theme
@@ -31,27 +25,4 @@
     document.documentElement.classList.remove('dark');
     document.documentElement.setAttribute('data-theme', 'light');
   }
-  
-  // Listen for system theme changes when in auto mode
-  if (!storedTheme) {
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      // Re-check to make sure we're still in auto mode
-      if (!localStorage.getItem('theme')) {
-        if (e.matches) {
-          document.documentElement.classList.add('dark');
-          document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-          document.documentElement.setAttribute('data-theme', 'light');
-        }
-      }
-    });
-  }
-  
-  // Debug info
-  console.log('Theme initialized:', {
-    stored: storedTheme,
-    systemPrefersDark: systemPrefersDark,
-    appliedDark: shouldUseDark
-  });
 })();
