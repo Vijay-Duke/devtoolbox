@@ -510,51 +510,382 @@ export class XMLFormatter {
   testXPath() {
     const xml = this.inputArea.value.trim();
     const xpath = this.container.querySelector('#xpath-input').value.trim();
+    const resultsEl = this.container.querySelector('#xpath-results');
     
-    if (!xml || !xpath) return;
+    // Clear previous results
+    resultsEl.innerHTML = '';
+    
+    if (!xml) {
+      this.showXPathError('No XML document provided. Please enter some XML content first.');
+      return;
+    }
+    
+    if (!xpath) {
+      this.showXPathError('No XPath expression provided. Please enter an XPath expression to test.');
+      return;
+    }
     
     try {
       const parser = new DOMParser();
       const doc = parser.parseFromString(xml, 'text/xml');
       
+      // Check for XML parsing errors
       const parserError = doc.querySelector('parsererror');
       if (parserError) {
-        throw new Error(parserError.textContent);
+        throw new Error(`XML parsing error: ${parserError.textContent}`);
       }
       
-      const evaluator = new XPathEvaluator();
-      const result = evaluator.evaluate(xpath, doc, null, XPathResult.ANY_TYPE, null);
+      // Test XPath expression
+      const results = this.evaluateXPath(xpath, doc);
+      this.displayXPathResults(results, xpath);
       
-      const resultsEl = this.container.querySelector('#xpath-results');
-      const matches = [];
-      let node;
+    } catch (error) {
+      this.showXPathError(`XPath evaluation failed: ${error.message}`);
+    }
+  }
+  
+  evaluateXPath(xpath, doc) {
+    try {
+      // Try using document.evaluate (most reliable method)
+      if (document.evaluate) {
+        const result = document.evaluate(
+          xpath, 
+          doc, 
+          null, 
+          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+          null
+        );
+        
+        const matches = [];
+        for (let i = 0; i < result.snapshotLength; i++) {
+          const node = result.snapshotItem(i);
+          matches.push(this.formatXPathResult(node));
+        }
+        
+        return { matches, method: 'document.evaluate' };
+      }
       
-      while ((node = result.iterateNext())) {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-          matches.push(`<${node.tagName}>${node.textContent}</${node.tagName}>`);
-        } else if (node.nodeType === Node.ATTRIBUTE_NODE) {
-          matches.push(`${node.name}="${node.value}"`);
-        } else {
-          matches.push(node.textContent);
+      // Fallback to manual XPath parsing for simple expressions
+      return this.evaluateXPathFallback(xpath, doc);
+      
+    } catch (error) {
+      // Try fallback method
+      return this.evaluateXPathFallback(xpath, doc);
+    }
+  }
+  
+  evaluateXPathFallback(xpath, doc) {
+    const matches = [];
+    
+    // Handle common XPath patterns
+    if (xpath.startsWith('//')) {
+      // Descendant axis: //elementName
+      const elementName = xpath.slice(2).split('[')[0].split('/')[0];
+      if (elementName) {
+        const elements = doc.getElementsByTagName(elementName);
+        for (let element of elements) {
+          if (this.matchesXPathConditions(element, xpath)) {
+            matches.push(this.formatXPathResult(element));
+          }
         }
       }
+    } else if (xpath.startsWith('/')) {
+      // Absolute path: /root/child
+      const pathParts = xpath.split('/').filter(part => part);
+      const result = this.followAbsolutePath(doc.documentElement, pathParts, 0);
+      if (result) {
+        matches.push(this.formatXPathResult(result));
+      }
+    } else {
+      // Try to find elements by tag name
+      const elements = doc.getElementsByTagName(xpath);
+      for (let element of elements) {
+        matches.push(this.formatXPathResult(element));
+      }
+    }
+    
+    return { matches, method: 'fallback' };
+  }
+  
+  matchesXPathConditions(element, xpath) {
+    // Parse conditions in brackets like [@id='value'] or [position()=1]
+    const conditionMatch = xpath.match(/\[([^\]]+)\]/);
+    if (!conditionMatch) return true;
+    
+    const condition = conditionMatch[1];
+    
+    // Handle attribute conditions: @attribute='value'
+    const attrMatch = condition.match(/@([^=]+)='([^']+)'/);
+    if (attrMatch) {
+      const attrName = attrMatch[1];
+      const attrValue = attrMatch[2];
+      return element.getAttribute(attrName) === attrValue;
+    }
+    
+    // Handle attribute existence: @attribute
+    const attrExistsMatch = condition.match(/@([^=\s]+)$/);
+    if (attrExistsMatch) {
+      const attrName = attrExistsMatch[1];
+      return element.hasAttribute(attrName);
+    }
+    
+    // Handle position conditions: position()=1
+    const posMatch = condition.match(/position\(\)=(\d+)/);
+    if (posMatch) {
+      const position = parseInt(posMatch[1]);
+      const siblings = Array.from(element.parentNode.children).filter(
+        child => child.tagName === element.tagName
+      );
+      return siblings.indexOf(element) + 1 === position;
+    }
+    
+    // Handle text content conditions: text()='value'
+    const textMatch = condition.match(/text\(\)='([^']+)'/);
+    if (textMatch) {
+      const textValue = textMatch[1];
+      return element.textContent.trim() === textValue;
+    }
+    
+    return true;
+  }
+  
+  followAbsolutePath(element, pathParts, index) {
+    if (index >= pathParts.length) return element;
+    
+    const currentPart = pathParts[index];
+    const [tagName, condition] = currentPart.split('[');
+    
+    if (element.tagName.toLowerCase() !== tagName.toLowerCase()) {
+      return null;
+    }
+    
+    if (condition) {
+      // Handle conditions for absolute paths
+      const conditionStr = '[' + condition;
+      if (!this.matchesXPathConditions(element, conditionStr)) {
+        return null;
+      }
+    }
+    
+    if (index === pathParts.length - 1) {
+      return element;
+    }
+    
+    // Continue with children
+    const nextPart = pathParts[index + 1];
+    const nextTagName = nextPart.split('[')[0];
+    
+    for (let child of element.children) {
+      if (child.tagName.toLowerCase() === nextTagName.toLowerCase()) {
+        const result = this.followAbsolutePath(child, pathParts, index + 1);
+        if (result) return result;
+      }
+    }
+    
+    return null;
+  }
+  
+  formatXPathResult(node) {
+    if (!node) return null;
+    
+    const result = {
+      type: this.getNodeTypeString(node.nodeType),
+      nodeName: node.nodeName,
+      nodeValue: null,
+      textContent: null,
+      attributes: {},
+      path: this.getNodePath(node)
+    };
+    
+    switch (node.nodeType) {
+      case Node.ELEMENT_NODE:
+        result.textContent = node.textContent?.trim() || '';
+        result.innerHTML = node.innerHTML;
+        // Get attributes
+        for (let attr of node.attributes || []) {
+          result.attributes[attr.name] = attr.value;
+        }
+        break;
+        
+      case Node.ATTRIBUTE_NODE:
+        result.nodeValue = node.value;
+        break;
+        
+      case Node.TEXT_NODE:
+        result.nodeValue = node.nodeValue?.trim() || '';
+        break;
+        
+      default:
+        result.nodeValue = node.nodeValue;
+    }
+    
+    return result;
+  }
+  
+  getNodeTypeString(nodeType) {
+    switch (nodeType) {
+      case Node.ELEMENT_NODE: return 'Element';
+      case Node.ATTRIBUTE_NODE: return 'Attribute';
+      case Node.TEXT_NODE: return 'Text';
+      case Node.COMMENT_NODE: return 'Comment';
+      case Node.DOCUMENT_NODE: return 'Document';
+      default: return 'Unknown';
+    }
+  }
+  
+  getNodePath(node) {
+    if (!node || node.nodeType === Node.DOCUMENT_NODE) return '/';
+    
+    const parts = [];
+    let current = node;
+    
+    while (current && current.nodeType === Node.ELEMENT_NODE) {
+      let part = current.tagName.toLowerCase();
       
-      if (matches.length > 0) {
-        resultsEl.innerHTML = `
-          <div class="xpath-matches">
-            <strong>Found ${matches.length} match${matches.length !== 1 ? 'es' : ''}:</strong>
-            <ul>
-              ${matches.map(m => `<li><code>${this.escapeHTML(m)}</code></li>`).join('')}
-            </ul>
+      // Add position if there are siblings with the same name
+      const siblings = Array.from(current.parentNode?.children || [])
+        .filter(child => child.tagName === current.tagName);
+      
+      if (siblings.length > 1) {
+        const position = siblings.indexOf(current) + 1;
+        part += `[${position}]`;
+      }
+      
+      parts.unshift(part);
+      current = current.parentNode;
+    }
+    
+    return '/' + parts.join('/');
+  }
+  
+  displayXPathResults(results, xpath) {
+    const resultsEl = this.container.querySelector('#xpath-results');
+    const { matches, method } = results;
+    
+    if (matches.length === 0) {
+      resultsEl.innerHTML = `
+        <div class="xpath-no-matches bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded p-3">
+          <div class="flex items-center text-yellow-800 dark:text-yellow-200">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <strong>No matches found</strong>
+          </div>
+          <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+            <p>The XPath expression <code class="bg-yellow-100 dark:bg-yellow-800 px-1 rounded">${this.escapeHTML(xpath)}</code> did not match any nodes.</p>
+            <div class="mt-2">
+              <p><strong>Tips:</strong></p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Check that element names match exactly (case-sensitive)</li>
+                <li>Verify the XML structure matches your XPath</li>
+                <li>Try simpler expressions like <code>//elementName</code></li>
+                <li>Use <code>//*</code> to select all elements</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+    
+    let html = `
+      <div class="xpath-matches bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded p-3">
+        <div class="flex items-center text-green-800 dark:text-green-200 mb-3">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <strong>Found ${matches.length} match${matches.length !== 1 ? 'es' : ''}</strong>
+        </div>
+        
+        <div class="space-y-3">
+    `;
+    
+    matches.forEach((match, index) => {
+      html += `
+        <div class="match-item border border-gray-200 dark:border-gray-600 rounded p-3 bg-white dark:bg-gray-800">
+          <div class="flex items-start justify-between mb-2">
+            <div class="text-sm font-medium text-gray-900 dark:text-white">
+              Match ${index + 1}: ${match.type} "${match.nodeName}"
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400 font-mono">
+              ${match.path}
+            </div>
+          </div>
+      `;
+      
+      if (match.type === 'Element') {
+        if (Object.keys(match.attributes).length > 0) {
+          html += `
+            <div class="mb-2">
+              <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Attributes:</div>
+              <div class="space-y-1">
+          `;
+          for (const [name, value] of Object.entries(match.attributes)) {
+            html += `
+              <div class="text-xs bg-gray-100 dark:bg-gray-700 rounded px-2 py-1 font-mono">
+                <span class="text-blue-600 dark:text-blue-400">${this.escapeHTML(name)}</span>="<span class="text-green-600 dark:text-green-400">${this.escapeHTML(value)}</span>"
+              </div>
+            `;
+          }
+          html += `</div></div>`;
+        }
+        
+        if (match.textContent) {
+          html += `
+            <div>
+              <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Text Content:</div>
+              <div class="text-sm bg-gray-100 dark:bg-gray-700 rounded p-2 font-mono whitespace-pre-wrap">${this.escapeHTML(match.textContent)}</div>
+            </div>
+          `;
+        }
+      } else if (match.nodeValue) {
+        html += `
+          <div>
+            <div class="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Value:</div>
+            <div class="text-sm bg-gray-100 dark:bg-gray-700 rounded p-2 font-mono">${this.escapeHTML(match.nodeValue)}</div>
           </div>
         `;
-      } else {
-        resultsEl.innerHTML = '<div class="xpath-no-matches">No matches found</div>';
       }
-    } catch (error) {
-      const resultsEl = this.container.querySelector('#xpath-results');
-      resultsEl.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-    }
+      
+      html += `</div>`;
+    });
+    
+    html += `
+        </div>
+        <div class="mt-3 text-xs text-gray-600 dark:text-gray-400">
+          Evaluation method: ${method}
+        </div>
+      </div>
+    `;
+    
+    resultsEl.innerHTML = html;
+  }
+  
+  showXPathError(message) {
+    const resultsEl = this.container.querySelector('#xpath-results');
+    resultsEl.innerHTML = `
+      <div class="xpath-error bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-3">
+        <div class="flex items-center text-red-800 dark:text-red-200">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 18.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+          <strong>XPath Error</strong>
+        </div>
+        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+          ${this.escapeHTML(message)}
+        </div>
+        <div class="mt-3 text-xs text-red-600 dark:text-red-400">
+          <p><strong>Common XPath patterns:</strong></p>
+          <ul class="list-disc list-inside space-y-1 mt-1">
+            <li><code>//book</code> - All book elements</li>
+            <li><code>//book[@id='bk101']</code> - Book with specific ID</li>
+            <li><code>//book/title</code> - All title elements inside book elements</li>
+            <li><code>/catalog/book[1]</code> - First book element</li>
+            <li><code>//book[position()>1]</code> - All books except the first</li>
+          </ul>
+        </div>
+      </div>
+    `;
   }
   
   escapeHTML(text) {
