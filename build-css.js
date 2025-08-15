@@ -11,7 +11,7 @@ async function buildCSS() {
     console.log('Current working directory:', process.cwd())
     
     // Read input CSS
-    const inputCSS = await fs.readFile('./src/input.css', 'utf8')
+    const inputCSS = await fs.readFile('./css/input.css', 'utf8')
     console.log('Input CSS length:', inputCSS.length)
     
     // Create PostCSS processor with plugins
@@ -22,7 +22,7 @@ async function buildCSS() {
     
     // Process CSS
     const result = await processor.process(inputCSS, {
-      from: './src/input.css',
+      from: './css/input.css',
       to: './css/styles.css'
     })
     
