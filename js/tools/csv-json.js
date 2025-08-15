@@ -335,6 +335,9 @@ Bob Johnson,35,Chicago,true</textarea>
     let current = '';
     let inQuotes = false;
     
+    // Normalize line endings and remove any BOM
+    line = line.replace(/\r\n/g, '\n').replace(/\r/g, '\n').replace(/^\uFEFF/, '');
+    
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
       const nextChar = line[i + 1];
@@ -363,10 +366,11 @@ Bob Johnson,35,Chicago,true</textarea>
       return '';
     }
     
-    value = String(value);
+    // Convert to string and normalize whitespace
+    value = String(value).trim();
     
     // Check if value needs escaping
-    if (value.includes(delimiter) || value.includes('"') || value.includes('\n')) {
+    if (value.includes(delimiter) || value.includes('"') || value.includes('\n') || value.includes('\r')) {
       // Escape quotes by doubling them
       value = value.replace(/"/g, '""');
       // Wrap in quotes
@@ -403,18 +407,15 @@ Bob Johnson,35,Chicago,true</textarea>
     if (value === null) return 'null';
     if (value === undefined) return '';
     if (typeof value === 'boolean') return value.toString();
+    if (typeof value === 'number') return value.toString();
     if (typeof value === 'object') return JSON.stringify(value);
-    return String(value);
+    // Ensure string values don't have extra whitespace
+    return String(value).trim();
   }
   
   displayOutput(output) {
-    if (this.mode === 'csv-to-json') {
-      // For JSON output, just display as text since pre elements don't support HTML
-      this.outputArea.textContent = output;
-    } else {
-      // Display CSV as plain text
-      this.outputArea.textContent = output;
-    }
+    // Always display as plain text to prevent any HTML interpretation
+    this.outputArea.textContent = output;
   }
   
   updateStatsLabel(rows, columns) {
