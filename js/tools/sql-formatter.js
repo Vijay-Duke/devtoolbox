@@ -18,10 +18,61 @@ export class SQLFormatter {
   
   render() {
     this.container.innerHTML = `
+      <style>
+        .feature-badge {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 12px;
+          border-radius: 8px;
+          border: 1px solid;
+          transition: all 0.2s;
+        }
+        .feature-badge.active {
+          background-color: #ecfdf5;
+          border-color: #10b981;
+          color: #065f46;
+        }
+        .dark .feature-badge.active {
+          background-color: #064e3b;
+          border-color: #10b981;
+          color: #d1fae5;
+        }
+        .feature-badge.inactive {
+          background-color: #f9fafb;
+          border-color: #d1d5db;
+          color: #6b7280;
+        }
+        .dark .feature-badge.inactive {
+          background-color: #1f2937;
+          border-color: #374151;
+          color: #9ca3af;
+        }
+        .feature-icon {
+          font-size: 18px;
+          font-weight: bold;
+          margin-bottom: 4px;
+        }
+        .feature-label {
+          font-size: 12px;
+          font-weight: 500;
+          text-align: center;
+        }
+        .complexity-low { color: #10b981; }
+        .complexity-medium { color: #f59e0b; }
+        .complexity-high { color: #ef4444; }
+        .complexity-very.high { color: #dc2626; font-weight: bold; }
+        .analysis-item {
+          margin-bottom: 8px;
+        }
+        .analysis-section {
+          margin-bottom: 16px;
+        }
+      </style>
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
         <div class="mb-6">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">SQL Formatter</h1>
-          <p class="text-gray-600 dark:text-gray-300">Format and beautify SQL queries with proper indentation</p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">SQL Formatter & Analyzer</h1>
+          <p class="text-gray-600 dark:text-gray-300">Format, beautify, and analyze SQL queries with performance insights</p>
         </div>
         
         <div class="mb-6 flex flex-wrap gap-4">
@@ -129,9 +180,26 @@ export class SQLFormatter {
           </div>
         </div>
         
+        <!-- Query Analysis Section -->
         <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg" id="sql-analysis" hidden>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">Query Analysis</h3>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Query Analysis Results
+          </h3>
           <div class="analysis-content text-sm text-gray-700 dark:text-gray-300"></div>
+        </div>
+
+        <!-- Error Display Section -->
+        <div class="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg" id="sql-error" hidden>
+          <h3 class="text-lg font-medium text-red-800 dark:text-red-200 mb-3 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 18.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+            Analysis Error
+          </h3>
+          <div class="error-content text-sm text-red-700 dark:text-red-300"></div>
         </div>
       </div>
     `;
@@ -404,51 +472,294 @@ export class SQLFormatter {
   
   explainQuery() {
     const sql = this.outputArea.value || this.inputArea.value;
-    if (!sql) return;
+    const analysisEl = this.container.querySelector('#sql-analysis');
+    const errorEl = this.container.querySelector('#sql-error');
     
-    const analysis = this.analyzeSQL(sql);
+    // Hide both sections initially
+    analysisEl.hidden = true;
+    errorEl.hidden = true;
+    
+    if (!sql || !sql.trim()) {
+      this.showAnalysisError('No SQL query provided. Please enter a SQL query to analyze.');
+      return;
+    }
+    
+    try {
+      const analysis = this.analyzeSQL(sql);
+      this.displayAnalysisResults(analysis);
+    } catch (error) {
+      this.showAnalysisError(`Analysis failed: ${error.message}`);
+    }
+  }
+  
+  displayAnalysisResults(analysis) {
     const analysisEl = this.container.querySelector('#sql-analysis');
     const contentEl = analysisEl.querySelector('.analysis-content');
     
-    contentEl.innerHTML = `
-      <div class="analysis-item">
-        <strong>Query Type:</strong> ${analysis.type}
+    // Build comprehensive analysis display
+    let analysisHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div class="analysis-section">
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Query Overview</h4>
+          <div class="space-y-1">
+            <div class="analysis-item"><strong>Type:</strong> <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">${analysis.type}</span></div>
+            <div class="analysis-item"><strong>Complexity:</strong> <span class="complexity-${analysis.complexity.toLowerCase()}">${analysis.complexity}</span></div>
+            <div class="analysis-item"><strong>Estimated Performance:</strong> ${analysis.performance}</div>
+          </div>
+        </div>
+        
+        <div class="analysis-section">
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Structure</h4>
+          <div class="space-y-1">
+            <div class="analysis-item"><strong>Tables:</strong> ${analysis.tables.length} (${analysis.tables.join(', ') || 'None detected'})</div>
+            <div class="analysis-item"><strong>Joins:</strong> ${analysis.joins.length} (${analysis.joins.join(', ') || 'None'})</div>
+            <div class="analysis-item"><strong>Subqueries:</strong> ${analysis.subqueries}</div>
+          </div>
+        </div>
       </div>
-      <div class="analysis-item">
-        <strong>Tables:</strong> ${analysis.tables.join(', ') || 'None detected'}
-      </div>
-      <div class="analysis-item">
-        <strong>Joins:</strong> ${analysis.joins.length || 'None'}
-      </div>
-      <div class="analysis-item">
-        <strong>Conditions:</strong> ${analysis.hasWhere ? 'Yes' : 'No'}
-      </div>
-      <div class="analysis-item">
-        <strong>Grouping:</strong> ${analysis.hasGroupBy ? 'Yes' : 'No'}
-      </div>
-      <div class="analysis-item">
-        <strong>Ordering:</strong> ${analysis.hasOrderBy ? 'Yes' : 'No'}
-      </div>
-      <div class="analysis-item">
-        <strong>Limit:</strong> ${analysis.hasLimit ? 'Yes' : 'No'}
-      </div>
-    `;
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+        <div class="feature-badge ${analysis.hasWhere ? 'active' : 'inactive'}">
+          <div class="feature-icon">${analysis.hasWhere ? '✓' : '✗'}</div>
+          <div class="feature-label">WHERE Clause</div>
+        </div>
+        <div class="feature-badge ${analysis.hasGroupBy ? 'active' : 'inactive'}">
+          <div class="feature-icon">${analysis.hasGroupBy ? '✓' : '✗'}</div>
+          <div class="feature-label">GROUP BY</div>
+        </div>
+        <div class="feature-badge ${analysis.hasOrderBy ? 'active' : 'inactive'}">
+          <div class="feature-icon">${analysis.hasOrderBy ? '✓' : '✗'}</div>
+          <div class="feature-label">ORDER BY</div>
+        </div>
+        <div class="feature-badge ${analysis.hasLimit ? 'active' : 'inactive'}">
+          <div class="feature-icon">${analysis.hasLimit ? '✓' : '✗'}</div>
+          <div class="feature-label">LIMIT</div>
+        </div>
+      </div>`;
     
+    // Add performance recommendations if any
+    if (analysis.recommendations && analysis.recommendations.length > 0) {
+      analysisHTML += `
+        <div class="analysis-section mt-4">
+          <h4 class="font-semibold text-gray-900 dark:text-white mb-2 flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Performance Recommendations
+          </h4>
+          <ul class="space-y-1">
+            ${analysis.recommendations.map(rec => `<li class="text-sm">• ${rec}</li>`).join('')}
+          </ul>
+        </div>`;
+    }
+    
+    // Add security warnings if any
+    if (analysis.securityWarnings && analysis.securityWarnings.length > 0) {
+      analysisHTML += `
+        <div class="analysis-section mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
+          <h4 class="font-semibold text-yellow-800 dark:text-yellow-200 mb-2 flex items-center">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 18.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+            Security Considerations
+          </h4>
+          <ul class="space-y-1">
+            ${analysis.securityWarnings.map(warning => `<li class="text-sm text-yellow-800 dark:text-yellow-200">⚠ ${warning}</li>`).join('')}
+          </ul>
+        </div>`;
+    }
+    
+    contentEl.innerHTML = analysisHTML;
     analysisEl.hidden = false;
   }
   
-  analyzeSQL(sql) {
-    const upper = sql.toUpperCase();
+  showAnalysisError(message) {
+    const errorEl = this.container.querySelector('#sql-error');
+    const contentEl = errorEl.querySelector('.error-content');
     
-    return {
-      type: this.detectQueryType(upper),
-      tables: this.extractTables(sql),
-      joins: this.extractJoins(upper),
-      hasWhere: upper.includes('WHERE'),
-      hasGroupBy: upper.includes('GROUP BY'),
-      hasOrderBy: upper.includes('ORDER BY'),
-      hasLimit: upper.includes('LIMIT')
-    };
+    contentEl.innerHTML = `
+      <div class="error-message">${this.escapeHtml(message)}</div>
+      <div class="mt-3 text-sm">
+        <p><strong>Common issues:</strong></p>
+        <ul class="mt-1 space-y-1">
+          <li>• Query is empty or contains only whitespace</li>
+          <li>• Query contains unsupported SQL syntax</li>
+          <li>• Query is malformed or has syntax errors</li>
+        </ul>
+        <p class="mt-2"><strong>Try:</strong> Formatting the query first to check for syntax errors</p>
+      </div>
+    `;
+    
+    errorEl.hidden = false;
+  }
+  
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  analyzeSQL(sql) {
+    if (!sql || typeof sql !== 'string') {
+      throw new Error('Invalid SQL input - must be a non-empty string');
+    }
+    
+    const trimmedSql = sql.trim();
+    if (!trimmedSql) {
+      throw new Error('SQL query is empty');
+    }
+    
+    const upper = trimmedSql.toUpperCase();
+    
+    try {
+      const type = this.detectQueryType(upper);
+      const tables = this.extractTables(sql);
+      const joins = this.extractJoins(upper);
+      const subqueries = this.countSubqueries(upper);
+      
+      const analysis = {
+        type,
+        tables,
+        joins,
+        subqueries,
+        hasWhere: upper.includes('WHERE'),
+        hasGroupBy: upper.includes('GROUP BY'),
+        hasOrderBy: upper.includes('ORDER BY'),
+        hasLimit: upper.includes('LIMIT'),
+        hasHaving: upper.includes('HAVING'),
+        hasUnion: upper.includes('UNION'),
+        complexity: this.calculateComplexity(upper, tables.length, joins.length, subqueries),
+        performance: this.estimatePerformance(upper, tables.length, joins.length),
+        recommendations: this.generateRecommendations(upper, tables.length, joins.length),
+        securityWarnings: this.checkSecurityIssues(sql)
+      };
+      
+      return analysis;
+    } catch (error) {
+      throw new Error(`SQL analysis failed: ${error.message}`);
+    }
+  }
+  
+  countSubqueries(sql) {
+    // Count SELECT statements excluding the main one
+    const selectCount = (sql.match(/SELECT/g) || []).length;
+    return Math.max(0, selectCount - 1);
+  }
+  
+  calculateComplexity(sql, tableCount, joinCount, subqueryCount) {
+    let complexity = 0;
+    
+    // Base complexity from query type
+    if (sql.includes('SELECT')) complexity += 1;
+    if (sql.includes('INSERT') || sql.includes('UPDATE') || sql.includes('DELETE')) complexity += 2;
+    
+    // Add complexity for structure
+    complexity += tableCount;
+    complexity += joinCount * 2;
+    complexity += subqueryCount * 3;
+    
+    // Add complexity for advanced features
+    if (sql.includes('GROUP BY')) complexity += 2;
+    if (sql.includes('HAVING')) complexity += 2;
+    if (sql.includes('ORDER BY')) complexity += 1;
+    if (sql.includes('UNION')) complexity += 3;
+    if (sql.includes('WITH')) complexity += 2; // CTEs
+    if (sql.includes('CASE')) complexity += 1;
+    if (sql.includes('EXISTS')) complexity += 2;
+    if (sql.includes('WINDOW')) complexity += 3;
+    
+    if (complexity <= 3) return 'Low';
+    if (complexity <= 8) return 'Medium';
+    if (complexity <= 15) return 'High';
+    return 'Very High';
+  }
+  
+  estimatePerformance(sql, tableCount, joinCount) {
+    let score = 100; // Start with perfect score
+    
+    // Deduct points for performance issues
+    if (!sql.includes('WHERE') && tableCount > 0) score -= 30; // No filtering
+    if (joinCount > 3) score -= 20; // Too many joins
+    if (sql.includes('SELECT *')) score -= 15; // Select all columns
+    if (!sql.includes('LIMIT') && sql.includes('SELECT')) score -= 10; // No result limiting
+    if (sql.includes('OR')) score -= 5; // OR conditions can be slow
+    if (sql.includes('LIKE')) score -= 5; // String matching
+    if (sql.includes('%')) score -= 5; // Wildcard at beginning
+    
+    // Add points for good practices
+    if (sql.includes('LIMIT')) score += 5;
+    if (sql.includes('INDEX')) score += 10;
+    
+    if (score >= 85) return 'Excellent';
+    if (score >= 70) return 'Good';
+    if (score >= 50) return 'Fair';
+    if (score >= 30) return 'Poor';
+    return 'Very Poor';
+  }
+  
+  generateRecommendations(sql, tableCount, joinCount) {
+    const recommendations = [];
+    
+    if (!sql.includes('WHERE') && tableCount > 0) {
+      recommendations.push('Add WHERE clause to filter results and improve performance');
+    }
+    
+    if (sql.includes('SELECT *')) {
+      recommendations.push('Specify only needed columns instead of SELECT * for better performance');
+    }
+    
+    if (!sql.includes('LIMIT') && sql.includes('SELECT')) {
+      recommendations.push('Consider adding LIMIT clause to restrict result set size');
+    }
+    
+    if (joinCount > 3) {
+      recommendations.push('Consider breaking complex joins into smaller queries or using subqueries');
+    }
+    
+    if (sql.includes('OR') && sql.includes('WHERE')) {
+      recommendations.push('Consider using UNION instead of OR for better index usage');
+    }
+    
+    if (sql.match(/LIKE\s+'%[^%]+'/i)) {
+      recommendations.push('Avoid leading wildcards in LIKE patterns - consider full-text search instead');
+    }
+    
+    if (!sql.includes('ORDER BY') && sql.includes('SELECT')) {
+      recommendations.push('Add ORDER BY clause for consistent result ordering');
+    }
+    
+    if (sql.includes('GROUP BY') && !sql.includes('HAVING')) {
+      recommendations.push('Consider using HAVING clause to filter grouped results');
+    }
+    
+    return recommendations;
+  }
+  
+  checkSecurityIssues(sql) {
+    const warnings = [];
+    
+    // Check for potential SQL injection patterns
+    if (sql.includes("'") && sql.includes('+')) {
+      warnings.push('Potential SQL injection risk - avoid string concatenation in queries');
+    }
+    
+    if (sql.includes('--')) {
+      warnings.push('SQL comments detected - ensure they are intentional');
+    }
+    
+    if (sql.includes(';') && sql.lastIndexOf(';') < sql.length - 1) {
+      warnings.push('Multiple statements detected - review for security risks');
+    }
+    
+    if (sql.includes('DROP') || sql.includes('DELETE') || sql.includes('TRUNCATE')) {
+      warnings.push('Destructive operation detected - ensure proper authorization');
+    }
+    
+    if (sql.includes('EXEC') || sql.includes('EXECUTE')) {
+      warnings.push('Dynamic SQL execution detected - review for injection risks');
+    }
+    
+    return warnings;
   }
   
   detectQueryType(sql) {
@@ -539,15 +850,62 @@ export class SQLFormatter {
   
   downloadSQL() {
     const sql = this.outputArea.value || this.inputArea.value;
-    if (!sql) return;
+    if (!sql || !sql.trim()) {
+      this.showTemporaryMessage('No SQL query to download', 'warning');
+      return;
+    }
     
-    const blob = new Blob([sql], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'query.sql';
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      // Add metadata comment to the downloaded file
+      const timestamp = new Date().toISOString();
+      const dialect = this.container.querySelector('#sql-dialect').value;
+      const header = `-- SQL Query exported from DevToolbox\n-- Date: ${timestamp}\n-- Dialect: ${dialect}\n-- \n\n`;
+      
+      const content = header + sql.trim();
+      
+      const blob = new Blob([content], { type: 'text/sql;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sql-query-${new Date().toISOString().split('T')[0]}.sql`;
+      
+      // Trigger download
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      // Clean up
+      URL.revokeObjectURL(url);
+      
+      this.showTemporaryMessage('SQL file downloaded successfully', 'success');
+    } catch (error) {
+      this.showTemporaryMessage(`Download failed: ${error.message}`, 'error');
+    }
+  }
+  
+  showTemporaryMessage(message, type = 'info') {
+    // Create temporary notification
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300 ${
+      type === 'success' ? 'bg-green-500 text-white' :
+      type === 'warning' ? 'bg-yellow-500 text-white' :
+      type === 'error' ? 'bg-red-500 text-white' :
+      'bg-blue-500 text-white'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        if (notification.parentNode) {
+          document.body.removeChild(notification);
+        }
+      }, 300);
+    }, 3000);
   }
   
   clear() {
@@ -555,5 +913,6 @@ export class SQLFormatter {
     this.outputArea.value = '';
     this.updateStats();
     this.container.querySelector('#sql-analysis').hidden = true;
+    this.container.querySelector('#sql-error').hidden = true;
   }
 }
