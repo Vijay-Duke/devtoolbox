@@ -14,7 +14,7 @@ export class SettingsManager {
   
   getDefaultSettings() {
     return {
-      theme: 'dark',
+      theme: 'light',
       autoProcess: true,
       debounceDelay: 300,
       maxHistoryItems: 50,

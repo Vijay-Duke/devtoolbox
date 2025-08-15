@@ -15,8 +15,6 @@ let lightButton, darkButton;
 document.addEventListener('DOMContentLoaded', () => {
   // Set up theme event listeners using centralized ThemeManager
   setupThemeListeners();
-  
-  // Theme toggle removed - dark theme only
 });
 
 function setupThemeListeners() {
@@ -35,7 +33,12 @@ function setupThemeListeners() {
   });
 }
 
-// Theme toggle function removed - dark theme only
+// Theme toggle function
+function toggleTheme() {
+  if (window.themeManager) {
+    window.themeManager.toggleTheme();
+  }
+}
 
 
 // Mobile Menu Toggle
@@ -541,7 +544,11 @@ document.addEventListener('keydown', (e) => {
     }
   }
   
-  // Theme toggle keyboard shortcut removed - dark theme only
+  // Theme toggle keyboard shortcut
+  if (e.key === 't' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+    e.preventDefault();
+    toggleTheme();
+  }
 });
 
 // Sidebar Category Collapse Functionality

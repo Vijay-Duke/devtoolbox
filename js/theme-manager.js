@@ -1,8 +1,8 @@
-// Centralized Theme Management - Dark Theme Only
+// Centralized Theme Management
 export class ThemeManager {
   constructor() {
     this.html = document.documentElement;
-    this.currentTheme = 'dark'; // Always dark
+    this.currentTheme = null;
     this.listeners = [];
     
     // Initialize theme immediately
@@ -10,31 +10,40 @@ export class ThemeManager {
   }
   
   init() {
-    // Always apply dark theme
-    this.applyTheme('dark', false);
+    // Apply initial theme
+    const initialTheme = this.getInitialTheme();
+    this.applyTheme(initialTheme, false);
   }
   
   getInitialTheme() {
-    // Always return dark theme
-    return 'dark';
+    // Try to load saved theme
+    const settings = this.getSettings();
+    
+    if (settings.theme === 'auto') {
+      // Detect system preference
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+      }
+      return 'light';
+    }
+    
+    // Use saved theme or default to light
+    return settings.theme || 'light';
   }
   
   getSettings() {
     try {
       const saved = localStorage.getItem('devtoolbox-settings');
       if (saved) {
-        const settings = JSON.parse(saved);
-        // Force dark theme
-        settings.theme = 'dark';
-        return settings;
+        return JSON.parse(saved);
       }
     } catch (e) {
       console.warn('Failed to load theme settings:', e);
     }
     
-    // Default settings with dark theme
+    // Default settings
     return {
-      theme: 'dark', // Always dark
+      theme: 'light',
       autoProcess: true,
       debounceDelay: 300,
       maxHistoryItems: 50,
@@ -55,35 +64,71 @@ export class ThemeManager {
   }
   
   applyTheme(theme, save = true) {
-    // Always force dark theme
-    const effectiveTheme = 'dark';
+    let effectiveTheme = theme;
+    
+    // Handle 'auto' theme
+    if (theme === 'auto') {
+      effectiveTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
     
     // Update HTML class and data attribute
-    this.html.classList.add('dark');
-    this.html.setAttribute('data-theme', 'dark');
+    this.html.setAttribute('data-theme', effectiveTheme);
+    
+    // Update theme buttons if they exist
+    this.updateThemeButtons(effectiveTheme);
     
     // Store current theme
-    this.currentTheme = 'dark';
+    this.currentTheme = effectiveTheme;
+    
+    // Save theme to settings if requested
+    if (save) {
+      this.saveTheme(theme);
+    }
     
     // Notify listeners
-    this.notifyListeners('dark', 'dark');
+    this.notifyListeners(effectiveTheme, theme);
   }
   
   saveTheme(theme) {
-    // No-op - theme is always dark
+    try {
+      // Load existing settings
+      let settings = this.getSettings();
+      settings.theme = theme;
+      
+      // Save back to localStorage
+      localStorage.setItem('devtoolbox-settings', JSON.stringify(settings));
+      
+      // Sync with settings manager if it exists
+      if (window.settingsManager) {
+        window.settingsManager.settings.theme = theme;
+      }
+    } catch (e) {
+      console.warn('Failed to save theme:', e);
+    }
   }
   
   updateThemeButtons(effectiveTheme) {
-    // No-op - no theme buttons to update
+    // Update theme button states
+    const lightButton = document.querySelector('button[data-theme="light"]');
+    const darkButton = document.querySelector('button[data-theme="dark"]');
+    
+    if (lightButton) {
+      lightButton.classList.toggle('active', effectiveTheme === 'light');
+    }
+    
+    if (darkButton) {
+      darkButton.classList.toggle('active', effectiveTheme === 'dark');
+    }
   }
   
   toggleTheme() {
-    // No-op - always dark theme
-    return 'dark';
+    const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+    this.applyTheme(newTheme);
+    return newTheme;
   }
   
   getCurrentTheme() {
-    return 'dark'; // Always dark
+    return this.currentTheme;
   }
   
   addListener(callback) {
