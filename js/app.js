@@ -13,27 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeToggle = document.querySelector('[data-theme-toggle]');
   
   themeToggle?.addEventListener('click', () => {
-    // Simple toggle: dark <-> light
-    const isDark = document.documentElement.classList.contains('dark');
-    const newTheme = isDark ? 'light' : 'dark';
-    
-    // Apply the new theme
-    if (newTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem('theme', 'light');
-    }
+    window.themeManager.toggleTheme();
   });
 });
 
 // Theme toggle function for keyboard shortcut
 function toggleTheme() {
-  const themeToggle = document.querySelector('[data-theme-toggle]');
-  themeToggle?.click();
+  window.themeManager.toggleTheme();
 }
 
 
