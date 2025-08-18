@@ -1,0 +1,91 @@
+name: Dependency Updates
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Weekly on Monday at 6 AM
+  workflow_dispatch:
+
+jobs:
+  update-dependencies:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Update npm dependencies
+      run: |
+        npm update
+        npm audit fix --audit-level moderate
+        
+    - name: Run tests after update
+      run: |
+        npm run build-css
+        npm test
+        
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "chore: update dependencies"
+        title: "🔄 Automated Dependency Updates"
+        body: |
+          ## Automated Dependency Updates
+          
+          This PR contains automated dependency updates:
+          
+          - ✅ Dependencies updated via `npm update`
+          - ✅ Security fixes applied via `npm audit fix`
+          - ✅ Tests passing after updates
+          - ✅ CSS build successful
+          
+          Please review the changes and merge if everything looks good.
+          
+          ---
+          *This PR was created automatically by the dependency update workflow.*
+        branch: automated-dependency-updates
+        delete-branch: true
+        
+  check-outdated:
+    name: Check Outdated Dependencies
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Check for outdated packages
+      run: |
+        npm outdated || true
+        echo "## Outdated Dependencies Report" > outdated-report.md
+        echo "" >> outdated-report.md
+        echo "\`\`\`" >> outdated-report.md
+        npm outdated >> outdated-report.md 2>&1 || true
+        echo "\`\`\`" >> outdated-report.md
+        
+    - name: Upload outdated report
+      uses: actions/upload-artifact@v4
+      with:
+        name: outdated-dependencies-report
+        path: outdated-report.md
