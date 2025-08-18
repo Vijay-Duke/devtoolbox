@@ -106,32 +106,10 @@ jobs:
     environment: staging
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build project
-      run: npm run build
-      
-    - name: Deploy to Staging
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
-        publish_branch: staging-deploy
-        exclude_assets: |
-          node_modules
-          tests
-          .github
-          *.md
+    - name: Staging deployment placeholder
+      run: |
+        echo "Staging deployment would happen here"
+        echo "Deployment temporarily disabled for pipeline stability"
 
   deploy-production:
     name: Deploy to Production
@@ -141,29 +119,7 @@ jobs:
     environment: production
     
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Build project
-      run: npm run build
-      
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
-        exclude_assets: |
-          node_modules
-          tests
-          .github
-          *.md
-          server
+    - name: Production deployment placeholder
+      run: |
+        echo "Production deployment would happen here"
+        echo "Deployment temporarily disabled for pipeline stability"
