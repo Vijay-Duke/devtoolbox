@@ -55,7 +55,7 @@ jobs:
     - name: Check for sensitive files
       run: |
         echo "Checking for sensitive files..."
-        SENSITIVE_FILES=$(find . -name "*.env*" -o -name "*.key" -o -name "*.pem" -o -name "*secret*" -o -name "*password*" | grep -v node_modules | grep -v .git || true)
+        SENSITIVE_FILES=$(find . -name "*.env*" -o -name "*.key" -o -name "*.pem" -o -name "*secret*" -o -name "*password*" | grep -v node_modules | grep -v .git | grep -v "js/tools/password-generator.js" || true)
         if [ ! -z "$SENSITIVE_FILES" ]; then
           echo "Warning: Found potentially sensitive files:"
           echo "$SENSITIVE_FILES"
