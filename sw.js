@@ -1,19 +1,21 @@
 // Service Worker for offline support and caching  
-// Version: 20250815-3 - Fix theme system
-const STATIC_CACHE = 'devtoolbox-static-v8-20250815';
-const DYNAMIC_CACHE = 'devtoolbox-dynamic-v8-20250815';
-const TOOLS_CACHE = 'devtoolbox-tools-v8-20250815';
+// Version: 20250824-1 - Fix service worker and update caches
+const STATIC_CACHE = 'devtoolbox-static-v9-20250824';
+const DYNAMIC_CACHE = 'devtoolbox-dynamic-v9-20250824';
+const TOOLS_CACHE = 'devtoolbox-tools-v9-20250824';
 
 // Core files to cache for offline use
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/css/styles.css',
-  '/js/theme-manager.js',
   '/js/app.js',
   '/js/router-lazy.js',
   '/js/fuzzy-search.js',
-  '/js/swipe.js'
+  '/js/swipe.js',
+  '/js/theme-manager.js',
+  '/js/utils/common.js',
+  '/js/utils/feedback.js'
 ];
 
 // Popular tools to pre-cache for instant loading
@@ -159,8 +161,8 @@ async function staleWhileRevalidate(request) {
   
   // Return cached version immediately if available
   if (cachedResponse) {
-    // Update cache in background
-    fetchPromise;
+    // Update cache in background (don't await, let it run async)
+    fetchPromise.catch(() => {}); // Ignore background update errors
     return cachedResponse;
   }
   
