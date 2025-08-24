@@ -605,8 +605,10 @@ export class DateDurationCalculator {
   loadSettings() {
     try {
       const settings = localStorage.getItem('date-duration-settings');
+      console.log('Raw localStorage settings:', settings);
       if (settings) {
         this.settings = JSON.parse(settings);
+        console.log('Parsed settings:', this.settings);
       } else {
         this.settings = {
           excludeWeekends: true,
@@ -616,12 +618,15 @@ export class DateDurationCalculator {
       
       // Restore country and state selections
       if (this.settings.selectedCountry) {
+        console.log('Loading saved country from settings:', this.settings.selectedCountry);
         this.userCountry = this.settings.selectedCountry;
       }
       if (this.settings.selectedState) {
+        console.log('Loading saved state from settings:', this.settings.selectedState);
         this.userState = this.settings.selectedState;
       }
     } catch (error) {
+      console.error('Error loading settings:', error);
       this.settings = {
         excludeWeekends: true,
         excludeHolidays: true
@@ -893,10 +898,13 @@ export class DateDurationCalculator {
 
       // Fetch available countries
       await this.fetchAvailableCountries();
+      console.log('Available countries loaded:', this.availableCountries.length);
+      
       this.populateCountrySelector();
 
       // Populate state selector if we have a saved country
       if (this.userCountry) {
+        console.log('Restoring saved country:', this.userCountry);
         this.updateLocationStatus(`Selected: ${this.getCountryName(this.userCountry)}`);
         await this.populateStateSelector(this.userCountry);
         if (this.userState) {
@@ -913,6 +921,12 @@ export class DateDurationCalculator {
 
   populateCountrySelector() {
     const selector = this.countrySelector;
+    if (!selector) {
+      console.error('Country selector not found');
+      return;
+    }
+    
+    console.log('Populating country selector with', this.availableCountries.length, 'countries');
     selector.innerHTML = '<option value="">Select a country...</option>';
 
     this.availableCountries.forEach(country => {
@@ -924,7 +938,9 @@ export class DateDurationCalculator {
 
     // Restore saved country selection
     if (this.userCountry) {
+      console.log('Setting country selector to:', this.userCountry);
       selector.value = this.userCountry;
+      console.log('Country selector value after setting:', selector.value);
     }
   }
 
