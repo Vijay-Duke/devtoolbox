@@ -613,6 +613,14 @@ export class DateDurationCalculator {
           excludeHolidays: true
         };
       }
+      
+      // Restore country and state selections
+      if (this.settings.selectedCountry) {
+        this.userCountry = this.settings.selectedCountry;
+      }
+      if (this.settings.selectedState) {
+        this.userState = this.settings.selectedState;
+      }
     } catch (error) {
       this.settings = {
         excludeWeekends: true,
@@ -887,16 +895,15 @@ export class DateDurationCalculator {
       await this.fetchAvailableCountries();
       this.populateCountrySelector();
 
-      // Update location status based on detection
+      // Populate state selector if we have a saved country
       if (this.userCountry) {
-        this.updateLocationStatus(`Detected: ${this.getCountryName(this.userCountry)}`);
-        this.countrySelector.value = this.userCountry;
+        this.updateLocationStatus(`Selected: ${this.getCountryName(this.userCountry)}`);
         await this.populateStateSelector(this.userCountry);
         if (this.userState) {
           this.stateSelector.value = this.userState;
         }
       } else {
-        this.updateLocationStatus('Location not detected - please select manually');
+        this.updateLocationStatus('No country selected - please select manually');
       }
     } catch (error) {
       console.error('Failed to initialize holiday UI:', error);
@@ -914,6 +921,11 @@ export class DateDurationCalculator {
       option.textContent = country.name;
       selector.appendChild(option);
     });
+
+    // Restore saved country selection
+    if (this.userCountry) {
+      selector.value = this.userCountry;
+    }
   }
 
   async populateStateSelector(countryCode) {
