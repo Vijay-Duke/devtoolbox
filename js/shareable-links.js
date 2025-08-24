@@ -164,6 +164,10 @@ export class ShareableLinks {
     
     const modal = document.createElement('div');
     modal.className = 'share-modal active';
+    
+    // Escape the URL to prevent XSS
+    const escapedUrl = this.escapeHtml(url);
+    
     modal.innerHTML = `
       <div class="modal-overlay" data-close></div>
       <div class="modal-content">
@@ -174,7 +178,7 @@ export class ShareableLinks {
         <div class="modal-body">
           <p>Share this link to preserve current tool settings:</p>
           <div class="share-url-container">
-            <input type="text" class="share-url-input" value="${url}" readonly>
+            <input type="text" class="share-url-input" value="${escapedUrl}" readonly>
             <button class="btn btn-primary" data-copy>Copy Link</button>
           </div>
           <div class="share-options">
@@ -314,6 +318,15 @@ export class ShareableLinks {
       notification.classList.remove('show');
       setTimeout(() => notification.remove(), 300);
     }, 3000);
+  }
+  
+  escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 }
 

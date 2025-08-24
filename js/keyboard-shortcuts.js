@@ -328,10 +328,12 @@ export class KeyboardShortcuts {
             ${favorites.map(fav => {
               const link = document.querySelector(`.nav-link[href="#${fav}"]`);
               const name = link?.textContent || fav;
+              const escapedFav = this.escapeHtml(fav);
+              const escapedName = this.escapeHtml(name);
               return `
-                <a href="#${fav}" class="favorite-item">
+                <a href="#${escapedFav}" class="favorite-item">
                   <span class="favorite-icon">⭐</span>
-                  <span>${name}</span>
+                  <span>${escapedName}</span>
                 </a>
               `;
             }).join('')}
@@ -382,6 +384,15 @@ export class KeyboardShortcuts {
       notification.classList.remove('show');
       setTimeout(() => notification.remove(), 300);
     }, 2000);
+  }
+  
+  escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 }
 
