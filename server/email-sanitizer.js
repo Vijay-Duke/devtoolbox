@@ -59,8 +59,8 @@ export function sanitizeEmailHTML(htmlContent) {
     return sanitized
       // Remove any remaining javascript: or data: protocols
       .replace(/(javascript|vbscript|data):/gi, '')
-      // Remove any remaining event handlers
-      .replace(/on\w+\s*=/gi, '')
+      // Remove any remaining event handlers (more precise)
+      .replace(/\s+on\w+\s*=/gi, ' ')
       // Limit external resource loading
       .replace(/src\s*=\s*["']https?:\/\/[^"']*["']/gi, (match) => {
         // Only allow images from trusted domains
@@ -87,9 +87,9 @@ export function sanitizeEmailText(textContent) {
   }
   
   return textContent
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/javascript:/gi, '')
-    .replace(/data:/gi, '')
+    .replace(/<script\b[^<]*(?:(?!<\/\s*script\s*>)<[^<]*)*<\/\s*script\s*>/gi, '')
+    .replace(/<script[^>]*>/gi, '') // Remove incomplete script tags
+    .replace(/(javascript|vbscript|data):/gi, '')
     .trim()
 }
 

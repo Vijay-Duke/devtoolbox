@@ -277,7 +277,7 @@ Bob Johnson,35,Chicago</textarea>
     
     // Range inputs
     this.container.querySelectorAll('input[type="range"]').forEach(range => {
-      const display = this.container.querySelector(`#${range.id.replace('-', '-')}-display`);
+      const display = this.container.querySelector(`#${range.id.replace(/^.*?-/, '')}-display`);
       if (display) {
         range.addEventListener('input', () => {
           display.textContent = range.value;

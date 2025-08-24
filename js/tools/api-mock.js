@@ -514,11 +514,11 @@ app.${method}('${endpoint.path}', (req, res) => {`;
   res.status(${endpoint.status}).json(${JSON.stringify(parsed, null, 2).split('\n').join('\n  ')});`;
         } catch {
           code += `
-  res.status(${endpoint.status}).send('${endpoint.response.replace(/'/g, "\\'")}');`;
+  res.status(${endpoint.status}).send('${endpoint.response.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}');`;
         }
       } else {
         code += `
-  res.status(${endpoint.status}).send(\`${endpoint.response.replace(/`/g, '\\`')}\`);`;
+  res.status(${endpoint.status}).send(\`${endpoint.response.replace(/\\/g, '\\\\').replace(/`/g, '\\`')}\`);`;
       }
       
       code += `

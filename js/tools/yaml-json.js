@@ -429,7 +429,7 @@ settings:
       if (value.includes(':') || value.includes('#') || value.includes('@') || 
           value.includes('|') || value.includes('>') || value.includes('"') ||
           value.includes("'") || value.startsWith(' ') || value.endsWith(' ')) {
-        return `"${value.replace(/"/g, '\\"')}"`;
+        return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
       }
       return value;
     }
