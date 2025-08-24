@@ -22,7 +22,7 @@
   
   
   <!-- Compiled Tailwind CSS with cache busting -->
-  <link rel="stylesheet" href="/css/styles.css?v=20250815-6">
+  <link rel="stylesheet" href="/css/styles.css?v=20250824-1">
   
   <!-- Minimal inline styles for critical tool layouts -->
   <style>
@@ -245,7 +245,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   
-  <script src="js/theme.js?v=20250815-6"></script>
+  <script src="js/theme.js?v=20250824-1"></script>
   <script>
     // Register Service Worker
     if ('serviceWorker' in navigator) {
@@ -377,11 +377,18 @@
         <div class="mb-6 p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500">
           <h2 class="px-3 mb-2 text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Converters</h2>
           <ul class="space-y-1">
-            <li><a href="#unix-time" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Unix Time Converter</a></li>
             <li><a href="#csv-json" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">CSV ↔ JSON</a></li>
             <li><a href="#yaml-json" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">YAML ↔ JSON</a></li>
             <li><a href="#binary-converter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Binary Converter</a></li>
             <li><a href="#image-converter" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Image Converter</a></li>
+          </ul>
+        </div>
+        
+        <div class="mb-6 p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 border-l-4 border-indigo-500">
+          <h2 class="px-3 mb-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Date & Time</h2>
+          <ul class="space-y-1">
+            <li><a href="#unix-time" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Unix Time Converter</a></li>
+            <li><a href="#date-duration" class="nav-link block px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Date Calculator</a></li>
           </ul>
         </div>
         
@@ -446,6 +453,6 @@
   <!-- Mobile sidebar overlay -->
   <div class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden" data-sidebar-overlay></div>
   
-  <script src="js/app.js?v=20250815-6" type="module"></script>
+  <script src="js/app.js?v=20250824-1" type="module"></script>
 </body>
 </html>

@@ -41,11 +41,14 @@ export class Router {
       // Converters
       { path: 'base64', name: 'Base64 Encode/Decode', module: './tools/base64.js', className: 'Base64Tool', category: 'Converters' },
       { path: 'url-encode', name: 'URL Encode/Decode', module: './tools/url-encode.js', className: 'URLEncodeTool', category: 'Converters' },
-      { path: 'unix-time', name: 'Unix Time Converter', module: './tools/unix-time.js', className: 'UnixTimeConverter', category: 'Converters' },
       { path: 'csv-json', name: 'CSV ↔ JSON Converter', module: './tools/csv-json.js', className: 'CSVJSONConverter', category: 'Converters' },
       { path: 'yaml-json', name: 'YAML ↔ JSON Converter', module: './tools/yaml-json.js', className: 'YAMLJSONConverter', category: 'Converters' },
       { path: 'binary-converter', name: 'Binary Converter', module: './tools/binary-converter.js', className: 'BinaryConverter', category: 'Converters' },
       { path: 'image-converter', name: 'Image Converter', module: './tools/image-converter.js', className: 'ImageConverter', category: 'Converters' },
+      
+      // Date & Time Tools
+      { path: 'unix-time', name: 'Unix Time Converter', module: './tools/unix-time.js', className: 'UnixTimeConverter', category: 'Date & Time' },
+      { path: 'date-duration', name: 'Date Calculator', module: './tools/date-duration.js', className: 'DateDurationCalculator', category: 'Date & Time' },
       
       // Text & Data Tools
       { path: 'jwt-decoder', name: 'JWT Decoder', module: './tools/jwt-decoder.js', className: 'JWTDecoder', category: 'Text & Data' },

@@ -143,11 +143,12 @@ const tools = [
   // Converters
   { name: 'Base64 Encode/Decode', href: '#base64', category: 'Converters', keywords: ['base64', 'encode', 'decode', 'binary'] },
   { name: 'URL Encode/Decode', href: '#url-encode', category: 'Converters', keywords: ['url', 'uri', 'encode', 'decode', 'percent'] },
-  { name: 'Unix Time Converter', href: '#unix-time', category: 'Converters', keywords: ['unix', 'timestamp', 'epoch', 'time', 'date'] },
+  { name: 'Unix Time Converter', href: '#unix-time', category: 'Date & Time', keywords: ['unix', 'timestamp', 'epoch', 'time', 'date'] },
   { name: 'CSV ↔ JSON Converter', href: '#csv-json', category: 'Converters', keywords: ['csv', 'json', 'convert', 'table', 'data', 'excel'] },
   { name: 'YAML ↔ JSON Converter', href: '#yaml-json', category: 'Converters', keywords: ['yaml', 'json', 'convert', 'config', 'configuration'] },
   { name: 'Binary Converter', href: '#binary-converter', category: 'Converters', keywords: ['binary', 'decimal', 'hex', 'hexadecimal', 'octal', 'ascii', 'base64', 'converter'] },
   { name: 'Image Converter', href: '#image-converter', category: 'Converters', keywords: ['image', 'convert', 'resize', 'compress', 'jpeg', 'png', 'webp', 'format'] },
+  { name: 'Date Calculator', href: '#date-duration', category: 'Date & Time', keywords: ['date', 'duration', 'time', 'calculator', 'days', 'business', 'calendar', 'period', 'between', 'add', 'subtract', 'plus', 'minus', 'future', 'past', 'arithmetic'] },
   
   // Text & Data Tools
   { name: 'JWT Decoder', href: '#jwt-decoder', category: 'Text & Data', keywords: ['jwt', 'token', 'decode', 'verify', 'auth'] },

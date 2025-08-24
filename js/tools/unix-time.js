@@ -355,24 +355,26 @@ export class UnixTimeConverter {
   getRelativeTime(date) {
     const now = new Date();
     const diff = now - date;
-    const seconds = Math.floor(diff / 1000);
+    const absDiff = Math.abs(diff);
+    const seconds = Math.floor(absDiff / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
     const years = Math.floor(days / 365);
     
-    if (seconds < 0) {
-      return 'in the future';
-    } else if (seconds < 60) {
-      return `${seconds} seconds ago`;
+    const isFuture = diff < 0;
+    const timeWord = isFuture ? 'in' : 'ago';
+    
+    if (seconds < 60) {
+      return `${isFuture ? 'in ' : ''}${seconds} second${seconds !== 1 ? 's' : ''}${isFuture ? '' : ' ago'}`;
     } else if (minutes < 60) {
-      return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+      return `${isFuture ? 'in ' : ''}${minutes} minute${minutes !== 1 ? 's' : ''}${isFuture ? '' : ' ago'}`;
     } else if (hours < 24) {
-      return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+      return `${isFuture ? 'in ' : ''}${hours} hour${hours !== 1 ? 's' : ''}${isFuture ? '' : ' ago'}`;
     } else if (days < 365) {
-      return `${days} day${days !== 1 ? 's' : ''} ago`;
+      return `${isFuture ? 'in ' : ''}${days} day${days !== 1 ? 's' : ''}${isFuture ? '' : ' ago'}`;
     } else {
-      return `${years} year${years !== 1 ? 's' : ''} ago`;
+      return `${isFuture ? 'in ' : ''}${years} year${years !== 1 ? 's' : ''}${isFuture ? '' : ' ago'}`;
     }
   }
   
