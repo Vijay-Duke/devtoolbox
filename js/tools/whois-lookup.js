@@ -750,7 +750,7 @@ network:
       historyDiv.innerHTML = this.lookupHistory.map(item => `
         <div class="history-item flex justify-between items-center p-2 bg-white dark:bg-gray-800 rounded cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600" data-query="${item.query}" data-type="${item.type}">
           <div class="flex-1">
-            <span class="text-sm font-mono text-gray-900 dark:text-white">${item.query}</span>
+            <span class="text-sm font-mono text-gray-900 dark:text-white">${this.escapeHtml(item.query)}</span>
             <span class="ml-2 text-xs text-gray-500 dark:text-gray-400">${item.type === 'ip' ? 'IP' : 'Domain'}</span>
           </div>
           <span class="text-xs text-gray-400 dark:text-gray-500">${item.timestamp}</span>
@@ -830,5 +830,11 @@ network:
     const errorDiv = this.container.querySelector('[data-error]');
     errorDiv.textContent = '';
     errorDiv.classList.add('hidden');
+  }
+  
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 }

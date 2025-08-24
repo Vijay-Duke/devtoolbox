@@ -659,7 +659,9 @@ query {
     const responseOutput = this.container.querySelector('#response-output');
     const responseMeta = this.container.querySelector('#response-meta');
     
-    responseOutput.innerHTML = `<span class="error">${message}</span>`;
+    // Escape HTML to prevent XSS from error messages
+    const escapedMessage = this.escapeHtml(message);
+    responseOutput.innerHTML = `<span class="error">${escapedMessage}</span>`;
     responseMeta.innerHTML = '<span class="response-status error">Error</span>';
   }
   
@@ -830,5 +832,11 @@ fragment TypeRef on __Type {
   
   loadExampleQuery() {
     this.loadExample('countries');
+  }
+  
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 }

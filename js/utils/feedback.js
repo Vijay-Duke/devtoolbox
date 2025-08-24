@@ -44,7 +44,7 @@ export class FeedbackManager {
     }
 
     toast.className = `${baseClasses} ${typeClasses}`;
-    toast.innerHTML = `<span class="text-lg">${icon}</span><span>${message}</span>`;
+    toast.innerHTML = `<span class="text-lg">${icon}</span><span>${this.escapeHtml(message)}</span>`;
 
     this.toastContainer.appendChild(toast);
 
@@ -167,6 +167,12 @@ export class FeedbackManager {
     if (stateConfig.classes) {
       button.className += ` ${stateConfig.classes}`;
     }
+  }
+  
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 }
 

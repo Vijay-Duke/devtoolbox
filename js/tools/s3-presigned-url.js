@@ -570,7 +570,7 @@ export class S3PresignedURL {
         <div class="flex justify-between items-start">
           <div class="flex-1">
             <div class="text-sm font-semibold text-gray-900 dark:text-white">
-              ${item.bucket}/${item.objectKey}
+              ${this.escapeHtml(item.bucket)}/${this.escapeHtml(item.objectKey)}
             </div>
             <div class="text-xs text-gray-600 dark:text-gray-400">
               ${item.method} • ${this.formatDuration(item.expiration)} • ${new Date(item.timestamp).toLocaleTimeString()}
@@ -656,5 +656,11 @@ export class S3PresignedURL {
     const errorDiv = this.container.querySelector('[data-error]');
     errorDiv.textContent = '';
     errorDiv.classList.add('hidden');
+  }
+  
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 }

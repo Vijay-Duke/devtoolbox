@@ -81,8 +81,18 @@ export function searchTools(query, tools) {
 export function highlightMatch(text, query) {
   if (!query) return text;
   
+  // Escape HTML in both text and query to prevent XSS
+  const escapeHtml = (str) => {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  };
+  
+  const escapedText = escapeHtml(text);
+  const escapedQuery = escapeHtml(query);
+  
   // Escape special regex characters to prevent regex injection
-  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const regex = new RegExp(`(${escapedQuery.split('').join('.*?')})`, 'gi');
-  return text.replace(regex, '<mark>$1</mark>');
+  const regexEscapedQuery = escapedQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${regexEscapedQuery.split('').join('.*?')})`, 'gi');
+  return escapedText.replace(regex, '<mark>$1</mark>');
 }

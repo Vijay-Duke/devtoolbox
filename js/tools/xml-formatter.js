@@ -464,7 +464,7 @@ export class XMLFormatter {
       treeContent.innerHTML = this.buildTreeHTML(doc.documentElement, 0);
     } catch (error) {
       const treeContent = this.container.querySelector('.tree-content');
-      treeContent.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+      treeContent.innerHTML = `<div class="error">Error: ${this.escapeHTML(error.message)}</div>`;
     }
   }
   
@@ -701,7 +701,8 @@ export class XMLFormatter {
     switch (node.nodeType) {
       case Node.ELEMENT_NODE:
         result.textContent = node.textContent?.trim() || '';
-        result.innerHTML = node.innerHTML;
+        // Safely extract inner content without creating XSS vulnerability
+        result.innerHTML = this.escapeHTML(node.innerHTML || '');
         // Get attributes
         for (let attr of node.attributes || []) {
           result.attributes[attr.name] = attr.value;
