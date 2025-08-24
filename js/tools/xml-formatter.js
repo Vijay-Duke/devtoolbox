@@ -423,8 +423,9 @@ export class XMLFormatter {
     try {
       // Remove comments, whitespace between tags
       const minified = xml
-        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/<!--[\s\S]*?-->/g, '') // Remove complete comments
         .replace(/<!--[\s\S]*$/g, '') // Remove incomplete comments at end
+        .replace(/-->/g, '') // Remove orphaned comment endings
         .replace(/>\s+</g, '><')
         .replace(/\s+/g, ' ')
         .trim();

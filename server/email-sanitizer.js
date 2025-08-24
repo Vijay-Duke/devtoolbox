@@ -87,9 +87,12 @@ export function sanitizeEmailText(textContent) {
   }
   
   return textContent
-    .replace(/<script\b[^<]*(?:(?!<\/\s*script\s*>)<[^<]*)*<\/\s*script\s*>/gi, '')
-    .replace(/<script[^>]*>/gi, '') // Remove incomplete script tags
-    .replace(/(javascript|vbscript|data):/gi, '')
+    .replace(/<script\b[^>]*>.*?<\/script>/gis, '') // Remove complete script tags with content
+    .replace(/<script\b[^>]*>/gi, '') // Remove incomplete script tags
+    .replace(/<\/script>/gi, '') // Remove orphaned closing script tags
+    .replace(/javascript:/gi, 'blocked:')
+    .replace(/vbscript:/gi, 'blocked:')
+    .replace(/data:/gi, 'blocked:')
     .trim()
 }
 
