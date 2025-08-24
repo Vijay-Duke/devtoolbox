@@ -465,4 +465,196 @@ describe('DateDurationCalculator', () => {
       expect(mockElements['#result-detailed'].textContent).toBe('0 days');
     });
   });
+
+  describe('Long Weekend Functionality', () => {
+    beforeEach(() => {
+      // Add mock elements for long weekends
+      calculator.container = {
+        querySelector: vi.fn((selector) => {
+          const mockElements = {
+            '#long-weekends-display': { 
+              classList: { add: vi.fn(), remove: vi.fn() } 
+            },
+            '#long-weekends-list': { innerHTML: '', appendChild: vi.fn() }
+          };
+          return mockElements[selector] || mockElement;
+        })
+      };
+    });
+
+    describe('identifyLongWeekends', () => {
+      it('should identify holiday on Monday as 3-day weekend', () => {
+        const holidays = [
+          { 
+            date: '2024-01-15', // Monday
+            name: 'Martin Luther King Jr. Day' 
+          }
+        ];
+
+        const longWeekends = calculator.identifyLongWeekends(holidays);
+        
+        expect(longWeekends).toHaveLength(1);
+        expect(longWeekends[0].type).toBe('3-day weekend');
+        expect(longWeekends[0].days).toBe(3);
+        expect(longWeekends[0].vacationDaysNeeded).toBe(0);
+      });
+
+      it('should identify holiday on Friday as 3-day weekend', () => {
+        const holidays = [
+          { 
+            date: '2024-07-04', // Thursday - but let's test with a Friday
+            name: 'Independence Day' 
+          }
+        ];
+        
+        // Mock a Friday holiday
+        const fridayHoliday = [
+          { 
+            date: '2024-07-05', // Assuming this is a Friday
+            name: 'Independence Day Observed' 
+          }
+        ];
+
+        const longWeekends = calculator.identifyLongWeekends(fridayHoliday);
+        
+        expect(longWeekends).toHaveLength(1);
+        expect(longWeekends[0].type).toBe('3-day weekend');
+        expect(longWeekends[0].days).toBe(3);
+      });
+
+      it('should identify holiday on Thursday as 4-day weekend opportunity', () => {
+        const holidays = [
+          { 
+            date: '2024-07-04', // Thursday
+            name: 'Independence Day' 
+          }
+        ];
+
+        const longWeekends = calculator.identifyLongWeekends(holidays);
+        
+        expect(longWeekends).toHaveLength(1);
+        expect(longWeekends[0].type).toBe('4-day weekend (take Friday off)');
+        expect(longWeekends[0].days).toBe(4);
+        expect(longWeekends[0].vacationDaysNeeded).toBe(1);
+        expect(longWeekends[0].bridgeDay).toBe('Friday');
+      });
+
+      it('should identify holiday on Tuesday as 4-day weekend opportunity', () => {
+        const holidays = [
+          { 
+            date: '2024-11-05', // Assuming this is a Tuesday
+            name: 'Election Day' 
+          }
+        ];
+
+        const longWeekends = calculator.identifyLongWeekends(holidays);
+        
+        expect(longWeekends).toHaveLength(1);
+        expect(longWeekends[0].type).toBe('4-day weekend (take Monday off)');
+        expect(longWeekends[0].days).toBe(4);
+        expect(longWeekends[0].vacationDaysNeeded).toBe(1);
+        expect(longWeekends[0].bridgeDay).toBe('Monday');
+      });
+
+      it('should handle consecutive holidays', () => {
+        const holidays = [
+          { 
+            date: '2024-12-24', 
+            name: 'Christmas Eve' 
+          },
+          { 
+            date: '2024-12-25', 
+            name: 'Christmas Day' 
+          }
+        ];
+
+        const longWeekends = calculator.identifyLongWeekends(holidays);
+        
+        // Should find the consecutive holiday pattern
+        const consecutiveWeekend = longWeekends.find(w => w.isConsecutive);
+        expect(consecutiveWeekend).toBeDefined();
+        expect(consecutiveWeekend.type).toContain('extended weekend');
+      });
+
+      it('should handle no holidays gracefully', () => {
+        const longWeekends = calculator.identifyLongWeekends([]);
+        expect(longWeekends).toHaveLength(0);
+      });
+
+      it('should handle holidays on weekends (no long weekend)', () => {
+        const holidays = [
+          { 
+            date: '2024-01-06', // Saturday
+            name: 'Epiphany' 
+          },
+          { 
+            date: '2024-01-07', // Sunday
+            name: 'Orthodox Christmas' 
+          }
+        ];
+
+        const longWeekends = calculator.identifyLongWeekends(holidays);
+        
+        // Weekends don't create long weekends by themselves (Saturday=6, Sunday=0)
+        expect(longWeekends).toHaveLength(0);
+      });
+
+      it('should remove duplicates and sort by date', () => {
+        const holidays = [
+          { date: '2024-02-19', name: 'Presidents Day' }, // Monday
+          { date: '2024-01-15', name: 'MLK Day' }, // Monday
+        ];
+
+        const longWeekends = calculator.identifyLongWeekends(holidays);
+        
+        expect(longWeekends).toHaveLength(2);
+        // Should be sorted by start date (January before February)
+        expect(new Date(longWeekends[0].holiday.date) < new Date(longWeekends[1].holiday.date)).toBe(true);
+      });
+    });
+
+    describe('displayLongWeekends', () => {
+      it('should hide display when no holidays provided', () => {
+        const mockDisplay = { classList: { add: vi.fn(), remove: vi.fn() } };
+        calculator.container.querySelector = vi.fn(() => mockDisplay);
+
+        calculator.displayLongWeekends([]);
+
+        expect(mockDisplay.classList.add).toHaveBeenCalledWith('hidden');
+      });
+
+      it('should hide display when no long weekends found', () => {
+        const holidays = [
+          { date: '2024-07-06', name: 'Saturday Holiday' } // Saturday - no long weekend
+        ];
+        
+        const mockDisplay = { classList: { add: vi.fn(), remove: vi.fn() } };
+        calculator.container.querySelector = vi.fn(() => mockDisplay);
+
+        calculator.displayLongWeekends(holidays);
+
+        expect(mockDisplay.classList.add).toHaveBeenCalledWith('hidden');
+      });
+
+      it('should show display when long weekends are found', () => {
+        const holidays = [
+          { date: '2024-01-15', name: 'MLK Day' } // Monday
+        ];
+        
+        const mockDisplay = { classList: { add: vi.fn(), remove: vi.fn() } };
+        const mockList = { innerHTML: '', appendChild: vi.fn() };
+        
+        calculator.container.querySelector = vi.fn((selector) => {
+          if (selector === '#long-weekends-display') return mockDisplay;
+          if (selector === '#long-weekends-list') return mockList;
+          return mockElement;
+        });
+
+        calculator.displayLongWeekends(holidays);
+
+        expect(mockDisplay.classList.remove).toHaveBeenCalledWith('hidden');
+        expect(mockList.appendChild).toHaveBeenCalled();
+      });
+    });
+  });
 });

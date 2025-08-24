@@ -240,6 +240,16 @@ export class DateDurationCalculator {
                   </div>
                 </div>
               </div>
+              
+              <!-- Long Weekends -->
+              <div id="long-weekends-display" class="hidden">
+                <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                  <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Long Weekends</h4>
+                  <div class="space-y-2" id="long-weekends-list">
+                    <!-- Long weekend items will be inserted here -->
+                  </div>
+                </div>
+              </div>
             </div>
             
           </div>
@@ -498,6 +508,9 @@ export class DateDurationCalculator {
 
     // Display holidays in range if available
     this.displayHolidaysInResults(holidays);
+    
+    // Display long weekends if available
+    this.displayLongWeekends(holidays);
   }
 
   clearResults() {
@@ -509,6 +522,9 @@ export class DateDurationCalculator {
 
     // Clear holiday display
     this.displayHolidaysInResults([]);
+    
+    // Clear long weekends display
+    this.displayLongWeekends([]);
   }
 
   applyPreset(preset) {
@@ -666,6 +682,194 @@ export class DateDurationCalculator {
       countDisplay.textContent = `Total: ${holidays.length} holidays`;
       holidaysList.appendChild(countDisplay);
     }
+  }
+
+  identifyLongWeekends(holidays) {
+    const longWeekends = [];
+    
+    // Sort holidays by date
+    const sortedHolidays = holidays.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    sortedHolidays.forEach((holiday, index) => {
+      const date = new Date(holiday.date);
+      const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+      
+      // Check for natural 3-day weekends
+      if (dayOfWeek === 1) { // Holiday on Monday
+        const friday = new Date(date);
+        friday.setDate(date.getDate() - 3);
+        const sunday = new Date(date);
+        sunday.setDate(date.getDate() - 1);
+        
+        longWeekends.push({
+          holiday: holiday,
+          type: '3-day weekend',
+          startDate: friday,
+          endDate: date,
+          days: 3,
+          vacationDaysNeeded: 0
+        });
+      } else if (dayOfWeek === 5) { // Holiday on Friday
+        const sunday = new Date(date);
+        sunday.setDate(date.getDate() + 2);
+        
+        longWeekends.push({
+          holiday: holiday,
+          type: '3-day weekend',
+          startDate: date,
+          endDate: sunday,
+          days: 3,
+          vacationDaysNeeded: 0
+        });
+      }
+      
+      // Check for potential 4-day weekends with bridge days
+      else if (dayOfWeek === 2) { // Holiday on Tuesday
+        const saturday = new Date(date);
+        saturday.setDate(date.getDate() - 3);
+        const sunday = new Date(date);
+        sunday.setDate(date.getDate() - 2);
+        
+        longWeekends.push({
+          holiday: holiday,
+          type: '4-day weekend (take Monday off)',
+          startDate: saturday,
+          endDate: date,
+          days: 4,
+          vacationDaysNeeded: 1,
+          bridgeDay: 'Monday'
+        });
+      } else if (dayOfWeek === 4) { // Holiday on Thursday
+        const sunday = new Date(date);
+        sunday.setDate(date.getDate() + 3);
+        
+        longWeekends.push({
+          holiday: holiday,
+          type: '4-day weekend (take Friday off)',
+          startDate: date,
+          endDate: sunday,
+          days: 4,
+          vacationDaysNeeded: 1,
+          bridgeDay: 'Friday'
+        });
+      }
+      
+      // Check for consecutive holidays (extended weekends)
+      if (index < sortedHolidays.length - 1) {
+        const nextHoliday = sortedHolidays[index + 1];
+        const nextDate = new Date(nextHoliday.date);
+        const daysDiff = (nextDate - date) / (1000 * 60 * 60 * 24);
+        
+        if (daysDiff === 1) { // Consecutive days
+          // Find the end of consecutive holidays
+          let endHolidayIndex = index + 1;
+          while (endHolidayIndex < sortedHolidays.length - 1) {
+            const currentHoliday = sortedHolidays[endHolidayIndex];
+            const nextHolidayInSequence = sortedHolidays[endHolidayIndex + 1];
+            const currentDate = new Date(currentHoliday.date);
+            const nextDateInSequence = new Date(nextHolidayInSequence.date);
+            const sequenceDaysDiff = (nextDateInSequence - currentDate) / (1000 * 60 * 60 * 24);
+            
+            if (sequenceDaysDiff === 1) {
+              endHolidayIndex++;
+            } else {
+              break;
+            }
+          }
+          
+          const endHoliday = sortedHolidays[endHolidayIndex];
+          const endDate = new Date(endHoliday.date);
+          const totalDays = (endDate - date) / (1000 * 60 * 60 * 24) + 1;
+          
+          // Check if consecutive holidays are purely on weekends (don't create long weekends)
+          const startDayOfWeek = date.getDay();
+          const endDayOfWeek = endDate.getDay();
+          const isPureWeekendSequence = (startDayOfWeek === 6 && endDayOfWeek === 0) || 
+                                       (startDayOfWeek === 0 && endDayOfWeek === 6);
+          
+          if (totalDays > 1 && !isPureWeekendSequence) {
+            const holidayNames = sortedHolidays.slice(index, endHolidayIndex + 1)
+              .map(h => h.name || h.localName).join(', ');
+            
+            longWeekends.push({
+              holiday: { name: holidayNames, date: holiday.date },
+              type: `${totalDays + 2}-day extended weekend`,
+              startDate: date,
+              endDate: endDate,
+              days: totalDays + 2, // Include adjacent weekend days
+              vacationDaysNeeded: 0,
+              isConsecutive: true
+            });
+          }
+        }
+      }
+    });
+    
+    // Remove duplicates and sort by start date
+    const uniqueLongWeekends = longWeekends.filter((weekend, index, self) => 
+      index === self.findIndex(w => w.startDate.getTime() === weekend.startDate.getTime())
+    );
+    
+    return uniqueLongWeekends.sort((a, b) => a.startDate - b.startDate);
+  }
+
+  displayLongWeekends(holidays) {
+    const longWeekendsDisplay = this.container.querySelector('#long-weekends-display');
+    const longWeekendsList = this.container.querySelector('#long-weekends-list');
+    
+    if (!holidays || holidays.length === 0) {
+      longWeekendsDisplay.classList.add('hidden');
+      return;
+    }
+    
+    const longWeekends = this.identifyLongWeekends(holidays);
+    
+    if (longWeekends.length === 0) {
+      longWeekendsDisplay.classList.add('hidden');
+      return;
+    }
+    
+    // Show long weekends display
+    longWeekendsDisplay.classList.remove('hidden');
+    
+    // Clear existing long weekends
+    longWeekendsList.innerHTML = '';
+    
+    longWeekends.forEach(weekend => {
+      const startDateStr = weekend.startDate.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric'
+      });
+      const endDateStr = weekend.endDate.toLocaleDateString('en-US', {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: weekend.endDate.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+      });
+      
+      const weekendItem = document.createElement('div');
+      weekendItem.className = 'flex justify-between items-start py-2 px-3 bg-green-50 dark:bg-green-900/20 rounded text-sm';
+      
+      let detailText = weekend.type;
+      if (weekend.vacationDaysNeeded > 0) {
+        detailText += ` • Take ${weekend.bridgeDay} off`;
+      }
+      
+      weekendItem.innerHTML = `
+        <div class="flex-1">
+          <div class="font-medium text-gray-900 dark:text-white">${startDateStr} - ${endDateStr}</div>
+          <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">${weekend.holiday.name}</div>
+          <div class="text-xs text-green-700 dark:text-green-300 mt-1">${detailText}</div>
+        </div>
+        <div class="text-right">
+          <div class="text-sm font-medium text-gray-900 dark:text-white">${weekend.days} days</div>
+          ${weekend.vacationDaysNeeded > 0 ? `<div class="text-xs text-orange-600 dark:text-orange-400">${weekend.vacationDaysNeeded} vacation day</div>` : ''}
+        </div>
+      `;
+      
+      longWeekendsList.appendChild(weekendItem);
+    });
   }
 
   // Holiday UI Methods
