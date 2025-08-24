@@ -60,6 +60,13 @@ describe('DateDurationCalculator', () => {
     mockFetch.mockClear();
     calculator = new DateDurationCalculator();
     calculator.container = mockElement;
+    
+    // Mock the essential DOM elements that the calculator expects
+    calculator.startDateInput = mockElement;
+    calculator.endDateInput = mockElement;
+    calculator.includeEndDateCheckbox = mockElement;
+    calculator.excludeWeekendsCheckbox = mockElement;
+    calculator.excludeHolidaysCheckbox = mockElement;
   });
 
   describe('Constructor and Initialization', () => {
