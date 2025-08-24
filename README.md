@@ -2,6 +2,10 @@
 
 A fast, minimal, privacy-first collection of developer utilities in one place. No ads, no tracking, works offline.
 
+## 🌐 **[Try DevToolbox Live →](https://encode.click)**
+
+**25+ developer tools** available instantly at **[encode.click](https://encode.click)** - No installation required!
+
 ## Features
 
 ### 🎯 Core Features
@@ -95,13 +99,13 @@ A fast, minimal, privacy-first collection of developer utilities in one place. N
 - **Settings Management** - Import/export all settings and preferences
 - **Tool Prefetching** - Popular tools cached for instant loading
 
-## Installation
+## 🚀 Get Started
 
-### Use Online
-The app is optimized for direct browser use - no installation required.
+### ⚡ Use Online (Recommended)
+**Visit [encode.click](https://encode.click)** - The app is optimized for direct browser use, no installation required!
 
-### Install as PWA
-1. Open the app in Chrome/Edge/Safari
+### 📱 Install as PWA
+1. Go to **[encode.click](https://encode.click)**
 2. Click the install icon in the address bar
 3. Or use browser menu: "Install DevToolbox"
 
