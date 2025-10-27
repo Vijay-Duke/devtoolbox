@@ -70,7 +70,7 @@ jobs:
         npx eslint js/ --ext .js --format json --output-file complexity-report.json || true
       
     - name: Upload complexity report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: complexity-report
         path: complexity-report.json

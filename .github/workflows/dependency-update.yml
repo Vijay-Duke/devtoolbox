@@ -85,7 +85,7 @@ jobs:
         echo "\`\`\`" >> outdated-report.md
         
     - name: Upload outdated report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: outdated-dependencies-report
         path: outdated-report.md
