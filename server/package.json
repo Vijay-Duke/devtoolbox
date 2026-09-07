@@ -9,11 +9,11 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.1",
-    "hono": "^4.12.1",
-    "uuid": "^10.0.0",
     "dompurify": "^3.3.1",
+    "dotenv": "^16.4.5",
+    "hono": "^4.12.1",
     "jsdom": "^26.1.0",
-    "dotenv": "^16.4.5"
+    "uuid": "^11.1.1"
   },
   "description": "Temporary email server with SSE support for DevToolbox",
   "author": "DevToolbox",
