@@ -105,7 +105,7 @@ jobs:
       run: npm run build
       
     - name: Deploy to Netlify (Preview)
-      uses: nwtgck/actions-netlify@v3.0
+      uses: nwtgck/actions-netlify@v4.0
       with:
         publish-dir: './'
         github-token: ${{ secrets.GITHUB_TOKEN }}
