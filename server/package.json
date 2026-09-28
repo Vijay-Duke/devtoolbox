@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.19.1",
-    "dompurify": "^3.3.1",
+    "dompurify": "^3.4.16",
     "dotenv": "^16.4.5",
     "hono": "^4.12.1",
     "jsdom": "^26.1.0",
